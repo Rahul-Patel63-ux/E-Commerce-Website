@@ -1,0 +1,110 @@
+
+{% load static %}
+
+{% if orders %}
+    {% for order in orders %}
+        <tr>
+            <td>{{ forloop.counter0|add:orders.start_index }}</td>
+<!--            <td>{{ order.order_ref.order_reg_id }}</td>-->
+            <td>
+                <a href="#packingOrderDetailsModal-{{ order.order_ref.id }}" class="text-primary" data-bs-toggle="modal" hx-get="{% url 'packingOrderDetails' order.order_ref.id %}" hx-target="#packing-order-details-{{ order.order_ref.id }}" hx-trigger="click once" hx-swap="outerHTML">
+                    {{ order.order_ref.order_item_reg_id }}
+                </a>
+
+                <div class="modal fade" id="packingOrderDetailsModal-{{ order.order_ref.id }}" tabindex="-1" aria-labelledby="packingOrderDetailsModalLabel-{{ order.order_ref.id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header" style="background-color:#405189; padding:10px 15px;">
+                                <h5 class="modal-title text-white mb-0">Order Details</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color:white;"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="packing-order-details-{{ order.order_ref.id }}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <span class="badge bg-danger">{{ order.packing_status }}</span>
+            </td>
+            <td class="border-light d-flex gap-2 ">
+                <a href="#editPackingStatusModal-{{ order.id }}" class="btn btn-sm text-white btn-icon" style="background-color:#405189;" data-bs-toggle="modal" hx-get="{% url 'packingManagementYettopackRenderData' %}?editid={{ order.id }}" hx-target="#packing-status-edit-form-{{ order.id }}" hx-trigger="click once" hx-swap="outerHTML">
+                    <i class="ri-pencil-fill"></i>
+                </a>
+
+            </td>
+        </tr>
+        <!-- Edit form modal -->
+        <div class="modal fade" id="editPackingStatusModal-{{ order.id }}" tabindex="-1" aria-labelledby="editPackingStatusModalLabel-{{ order.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color:#405189;padding:10px 15px 10px 10px;">
+                        <h5 class="modal-title text-white mb-0">Edit Packing Status</h5>
+                        <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" style="background-color: white;" type="button"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="packing-status-edit-form-{{ order.id }}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <tr>
+        <td colspan="4" style="color:red; text-align:center;">No Orders Found</td>
+    </tr>
+{% endif %}
+
+<!-- Pagination starts here -->
+<div class="d-flex justify-content-center" id="pagination_div" hx-swap-oob="true">
+    <ul class="pagination pagination-separated pagination-sm justify-content-center justify-content-sm-start mb-0">
+        {% if orders.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="#" hx-get="{% url 'packingManagementYettopackRenderData' %}?page={{ orders.previous_page_number }}" hx-target="#packed_table_container_block" hx-swap="innerHTML" hx-include="#search-filter-form,#query">Previous</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled text-muted">
+                <a class="page-link" href="#">Previous</a>
+            </li>
+        {% endif %}
+
+        {% if orders.number > 3 %}
+            <li class="page-item">
+                <a class="page-link" href="#" hx-get="{% url 'packingManagementYettopackRenderData' %}?page=1" hx-target="#packed_table_container_block" hx-swap="innerHTML" hx-include="#search-filter-form,#query">1</a>
+            </li>
+            {% if orders.number == 4 %}
+                <li class="page-item text-muted" style="display: none;"><span class="page-link">...</span></li>
+            {% else %}
+                <li class="page-item text-muted"><span class="page-link">...</span></li>
+            {% endif %}
+        {% endif %}
+
+        {% for page_num in orders.paginator.page_range %}
+            {% if page_num >= orders.number|add:-2 and page_num <= orders.number|add:2 %}
+                <li class="page-item {% if page_num == orders.number %}active{% endif %}">
+                    <a class="page-link" href="#" hx-get="{% url 'packingManagementYettopackRenderData' %}?page={{ page_num }}" hx-target="#packed_table_container_block" hx-swap="innerHTML" hx-include="#search-filter-form,#query">{{ page_num }}</a>
+                </li>
+            {% endif %}
+            {% endfor %}
+
+
+        {% if orders.number < orders.paginator.num_pages|add:-2 %}
+            <li class="page-item text-muted"><span class="page-link">...</span></li>
+            <li class="page-item">
+                <a class="page-link" href="#" hx-get="{% url 'packingManagementYettopackRenderData' %}?page={{ orders.paginator.num_pages }}" hx-target="#packed_table_container_block" hx-swap="innerHTML" hx-include="#search-filter-form,#query">{{ orders.paginator.num_pages }}</a>
+            </li>
+        {% endif %}
+
+        {% if orders.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="#" hx-get="{% url 'packingManagementYettopackRenderData' %}?page={{ orders.next_page_number }}" hx-target="#packed_table_container_block" hx-swap="innerHTML" hx-include="#search-filter-form,#query">Next</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled text-muted">
+                <a class="page-link" href="#">Next</a>
+            </li>
+        {% endif %}
+    </ul>
+</div>
+<!-- Pagination ends here -->

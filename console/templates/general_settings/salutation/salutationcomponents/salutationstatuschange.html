@@ -1,0 +1,24 @@
+{% load static %}
+
+{% if status_page == 'salutation_page' %}
+
+    <td class="border-light" id="salutation_status_td{{salutation.id}}">
+          {% if salutation.salutation_status %}
+          <span class="badge bg-success">
+              <a href="#" hx-post="{% url 'salutationStatusChange' salutation.id %}"
+                  hx-target="#salutation_status_td{{salutation.id}}"
+                  hx-trigger="click once"
+                  hx-swap="innerHTML"
+                  hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Active</a>
+          </span>
+          {% else %}
+          <span class="badge bg-danger">
+              <a href="#" hx-post="{% url 'salutationStatusChange' salutation.id %}"
+                  hx-target="#salutation_status_td{{salutation.id}}"
+                  hx-trigger="click once"
+                  hx-swap="innerHTML"
+                  hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Deactive</a>
+          </span>
+          {% endif %}
+      </td>
+{% endif %}

@@ -1,0 +1,251 @@
+{% extends 'console_base/base.html' %}
+
+{% block content %}
+
+<!--Breedcrumb starts here-->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="{% url 'consoleProduct' %}">Products</a></li>
+                    <li class="breadcrumb-item active">Create Form</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Breed crumb ends here-->
+
+
+<!--create form starts here-->
+{% load static %}
+<div class="card">
+  <div class="card-header">
+    <h2 class="mb-10 fs-5">Create New Product</h2>
+  </div>
+  <div class="card-body">
+      <form method="post" enctype="multipart/form-data" class="row g-3">
+        {% csrf_token %}
+        <div class="row">
+    <!--          gender field starts here-->
+              <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                    <label for="gender_ref" class="form-label">Gender <span style="color:red;">*</span></label>
+                    <select name="gender_ref" id="gender_ref" class="form-select">
+                        <option value="" disabled selected>Select Gender</option>
+                        {% for gender in genders %}
+                            <option value="{{ gender.id }}">{{ gender }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+    <!--          gender fields ends here-->
+    <!--          main category-->
+              <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                      <label for="main_category_ref" class="form-label">Main Category <span style="color:red;">*</span></label>
+                      <select name="main_category_ref" id="main_category_ref" class="form-select">
+                          <option value="" disabled selected>Select Main Category</option>
+                          {% for category in main_categories %}
+                              <option value="{{ category.id }}">{{ category }}</option>
+                          {% endfor %}
+                      </select>
+                  </div>
+
+  <!--        main category ends here-->
+  <!--        sub category-->
+              <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                  <label for="sub_category_ref" class="form-label">Sub Category <span style="color:red;">*</span></label>
+                  <select name="sub_category_ref" id="sub_category_ref" class="form-select" >
+                      <option value="" disabled selected>Select Sub Category</option>
+                      {% for sub_category in sub_categories %}
+                          <option value="{{ sub_category.id }}">{{ sub_category }}</option>
+                      {% endfor %}
+                  </select>
+              </div>
+  <!--        sub category ends here-->
+<!--          brand-->
+              <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                  <label for="brand_ref" class="form-label">Brand <span style="color:red;">*</span></label>
+                  <select name="brand_ref" id="brand_ref" class="form-select" >
+                      <option value="" disabled selected>Select Brand</option>
+                      {% for brand in brands %}
+                          <option value="{{ brand.id }}">{{ brand }}</option>
+                      {% endfor %}
+                  </select>
+              </div>
+<!--          brand-->
+<!--              material-->
+              <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                  <label for="material_ref" class="form-label">Material <span style="color:red;">*</span></label>
+                  <select name="material_ref" id="material_ref" class="form-select" >
+                      <option value="" disabled selected>Select Material</option>
+                      {% for material in materials %}
+                          <option value="{{ material.id }}">{{ material }}</option>
+                      {% endfor %}
+                  </select>
+              </div>
+<!--              material-->
+<!--          size-->
+                <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                    <label for="size_ref" class="form-label">Size <span style="color:red;">*</span></label>
+                    <select name="size_ref" id="size_ref" class="form-select" >
+                        <option value="" disabled selected>Select Size</option>
+                        {% for size in sizes %}
+                            <option value="{{ size.id }}">{{ size }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+<!--          size-->
+<!--          title-->
+                <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                    <label for="product_title" class="form-label">Product Title <span style="color:red;">*</span></label>
+                    <input type="text" name="product_title" id="product_title" class="form-control" placeholder="Ex: Men Solid Round Neck Polyester Blue T-Shirt">
+                </div>
+<!--          title-->
+              <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                  <label for="tags_ref" class="form-label">Tags <span style="color:red;">*</span></label>
+                  <select name="tags_ref" id="tags_ref" class="form-select" >
+                      <option value="" disabled selected>Select Tag</option>
+                      {% for tag in tags %}
+                          <option value="{{ tag.id }}">{{ tag }}</option>
+                      {% endfor %}
+                  </select>
+              </div>
+
+              <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                  <label for="payment_ref" class="form-label">Payment Type <span style="color:red;">*</span></label>
+                  <select name="payment_ref" id="payment_ref" class="form-select" >
+                      <option value="" disabled selected>Select Payment Type</option>
+                      {% for payment in payment_types %}
+                          <option value="{{ payment.id }}">{{ payment }}</option>
+                      {% endfor %}
+                  </select>
+              </div>
+
+              <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                  <label for="product_description" class="form-label">Product Description <span style="color:red;">*</span></label>
+                  <textarea name="product_description" id="product_description" class="form-control" rows="4" placeholder="Ex: The soft polyester material ensures durability while maintaining a smooth, comfortable feel against the skin. Featuring a classic crewneck design, this T-shirt pairs effortlessly with shorts, jeans, or athletic wear."></textarea>
+              </div>
+
+              <div class="col-lg-3 col-md-3 col-sm-12 mb-4">
+                  <label for="product_stock_quantity" class="form-label">Stock Quantity <span style="color:red;">*</span></label>
+                  <input type="number" name="product_stock_quantity" id="product_stock_quantity" placeholder="Ex: 2000" class="form-control" >
+              </div>
+
+              <div class="col-lg-3 col-md-3 col-sm-12 mb-4">
+                  <label for="product_mrp" class="form-label">MRP <span style="color:red;">*</span></label>
+                  <input type="number" step="0.01" name="product_mrp" id="product_mrp" placeholder="Ex: 250" class="form-control" >
+              </div>
+
+              <div class="col-lg-3 col-md-3 col-sm-12 mb-4">
+                  <label for="product_selling_price" class="form-label">Selling Price <span style="color:red;">*</span></label>
+                  <input type="number" step="0.01" name="product_selling_price" placeholder="Ex: 200" id="product_selling_price" class="form-control" >
+              </div>
+
+              <div class="col-lg-3 col-md-3 col-sm-12 mb-4">
+                  <label for="product_discount_percentage" class="form-label">Discount Percentage <span style="color:red;">*</span></label>
+                  <input type="number" step="0.01" name="product_discount_percentage" placeholder="Ex: 10%" id="product_discount_percentage" class="form-control" >
+              </div>
+        </div>
+
+              <!-- Product Images Section -->
+            <h3 class="mt-4 fs-5">Product Images <span style="float:right;"><button type="button" class="btn text-success add-image-block" onclick="addImageBlock()"><i class="bx bx-plus-circle"></i><span></span></button></span></h3>
+            <div id="image-blocks">
+                <div class="image-block">
+                  <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                        <label for="image_color_ref_0" class="form-label">Image Color <span style="color:red;">*</span></label>
+                        <select name="image_color_ref[0]" id="image_color_ref_0" class="form-select">
+                            <option value="" disabled selected>Select Color</option>
+                            {% for color in colors %}
+                                <option value="{{ color.id }}">{{ color }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                        <label for="product_image1_0" class="form-label">Product Image 1 <span style="color:red;">*</span></label>
+                        <input type="file" name="product_image1[0]" id="product_image1_0" class="form-control" accept="image/*">
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                        <label for="product_image2_0" class="form-label">Product Image 2 <span style="color:red;">*</span></label>
+                        <input type="file" name="product_image2[0]" id="product_image2_0" class="form-control" accept="image/*">
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                        <label for="product_image3_0" class="form-label">Product Image 3 <span style="color:red;">*</span></label>
+                        <input type="file" name="product_image3[0]" id="product_image3_0" class="form-control" accept="image/*">
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                        <label for="product_image4_0" class="form-label">Product Image 4</label>
+                        <input type="file" name="product_image4[0]" id="product_image4_0" class="form-control" accept="image/*">
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                        <label for="product_image5_0" class="form-label">Product Image 5</label>
+                        <input type="file" name="product_image5[0]" id="product_image5_0" class="form-control" accept="image/*">
+                    </div>
+                  </div>
+
+                </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 mb-4 d-flex justify-content-center gap-2">
+              <button type="submit" id="createproductFormSubmit" class="btn text-white" style="background-color:#405189;">Submit</button>
+              <button type="button" class="btn bg-light" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </form>
+  </div>
+</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let blockCount = 1;
+
+        function addImageBlock() {
+            const imageBlocks = document.getElementById('image-blocks');
+            const newBlock = document.createElement('div');
+            newBlock.className = 'image-block';
+            newBlock.innerHTML = `
+                  <h3 class="fs-5">Product Images <span style="float:right;"><button type="button" class="btn text-danger remove-image-block"  onclick="removeImageBlock(this)"><i class="bx bx-minus-circle"></i></button></span> </h3>
+                  <div class="row">
+                      <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                          <label for="image_color_ref_${blockCount}" class="form-label">Image Color <span style="color:red;">*</span></label>
+                          <select name="image_color_ref[${blockCount}]" id="image_color_ref_${blockCount}" class="form-select" >
+                              <option value="" disabled selected>Select Color</option>
+                              {% for color in colors %}
+                                  <option value="{{ color.id }}">{{ color }}</option>
+                              {% endfor %}
+                          </select>
+                      </div>
+                      <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                          <label for="product_image1_${blockCount}" class="form-label">Product Image 1 <span style="color:red;">*</span></label>
+                          <input type="file" name="product_image1[${blockCount}]" id="product_image1_${blockCount}" class="form-control" accept="image/*">
+                      </div>
+                      <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                          <label for="product_image2_${blockCount}" class="form-label">Product Image 2 <span style="color:red;">*</span></label>
+                          <input type="file" name="product_image2[${blockCount}]" id="product_image2_${blockCount}" class="form-control" accept="image/*">
+                      </div>
+                      <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                          <label for="product_image3_${blockCount}" class="form-label">Product Image 3 <span style="color:red;">*</span></label>
+                          <input type="file" name="product_image3[${blockCount}]" id="product_image3_${blockCount}" class="form-control" accept="image/*">
+                      </div>
+                      <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                          <label for="product_image4_${blockCount}" class="form-label">Product Image 4</label>
+                          <input type="file" name="product_image4[${blockCount}]" id="product_image4_${blockCount}" class="form-control" accept="image/*">
+                      </div>
+                      <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                          <label for="product_image5_${blockCount}" class="form-label">Product Image 5</label>
+                          <input type="file" name="product_image5[${blockCount}]" id="product_image5_${blockCount}" class="form-control" accept="image/*">
+                      </div>
+
+                  </div>
+            `;
+            imageBlocks.appendChild(newBlock);
+            blockCount++;
+        }
+        function removeImageBlock(button) {
+            if ($('.image-block').length > 1) {
+                $(button).closest('.image-block').remove();
+            }
+        }
+    </script>
+<!--product form ends here-->
+
+{% endblock %}

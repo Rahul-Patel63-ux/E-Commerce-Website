@@ -1,0 +1,159 @@
+{% include 'base_assets/base_css.html' %}
+
+<form id="edit_account_detail_form" action="{% url 'updateAccountDetail' s.id %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+            <label for="uaccount_type" class="form-label">Account Type <span style="color:red;">*</span></label>
+            <select name="uaccount_type" id="uaccount_type" class="form-select">
+                <option value="">Select account type</option>
+                {% for at in account_types %}
+                    <option value="{{ at.id }}" {% if at.id == s.account_type_id.id %}selected{% endif %}>{{ at.account_type }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+            <label for="ubank_name" class="form-label">Bank Name <span style="color:red;">*</span></label>
+            <select name="ubank_name" id="ubank_name" class="form-select">
+                <option value="">Select bank name</option>
+                {% for bn in bank_names %}
+                    <option value="{{ bn.id }}" {% if bn.id == s.bank_name_id.id %}selected{% endif %}>{{ bn.bank_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+            <label for="ubank_branch" class="form-label">Bank Branch <span style="color:red;">*</span></label>
+            <input type="text" id="ubank_branch" class="form-control" name="ubank_branch" value="{{ s.bank_branch }}" placeholder="Ex: Main Branch">
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+            <label for="uaccount_number" class="form-label">Account Number <span style="color:red;">*</span></label>
+            <input type="text" id="uaccount_number" class="form-control" name="uaccount_number" value="{{ s.account_number }}" placeholder="Ex: 1234567890">
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+            <label for="uifsc_code" class="form-label">IFSC Code <span style="color:red;">*</span></label>
+            <input type="text" id="uifsc_code" class="form-control" name="uifsc_code" value="{{ s.ifsc_code }}" placeholder="Ex: SBIN0001234">
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+            <label for="ubank_holder" class="form-label">Bank Holder Name <span style="color:red;">*</span></label>
+            <input type="text" id="ubank_holder" class="form-control" name="ubank_holder" value="{{ s.bank_holder }}" placeholder="Ex: John Doe">
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" id="editAccountDetailFormSubmit" class="btn text-white" style="background-color:#405189;">Save</button>
+        <button type="button" class="btn bg-light" data-bs-dismiss="modal">Close</button>
+    </div>
+</form>
+
+<!--base_assets js file-->
+{% include 'base_assets/base_js.html' %}
+
+<script>
+$(document).ready(function() {
+    // Function to capitalize first letter
+    function capitalizeFirstLetter(str) {
+        if (str.length > 0) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+        return str;
+    }
+
+    // Custom validation methods
+    $.validator.addMethod("capitalizeFirstLetter", function(value, element) {
+        $(element).val(capitalizeFirstLetter(value));
+        return true;
+    }, "");
+
+    $.validator.addMethod("letterStartNoLeadingSpace", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z][^\s].*/.test(value);
+    }, "Name must start with a letter and have no leading space.");
+
+    $.validator.addMethod("atLeastOneAlpha", function(value, element) {
+        return this.optional(element) || /[a-zA-Z]/.test(value);
+    }, "Please enter at least one alphabetical character.");
+
+    $.validator.addMethod("noDoubleSpace", function(value, element) {
+        return this.optional(element) || !/\s{2,}/.test(value);
+    }, "Double spaces are not allowed.");
+
+    $.validator.addMethod("alphaSpaceOnly", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z\s]*$/.test(value);
+    }, "Only alphabetical characters and spaces are allowed.");
+
+    $.validator.addMethod("validAccountNumber", function(value, element) {
+        return this.optional(element) || /^\d{9,18}$/.test(value);
+    }, "Please enter a valid account number (9-18 digits).");
+
+    $.validator.addMethod("validIfscCode", function(value, element) {
+        return this.optional(element) || /^[A-Z]{4}0[A-Z0-9]{6}$/.test(value);
+    }, "Please enter a valid IFSC code (e.g., SBIN0001234).");
+
+    $('#edit_account_detail_form').validate({
+        rules: {
+            uaccount_type: { required: true },
+            ubank_name: { required: true },
+            ubank_branch: {
+                required: true,
+                alphaSpaceOnly: true,
+                noDoubleSpace: true,
+                letterStartNoLeadingSpace: true,
+                atLeastOneAlpha: true,
+                minlength: 2,
+                maxlength: 50,
+                capitalizeFirstLetter: true
+            },
+            uaccount_number: {
+                required: true,
+                validAccountNumber: true
+            },
+            uifsc_code: {
+                required: true,
+                validIfscCode: true
+            },
+            ubank_holder: {
+                required: true,
+                alphaSpaceOnly: true,
+                noDoubleSpace: true,
+                letterStartNoLeadingSpace: true,
+                atLeastOneAlpha: true,
+                minlength: 2,
+                maxlength: 50,
+                capitalizeFirstLetter: true
+            }
+        },
+        messages: {
+            uaccount_type: { required: "Please select an account type." },
+            ubank_name: { required: "Please select a bank name." },
+            ubank_branch: {
+                required: "Please enter the bank branch.",
+                alphaSpaceOnly: "Only alphabetical characters and spaces are allowed.",
+                noDoubleSpace: "Double spaces are not allowed.",
+                letterStartNoLeadingSpace: "Bank branch must start with a letter and have no leading space.",
+                atLeastOneAlpha: "Please enter at least one alphabetical character.",
+                minlength: "Bank branch should be at least 2 characters.",
+                maxlength: "Bank branch should not exceed 50 characters."
+            },
+            uaccount_number: {
+                required: "Please enter the account number.",
+                validAccountNumber: "Please enter a valid account number (9-18 digits)."
+            },
+            uifsc_code: {
+                required: "Please enter the IFSC code.",
+                validIfscCode: "Please enter a valid IFSC code (e.g., SBIN0001234)."
+            },
+            ubank_holder: {
+                required: "Please enter the bank holder name.",
+                alphaSpaceOnly: "Only alphabetical characters and spaces are allowed.",
+                noDoubleSpace: "Double spaces are not allowed.",
+                letterStartNoLeadingSpace: "Bank holder name must start with a letter and have no leading space.",
+                atLeastOneAlpha: "Please enter at least one alphabetical character.",
+                minlength: "Bank holder name should be at least 2 characters.",
+                maxlength: "Bank holder name should not exceed 50 characters."
+            }
+        },
+        submitHandler: function(form) {
+            console.log("Form is valid.");
+            form.submit();
+        }
+    });
+});
+</script>

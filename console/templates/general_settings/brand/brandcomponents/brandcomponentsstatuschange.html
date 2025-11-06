@@ -1,0 +1,24 @@
+
+
+{% if status_page == 'brand_page' %}
+
+      <td class="border-light" id="brand_status_td{{brand.id}}">
+          {% if brand.brand_status %}
+          <span class="badge bg-success">
+              <a href="#" hx-post="{% url 'brandStatusChange' brand.id %}"
+                  hx-target="#brand_status_td{{brand.id}}"
+                  hx-trigger="click once"
+                  hx-swap="innerHTML"
+                  hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Active</a>
+          </span>
+          {% else %}
+          <span class="badge bg-danger">
+              <a href="#" hx-post="{% url 'brandStatusChange' brand.id %}"
+                  hx-target="#brand_status_td{{brand.id}}"
+                  hx-trigger="click once"
+                  hx-swap="innerHTML"
+                  hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Deactive</a>
+          </span>
+          {% endif %}
+      </td>
+{% endif %}

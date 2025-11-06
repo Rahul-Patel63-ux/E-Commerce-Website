@@ -1,0 +1,361 @@
+{% load static %}
+{% include 'base_assets/base_css.html' %}
+
+{% block style %}
+<style>
+    .table th{
+        background-color: #f8f9fa;
+    }
+<!--    .table tr{-->
+<!--        background-color: #f8f9fa;-->
+<!--    }-->
+</style>
+{% endblock %}
+
+    <h6>Purchase Details</h6>
+    <form method="POST" action="{% url 'editPurchase' item.id %}">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0 fs-5">Vendor Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-12 mb-4">
+                                <label for="upurchase_vendor" class="form-label">Vendor <span style="color:red;">*</span></label>
+                                <select name="upurchase_vendor" id="upurchase_vendor" class="form-select purchase_vendor">
+                                  <option value="">Select Vendor</option>
+                                     {% for v in vendors %}
+
+                                        <option value="{{ v.id }}" {% if v.id == item.vendor.id %}selected{% endif %}>{{ v.vendor_company_name}}</option>
+                                    {% endfor %}
+
+
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-12 mb-4">
+                              <label for="upurchase_vendor_name" class="form-label">Name <span style="color:red;">*</span></label>
+                              <input type="text" id="upurchase_vendor_name" class="form-control text-dark" name="upurchase_vendor_name" placeholder="Ex: Arun" disabled>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-12 mb-4">
+                                <label for="upurchase_vendor_phone" class="form-label">Mobile Number <span style="color:red;">*</span></label>
+                                <input type="tel" id="upurchase_vendor_phone" class="form-control text-dark" name="upurchase_vendor_phone" placeholder="Ex: 9347897976" disabled>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-12 mb-4">
+                                <label for="upurchase_vendor_email" class="form-label">Email <span style="color:red;">*</span></label>
+                                <input type="email" id="upurchase_vendor_email" class="form-control text-dark" name="upurchase_vendor_email" placeholder="Ex: email@gmail.com" disabled>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-12 mb-4">
+                                <label for="upurchase_vendor_aadhar" class="form-label">Aadhaar <span style="color:red;">*</span></label>
+                                <input type="number" id="upurchase_vendor_aadhar" class="form-control text-dark" name="upurchase_vendor_aadhar" placeholder="Ex: 6161 3001 0823" disabled>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-12 mb-4">
+                                <label for="upurchase_vendor_url" class="form-label">URL <span style="color:red;">*</span></label>
+                                <input type="url" id="upurchase_vendor_url" class="form-control text-dark" name="upurchase_vendor_url" placeholder="Ex: https://www.google.com/" disabled>
+        <!--                        <a id="purchase_vendor_url_link" href="#" target="_blank" class="url-link text-primary" style="text-decoration: underline;">Visit Company Website</a>-->
+                            </div>
+
+                            <div class="col-lg-3 col-md-3 col-sm-12 mb-4">
+                                <label for="upurchase_vendor_type" class="form-label">Vendor Type <span style="color:red;">*</span></label>
+                                <input type="text" id="upurchase_vendor_type" class="form-control text-dark" name="upurchase_vendor_type" placeholder="Ex: Retailers" disabled>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+
+                        <div class="col-lg-3 col-md-3 col-sm-12 mb-4">
+
+                            <label class="form-label">Grand Total</label>
+                            <input type="text" class="form-control" value="Rs. {{ item.grand_total|default:'0.00' }}" readonly>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 mb-4">
+                            <label class="form-label">Advance Amount</label>
+                            <input type="text" class="form-control" value="Rs. {{ item.advance_amount|default:'0.00' }}" readonly>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 mb-4">
+                            <label class="form-label">Pending Amount</label>
+                            <input type="text" class="form-control" value="Rs. {{ item.pending_amount|default:'0.00' }}" readonly>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 mb-4">
+                            <label class="form-label">Payment Type</label>
+                            <input type="text" class="form-control" value="{{ item.purchase_ref.payment_type.payment_type }}" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+<!--            <div class="mb-3">-->
+<!--                <label class="form-label">Vendor</label>-->
+<!--                <input type="text" class="form-control" value="{{ invoice.vendor.vendor_name }}" readonly>-->
+<!--            </div>-->
+
+
+        </div>
+
+        <!-- Display Purchase Items -->
+        <h6>Purchase Items</h6>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>MRP</th>
+                    <th>Purchase Price</th>
+                    <th>CGST</th>
+                    <th>SGST</th>
+                    <th>Total Amount</th>
+                    <th>Total with GST</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for purchase_item in item.purchase_ref.items.all %}
+                <tr>
+                    <td>{{ purchase_item.product.product_title }}</td>
+                    <td>{{ purchase_item.quantity }}</td>
+                    <td>Rs. {{ purchase_item.mrp }}</td>
+                    <td>Rs. {{ purchase_item.purchase_price }}</td>
+                    <td>{{ purchase_item.cgst }}%</td>
+                    <td>{{ purchase_item.sgst }}%</td>
+                    <td>Rs. {{ purchase_item.total_amount }}</td>
+                    <td>Rs. {{ purchase_item.total_amount_with_gst }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8">No items found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+
+    <!-- Payment Installment Form -->
+    <h5 class="mb-3">Add Payment Installment</h5>
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-3 col-md-3 col-sm-12 mb-3">
+                        <label for="installment_amount" class="form-label">Installment Amount <span style="color:red;">*</span></label>
+                        <input type="number" step="0.01" class="form-control" id="installment_amount" name="installment_amount" required placeholder="Enter amount">
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-12 mb-3">
+                        <label for="payment_type" class="form-label">Payment Type <span style="color:red;">*</span></label>
+                        <select class="form-select" id="payment_type" name="payment_type" required>
+                            <option value="">Select Payment Type</option>
+                            {% for payment_type in payment_types %}
+                            <option value="{{ payment_type.id }}">{{ payment_type.payment_type }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="payment-fields cash-fields col-lg-3 col-md-3 col-sm-12 mb-4" style="display: none;">
+                        <label for="cash_amount" class="form-label">Amount</label>
+                        <input type="number" step="0.01" class="form-control" name="cash_amount" id="cash_amount" placeholder="Ex: 1000.00">
+                    </div>
+                    <div class="payment-fields upi-fields col-lg-3 col-md-3 col-sm-12 mb-4" style="display: none;">
+                        <label for="upi_id" class="form-label">UPI ID</label>
+                        <input type="text" class="form-control" name="upi_id" id="upi_id" placeholder="Ex: user@upi">
+                    </div>
+                    <div class="payment-fields upi-fields col-lg-3 col-md-3 col-sm-12 mb-4" style="display: none;">
+                        <label for="upi_transaction_id" class="form-label">Transaction ID</label>
+                        <input type="text" class="form-control" name="upi_transaction_id" id="upi_transaction_id" placeholder="Ex: TXN123456789">
+                    </div>
+                    <div class="payment-fields upi-cash-fields col-lg-3 col-md-3 col-sm-12 mb-4" style="display: none;">
+                        <label for="upi_cash_amount" class="form-label">Cash Amount</label>
+                        <input type="number" step="0.01" class="form-control" name="upi_cash_amount" id="upi_cash_amount" placeholder="Ex: 500.00">
+                    </div>
+                    <div class="payment-fields upi-cash-fields col-lg-3 col-md-3 col-sm-12 mb-4" style="display: none;">
+                        <label for="upi_amount" class="form-label">UPI Amount</label>
+                        <input type="number" step="0.01" class="form-control" name="upi_amount" id="upi_amount" placeholder="Ex: 500.00">
+                    </div>
+                    <div class="payment-fields upi-cash-fields col-lg-3 col-md-3 col-sm-12 mb-4" style="display: none;">
+                        <label for="upi_cash_transaction_id" class="form-label">Transaction ID</label>
+                        <input type="text" class="form-control" name="upi_cash_transaction_id" id="upi_cash_transaction_id" placeholder="Ex: TXN123456789">
+                    </div>
+                    <div class="payment-fields netbanking-fields col-lg-3 col-md-3 col-sm-12 mb-4" style="display: none;">
+                        <label for="account_type" class="form-label">Account Type</label>
+                        <select name="account_type" id="account_type" class="form-select">
+                            <option value="">Select Account Type</option>
+                            {%for account_type in account_types %}
+                                <option value="{{account_type.id}}">{{ account_type.account_type }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="payment-fields netbanking-fields col-lg-3 col-md-3 col-sm-12 mb-4" style="display: none;">
+                        <label for="bank_name" class="form-label">Bank Name</label>
+                        <input type="text" class="form-control" name="bank_name" id="bank_name" placeholder="Ex: HDFC Bank">
+                    </div>
+                    <div class="payment-fields netbanking-fields col-lg-3 col-md-3 col-sm-12 mb-4" style="display: none;">
+                        <label for="account_number" class="form-label">Account Number</label>
+                        <input type="text" class="form-control" name="account_number" id="account_number" placeholder="Ex: 123456789012">
+                    </div>
+                    <div class="payment-fields netbanking-fields col-lg-3 col-md-3 col-sm-12 mb-4" style="display: none;">
+                        <label for="netbanking_transaction_id" class="form-label">Transaction ID</label>
+                        <input type="text" class="form-control" name="netbanking_transaction_id" id="netbanking_transaction_id" placeholder="Ex: TXN123456789">
+                    </div>
+                    <div class="payment-fields cheque-fields col-lg-3 col-md-3 col-sm-12 mb-4" style="display: none;">
+                        <label for="cheque_number" class="form-label">Cheque Number</label>
+                        <input type="text" class="form-control" name="cheque_number" id="cheque_number" placeholder="Ex: 123456">
+                    </div>
+
+                </div>
+
+                <button type="submit" class="btn btn-primary">Add Installment</button>
+            </div>
+        </div>
+
+        <h5 class="mb-3">Payment History</h5>
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-bordered ">
+                    <thead>
+                        <tr>
+                            <th>Payment Type</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="">
+                        {% for payment in purchase_payments %}
+                        <tr class="bg-white">
+                            <td>{{ payment.payment_type.payment_type|default:'N/A' }}</td>
+                            <td>Rs. {{ payment.advance_amount|floatformat:2|default:'0.00' }}</td>
+                            <td>{{ payment.purchase_created_at|date:"d M, Y" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center">No payments recorded.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </form>
+
+
+
+{% include 'base_assets/base_js.html' %}
+
+
+
+
+<script>
+    $(document).ready(function() {
+
+        $('#payment_type').on('change', function() {
+            $('.payment-fields').hide().find('input, select').prop('disabled', true);
+            let selectedOption = $(this).find('option:selected').text().toLowerCase().replace(' ', '_');
+            if (selectedOption === 'cash') {
+                $('.cash-fields').show().find('input').prop('disabled', false);
+            } else if (selectedOption === 'upi') {
+                $('.upi-fields').show().find('input').prop('disabled', false);
+            } else if (selectedOption === 'upi_cash') {
+                $('.upi-cash-fields').show().find('input').prop('disabled', false);
+            } else if (selectedOption === 'net_banking') {
+                $('.netbanking-fields').show().find('input, select').prop('disabled', false);
+            } else if (selectedOption === 'cheque') {
+                $('.cheque-fields').show().find('input').prop('disabled', false);
+            }
+        });
+        // Function to fetch vendor details
+        function fetchVendorDetails(vendorId) {
+            if (vendorId) {
+                $.ajax({
+                    url: '{% url "get_vendor_details" %}',
+                    type: 'GET',
+                    data: { vendor_id: vendorId },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#upurchase_vendor_name').val(response.vendor_name || '');
+                            $('#upurchase_vendor_phone').val(response.vendor_phone_number || '');
+                            $('#upurchase_vendor_email').val(response.vendor_email || '');
+                            $('#upurchase_vendor_aadhar').val(response.vendor_aadhaar || '');
+                            $('#upurchase_vendor_url').val(response.vendor_company_url || '');
+                            $('#upurchase_vendor_type').val(response.vendor_type || '');
+                        } else {
+                            $('#upurchase_vendor_name').val('');
+                            $('#upurchase_vendor_phone').val('');
+                            $('#upurchase_vendor_email').val('');
+                            $('#upurchase_vendor_aadhar').val('');
+                            $('#upurchase_vendor_url').val('');
+                            $('#upurchase_vendor_type').val('');
+                        }
+                    },
+                    error: function() {
+                        // Optionally handle errors
+                    }
+                });
+            } else {
+                $('#upurchase_vendor_name').val('');
+                $('#upurchase_vendor_phone').val('');
+                $('#upurchase_vendor_email').val('');
+                $('#upurchase_vendor_aadhar').val('');
+                $('#upurchase_vendor_url').val('');
+                $('#upurchase_vendor_type').val('');
+            }
+        }
+
+        // Trigger fetch on vendor selection change
+        $('#upurchase_vendor').on('change', function() {
+            var vendorId = $(this).val();
+            fetchVendorDetails(vendorId);
+        });
+
+        // Trigger fetch on page load if a vendor is pre-selected
+        var initialVendorId = $('#upurchase_vendor').val();
+        fetchVendorDetails(initialVendorId);
+    });
+</script>
+
+<!--<script>-->
+<!--    $('#upurchase_vendor').on('change', function() {-->
+<!--        var vendorId = $(this).val();-->
+<!--        if (vendorId) {-->
+<!--            $.ajax({-->
+<!--                url: '{% url "get_vendor_details" %}',-->
+<!--                type: 'GET',-->
+<!--                data: { vendor_id: vendorId },-->
+<!--                success: function(response) {-->
+<!--                    if (response.success) {-->
+<!--                        $('#upurchase_vendor_name').val(response.vendor_name || '');-->
+<!--                        $('#upurchase_vendor_phone').val(response.vendor_phone_number || '');-->
+<!--                        $('#upurchase_vendor_email').val(response.vendor_email || '');-->
+<!--                        $('#upurchase_vendor_aadhar').val(response.vendor_aadhaar || '');-->
+<!--                        $('#upurchase_vendor_url').val(response.vendor_company_url || '');-->
+<!--                        $('#upurchase_vendor_type').val(response.vendor_type || '');-->
+<!--                    } else {-->
+<!--&lt;!&ndash;                        alert('Vendor details not found.');&ndash;&gt;-->
+<!--                        $('#upurchase_vendor_name').val('');-->
+<!--                        $('#upurchase_vendor_phone').val('');-->
+<!--                        $('#upurchase_vendor_email').val('');-->
+<!--                        $('#upurchase_vendor_aadhar').val('');-->
+<!--                        $('#upurchase_vendor_url').val('');-->
+<!--                        $('#upurchase_vendor_type').val('');-->
+<!--                    }-->
+<!--                },-->
+<!--                error: function() {-->
+<!--&lt;!&ndash;                    alert('Error fetching vendor details.');&ndash;&gt;-->
+<!--                }-->
+<!--            });-->
+<!--        } else {-->
+<!--            $('#upurchase_vendor_name').val('');-->
+<!--            $('#upurchase_vendor_phone').val('');-->
+<!--            $('#upurchase_vendor_email').val('');-->
+<!--            $('#upurchase_vendor_aadhar').val('');-->
+<!--            $('#upurchase_vendor_url').val('');-->
+<!--            $('#upurchase_vendor_type').val('');-->
+<!--        }-->
+<!--    });-->
+<!--</script>-->

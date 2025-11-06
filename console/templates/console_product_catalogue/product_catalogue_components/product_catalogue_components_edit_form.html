@@ -1,0 +1,443 @@
+<!--base assets css-->
+{% include 'base_assets/base_css.html' %}
+<!-- custom css -->
+        {% block style %}
+                <!-- Custom CSS for Select2 -->
+                    <style>
+                    .select2-container .select2-selection--multiple {
+                        min-height: 38px;
+                        border: 1px solid #ced4da;
+                        border-radius: 0.25rem;
+                    }
+                    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+                        background-color: #405189;
+                        color: white;
+
+                    }
+
+                    </style>
+
+        {% endblock %}
+        <!-- custom css end here -->
+
+<form id="edit_productcatalogue_form" action="{% url 'updateProductCatalogue' p.id %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+      <div class="row">
+          <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+              <label for="product_catalogue_title" class="form-label">Product Title <span style="color:red;">*</span></label>
+              <input type="text" id="product_catalogue_title" class="form-control" name="uproduct_catalogue_title" value="{{p.product_title}}" placeholder="Shirts">
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                <label for="product_brand" class="form-label">Brand <span style="color:red;">*</span></label>
+                <select name="uproduct_brand" id="product_brand" class="form-select product_brand">
+                  <option value="">Select Brand</option>
+                     {% for b in brand %}
+
+                        <option value="{{ b.id }}" {% if b.id == p.product_brand_ref.id %}selected{% endif %}>{{ b.brand_name}}</option>
+                    {% endfor %}
+
+
+                </select>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                <label for="product_category" class="form-label">Main Category <span style="color:red;">*</span></label>
+                <select name="uproduct_category" id="product_category" class="form-select product_category">
+                  <option value="">Select Main Category</option>
+                     {% for i in main_category %}
+
+                        <option value="{{ i.id }}" {% if i.id == p.main_category_ref.id %}selected{% endif %}>{{ i.main_category}}</option>
+                    {% endfor %}
+
+
+                </select>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                <label for="product_subcategory" class="form-label">Sub Category <span style="color:red;">*</span></label>
+                <select name="uproduct_subcategory" id="product_subcategory" class="form-select product_subcategory">
+                  <option value="">Select Sub Category</option>
+                     {% for j in sub_category %}
+
+                        <option value="{{ j.id }}" {% if j.id == p.sub_category_ref.id %}selected{% endif %}>{{ j.sub_category}}</option>
+                    {% endfor %}
+
+
+                </select>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                <label for="product_color" class="form-label">Color <span style="color:red;">*</span></label>
+                <select name="uproduct_color" id="product_color" class="form-select product_color">
+                  <option value="">Select Color</option>
+                     {% for c in color %}
+                            <option value="{{ c.id }}"{% if c.id == p.product_color_ref.id %}selected{% endif %} style="color: {{ c.product_color_code }};">
+                                {{ c.product_color_name }}
+                            </option>
+                                                            <!-- &#9632;-->
+                    {% endfor %}
+
+
+                </select>
+          </div>
+           <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                    <label for="product_size" class="form-label">Size <span style="color:red;">*</span></label>
+                    <select name="uproduct_size[]" id="product_size" class="form-select product_size" multiple>
+    <!--                                                              <option value="">Select Size</option>-->
+                         {% for s in size %}
+
+                            <option value="{{ s.id }}" {% if s in p.product_size_ref.all %}selected{% endif %}>{{ s.product_size_name}}</option>
+                        {% endfor %}
+
+
+                    </select>
+              </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                    <label for="product_material" class="form-label">Material <span style="color:red;">*</span></label>
+                    <select name="uproduct_material" id="product_material" class="form-select product_material">
+                      <option value="">Select Material</option>
+                         {% for mat in material %}
+
+                            <option value="{{ mat.id }}" {% if mat.id == p.product_material.id %}selected{% endif %}>{{ mat.product_material}}</option>
+                        {% endfor %}
+
+
+                    </select>
+              </div>
+<!--          <div class="col-lg-6 col-md-6 col-sm-12 mb-4">-->
+<!--                <label for="product_catalogue_mrp" class="form-label">MRP <span style="color:red;">*</span></label>-->
+<!--                <input type="number" id="product_catalogue_mrp" class="form-control" name="uproduct_catalogue_mrp" value="{{ p.product_mrp }}" placeholder="Ex: 100.99" step="0.01" min="0.01">-->
+<!--            </div>-->
+<!--            <div class="col-lg-6 col-md-6 col-sm-12 mb-4">-->
+<!--                <label for="product_discount_percent" class="form-label">Discount Percent</label>-->
+<!--                <input type="number" id="product_discount_percent" class="form-control" name="uproduct_discount_percent" value="{{ p.product_discount_percent }}" placeholder="Ex: 10.00" step="0.01" min="0" max="100">-->
+<!--            </div>-->
+          {% comment %} <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                <label for="product_catalogue_mrp" class="form-label">MRP <span style="color:red;">*</span></label>
+                <input type="number" id="product_catalogue_mrp" class="form-control" name="uproduct_catalogue_mrp" value="{{ p.product_mrp }}" placeholder="Ex: 100.99" step="0.01" min="0.01">
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                <label for="product_discount_percent" class="form-label">Discount Percent</label>
+                <input type="number" id="product_discount_percent" class="form-control" name="uproduct_discount_percent" value="{{ p.product_discount_percent }}" placeholder="Ex: 10.00" step="0.01" min="0" max="100">
+            </div> {% endcomment %}
+          <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+               <label for="product_images" class="form-label" >Image <span style="color:red;">* <sub class="text-primary">(.png, .jpg, min-3,max-5)</sub></span></label>
+               <input type="file" id="product_images" name="uproduct_images" class="form-control" multiple>
+              <div id="image-error" class="text-danger" style="display:none;"></div>
+          </div>
+<!--          <div class="col-lg-6 col-md-6 col-sm-12 mb-4">-->
+<!--              <label for="product_catalogue_stock_quantity" class="form-label">Stock Quantity <span style="color:red;">*</span></label>-->
+<!--              <input type="number" id="product_catalogue_stock_quantity" class="form-control" name="uproduct_catalogue_stock_quantity" value="{{ p.product_stock_quantity }}" placeholder="Ex: 100">-->
+<!--          </div>-->
+<!--          <div class="col-lg-6 col-md-6 col-sm-12 mb-4">-->
+<!--              <label for="product_catalogue_mrp" class="form-label">MRP <span style="color:red;">*</span></label>-->
+<!--              <input type="number" id="product_catalogue_mrp" class="form-control" name="uproduct_catalogue_mrp" value="{{p.product_mrp}}" placeholder="Ex: 100.99">-->
+<!--          </div>-->
+
+
+<!--          <div class="col-lg-6 col-md-6 col-sm-12 mb-4">-->
+<!--               <label for="product_image" class="form-label" >Image <span class="text-light-emphasis">*</span></label>-->
+<!--               <input type="file" id="product_image" name="uproduct_image" class="form-control">-->
+<!--              {% if p.product_image %}-->
+<!--                            <small class="text-muted">Current Image: <a href="{{ p.product_image.url }}" target="_blank" class="pt-3"><img src="{{ p.product_image.url }}" alt="Product Image" style="max-width: 50px; max-height: 50px; vertical-align: middle;"></a></small>-->
+<!--                        {% endif %}-->
+
+<!--          </div>-->
+            <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                <label for="product_description" class="form-label">Description <span class="text-light-emphasis">* </span></label>
+                <textarea class="form-control ckeditor-classic" id="product_description" name="uproduct_description" rows="5">{{p.product_description|safe}}</textarea>
+            </div>
+
+      </div>
+
+
+
+
+    <div class="modal-footer">
+        <button type="submit" id="editproductcatalogueFormSubmit" class="btn text-white" style="background-color:#405189;">Save</button>
+        <button type="button" class="btn bg-light" data-bs-dismiss="modal">Close</button>
+    </div>
+    </form>
+
+<!--base js-->
+{% include 'base_assets/base_js.html' %}
+
+<!-- Initialize Select2 for product_size -->
+<script>
+$(document).ready(function() {
+    var sizeSelect = $('.product_size');
+    sizeSelect.select2({
+        placeholder: "Select Sizes",
+        allowClear: true,
+        width: '100%',
+        closeOnSelect: false,
+        minimumResultsForSearch: Infinity, // Disable search feature
+        dropdownParent: $('#editproductcatalogueModal-{{p.id}}') // Attach dropdown to modal
+    });
+});
+</script>
+
+<!-- Initialize CKEditor -->
+<script>
+    document.querySelectorAll(".ckeditor-classic").forEach(function(element) {
+        ClassicEditor
+            .create(element, {
+                toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'alignment', '|', 'blockQuote', 'undo', 'redo'],
+                alignment: {
+                    options: ['left', 'center', 'right', 'justify']
+                },
+                height: '200px'
+            })
+            .then(function(editor) {
+                editor.ui.view.editable.element.style.height = '200px';
+            })
+            .catch(function(error) {
+                console.error(error);
+            });
+    });
+</script>
+
+<script>
+$(document).ready(function() {
+    // When main category changes, fetch subcategories
+    $('.product_category').change(function() {
+        var mainCategoryId = $(this).val();
+        if (mainCategoryId) {
+            $.ajax({
+                url: "{% url 'get_subcategories' %}",
+                data: {
+                    'main_category_id': mainCategoryId
+                },
+                dataType: 'json',
+                success: function(data) {
+                    $('.product_subcategory').empty();
+                    $('.product_subcategory').append('<option value="">Select Sub Category</option>');
+                    $.each(data.subcategories, function(index, subcategory) {
+                        $('.product_subcategory').append(
+                            $('<option>').val(subcategory.id).text(subcategory.sub_category)
+                        );
+                    });
+                }
+            });
+        } else {
+            $('.product_subcategory').empty();
+            $('.product_subcategory').append('<option value="">Select Sub Category</option>');
+        }
+    });
+});
+</script>
+
+
+<!--validations-->
+<script>
+$(document).ready(function() {
+    // Function to capitalize first letter
+    function capitalizeFirstLetter(str) {
+        if (str.length > 0) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+        return str;
+    }
+
+    // Custom validation method for capitalizing first letter
+    $.validator.addMethod("capitalizeFirstLetter", function(value, element) {
+        $(element).val(capitalizeFirstLetter(value));
+        return true;
+    }, "");
+
+    // Custom validation method to restrict double spaces
+    $.validator.addMethod("noDoubleSpace", function(value, element) {
+        return this.optional(element) || !/\s{2,}/.test(value);
+    }, "Double spaces are not allowed.");
+
+    // Custom validation method for letters and spaces only
+    $.validator.addMethod("alphaSpaceOnly", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z\s]*$/.test(value);
+    }, "Only alphabetical characters and spaces are allowed.");
+    $.validator.addMethod("letterStartNoLeadingSpace", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z][^\s].*/.test(value);
+    }, "Product Name must start with a letter and have no leading space.");
+
+    // Custom validation method for file extensions and size
+    $.validator.addMethod("validImageFiles", function(value, element) {
+        if (element.files && element.files.length > 0) {
+            const validExtensions = ['jpg', 'png'];
+            const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+
+            for (let i = 0; i < element.files.length; i++) {
+                const file = element.files[i];
+                const fileExtension = file.name.split('.').pop().toLowerCase();
+
+                // Check file extension
+                if (!validExtensions.includes(fileExtension)) {
+                    return false;
+                }
+
+                // Check file size
+                if (file.size > maxSize) {
+                    return false;
+                }
+            }
+
+            // Check file count (3-5 images)
+            if (element.files.length < 3 || element.files.length > 5) {
+                return false;
+            }
+
+            return true;
+        }
+        return true; // Return true if no files are selected
+    }, "Please upload 3-5 images in JPG or PNG format, each not exceeding 5MB.");
+    $.validator.addMethod("multiSelectRequired", function(value, element) {
+        return $(element).val() && $(element).val().length > 0;
+    }, "Please select at least one size.");
+
+
+
+    // Custom validation method for ckeditor
+    $.validator.addMethod("ckeditorRequired", function(value, element) {
+        var editor = CKEDITOR.instances[element.id];
+        if (editor) {
+            var content = editor.getData().trim();
+            return content.length > 0;
+        }
+        return false;
+    }, "Please enter a description in the editor.");
+    // Custom validation method for positive numbers
+    $.validator.addMethod("positiveNumber", function(value, element) {
+        return this.optional(element) || (Number(value) > 0);
+    }, "Please enter a positive number.");
+    $.validator.addMethod("validDiscountPercent", function(value, element) {
+        return this.optional(element) || (Number(value) >= 0 && Number(value) <= 100);
+    }, "Discount percent must be between 0 and 100.");
+
+    $('#edit_productcatalogue_form').validate({
+        rules: {
+            uproduct_category: {
+                required: true
+            },
+            uproduct_subcategory: {
+                required: true
+            },
+            uproduct_catalogue_title: {
+                required: true,
+                alphaSpaceOnly: true,
+                noDoubleSpace: true,
+                letterStartNoLeadingSpace:true,
+                minlength: 3,
+                maxlength: 100,
+                capitalizeFirstLetter: true
+            },
+<!--            product_image: {-->
+<!--                required: true,-->
+<!--                extension: "jpg|png",-->
+<!--                maxFileSize: 5-->
+<!--            },-->
+            uproduct_brand: {
+                required: true
+            },
+            uproduct_color: {
+                required: true
+            },
+            'uproduct_size[]': {
+                multiSelectRequired: true
+            },
+            uproduct_material: {
+                required: true
+            },
+            //uproduct_catalogue_mrp: {
+            //    required: true,
+            //    number: true,
+            //    positiveNumber: true,
+            //    min: 0.01
+            //},
+            //uproduct_discount_percent: {
+            //    number: true,
+            //    validDiscountPercent: true
+            //},
+            uproduct_images: {
+
+                validImageFiles:true
+            },
+<!--            uproduct_catalogue_stock_quantity: {-->
+<!--                required: true,-->
+<!--                number: true,-->
+<!--                positiveNumber: true,-->
+<!--                min: 1,-->
+<!--                max: 999999-->
+<!--            },-->
+            uproduct_description: {
+                ckeditorRequired: true,
+                minlength: 10,
+                maxlength: 1000
+            }
+        },
+        messages: {
+            uproduct_category: {
+                required: "Please select a main category."
+            },
+            uproduct_subcategory: {
+                required: "Please select a sub category."
+            },
+            uproduct_catalogue_title: {
+                required: "Please enter the product title.",
+                alphaSpaceOnly: "Product title must contain only letters and spaces.",
+                noDoubleSpace: "Product title cannot contain double spaces.",
+                minlength: "Product title must be at least 3 characters.",
+                maxlength: "Product title must not exceed 100 characters."
+            },
+            uproduct_brand: {
+                required: "Please select a brand."
+            },
+<!--            product_image: {-->
+<!--                required: "Please upload a product image.",-->
+<!--                extension: "Only .jpg or .png files are allowed.",-->
+<!--                maxFileSize: "Image size must not exceed 5MB."-->
+<!--            },-->
+            uproduct_color: {
+                required: "Please select a color."
+            },
+            'uproduct_size[]': {
+                multiSelectRequired: "Please select at least one size."
+            },
+            uproduct_material: {
+                required: "Please select a material."
+            },
+            //uproduct_catalogue_mrp: {
+            //    required: "Please enter MRP.",
+            //    number: "Please enter a valid number.",
+            //    positiveNumber: "MRP must be a positive number.",
+            //    min: "MRP must be at least 0.01."
+            //},
+            //uproduct_discount_percent: {
+            //    number: "Please enter a valid number.",
+            //    validDiscountPercent: "Discount percent must be between 0 and 100."
+            //},
+
+<!--            uproduct_catalogue_stock_quantity: {-->
+<!--                required: "Please enter stock quantity.",-->
+<!--                number: "Please enter a valid number.",-->
+<!--                positiveNumber: "Stock quantity must be a positive number.",-->
+<!--                min: "Stock quantity must be at least 1.",-->
+<!--                max: "Stock quantity must not exceed 999999."-->
+<!--            },-->
+            uproduct_description: {
+                ckeditorRequired: "Please enter a product description.",
+                minlength: "Description must be at least 10 characters.",
+                maxlength: "Description must not exceed 1000 characters."
+            }
+        },
+        errorPlacement: function(error, element) {
+            if (element.attr("name") === "product_description") {
+                error.insertAfter(element.next(".cke"));
+            } else if (element.attr("name") === "product_size[]") {
+                error.insertAfter(element.next(".select2-container"));
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        submitHandler: function(form) {
+            console.log("Form is valid.");
+            form.submit();
+        }
+    });
+});
+</script>

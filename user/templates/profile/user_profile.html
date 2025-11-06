@@ -1,0 +1,498 @@
+{% extends "user_base/base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+{% include 'alertToast/alerttoasters.html' %}
+
+<div class="container-fluid">
+
+    <!-- start page title -->
+    <div class="row pt-5">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+                        <li class="breadcrumb-item active">Profile</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if user %}
+    <div class="rowjustify-content-center">
+        <div class="col-xxl-12">
+            <div class="card shadow-lg">
+                <div class="row p-5">
+                    <div class="col-3">
+                        <div class="text-center mt-3">
+                            {% if user.profile_picture %}
+                            <img class="rounded-circle header-profile-user avatar-xl"
+                                src="{{ user.profile_picture.url }}" alt=".  ">
+                            {% else %}
+                            <p>No profile picture found</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-6 pt-4 ps-3">
+                        <div class="row username">
+                            <div class="col-4 text-muted">
+                                <label for="">Username </label>
+                            </div>
+                            <div class="col-8">
+                                <label for="">{{ user.user.username | title }}</label>
+                            </div>
+                        </div>
+                        <div class="row eamil pt-2">
+                            <div class="col-4 text-muted">
+                                <label for="">Email </label>
+                            </div>
+                            <div class="col-8">
+                                <label for="">{{user.user.email}}</label>
+                            </div>
+                        </div>
+                        <div class="row contact pt-2">
+                            <div class="col-4 text-muted">
+                                <label for="">Phone Number </label>
+                            </div>
+                            <div class="col-8 pt-2">
+                                <label for="">+91 <span class="ms-1">{{ user.user.phone_number }}</span></label>
+                            </div>
+                        </div>
+                        <div class="row age pt-2">
+                            <div class="col-4 text-muted">
+                                <label for="">Age</label>
+                            </div>
+                            <div class="col-8">
+                                <label for="">{{user.age}}</label>
+                            </div>
+                        </div>
+                        <div class="row gender pt-2">
+                            <div class="col-4 text-muted">
+                                <label for="">Gender</label>
+                            </div>
+                            <div class="col-8">
+                                <label for="">{{user.gender | lower | capfirst}}</label>
+                            </div>
+                        </div>
+                        <div class="row address pt-2">
+                            <div class="col-4 text-muted">
+                                <label for="">Address</label>
+                            </div>
+                            <div class="col-8">
+                                <label for="">{{user.address}}, {{user.area}}, {{user.city}}, {{user.state}},
+                                    {{user.country}}</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3 text-end">
+                        <div class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#updateProfile"><i
+                                class="bi bi-pencil-square me-2"></i>Edit
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <!-- <div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-nowrap align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">ID</th>
+                                            <th scope="col">Customer</th>
+                                            <th scope="col">Date</th>
+                                            <th scope="col">Invoice</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="fw-medium">01</td>
+                                            <td>Bobby Davis</td>
+                                            <td>Nov 14, 2021</td>
+                                            <td>$2,410</td>
+                                            <td><span class="badge bg-success">Confirmed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-medium">02</td>
+                                            <td>Christopher Neal</td>
+                                            <td>Nov 21, 2021</td>
+                                            <td>$1,450</td>
+                                            <td><span class="badge bg-warning">Waiting</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-medium">03</td>
+                                            <td>Monkey Karry</td>
+                                            <td>Nov 24, 2021</td>
+                                            <td>$3,500</td>
+                                            <td><span class="badge bg-success">Confirmed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-medium">04</td>
+                                            <td>Aaron James</td>
+                                            <td>Nov 25, 2021</td>
+                                            <td>$6,875</td>
+                                            <td><span class="badge bg-danger">Cancelled</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+            </div> <!-- card end -->
+        </div>
+    </div>
+
+    <!-- Popup Modal for Order place confirmation -->
+    <div class="modal fade zoomIn" id="updateProfile" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+
+                <!-- Creating popup window Header start-->
+                <div class="modal-header pb-3" style="background-color:#405189;">
+                    <h4 class="modal-title text-white">Update Profile</h4>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal"
+                        style="background-color: white;" type="button"></button>
+                </div>
+                <!-- Creating Popup window Header Ends -->
+
+                <!-- Creating Fields for the popup window starts here-->
+                <form id="updateProfileForm" action="{% url 'profile' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="inputField p-4">
+                            <div class="row">
+                                <div class="col-4">
+                                    <label for="image" class="mb-2">Profile Image
+                                        <sub><span class="text-primary">(.jpg/.jpeg)</span></sub>
+                                    </label>
+                                    <div class="row">
+                                        <div class="col-3 text-end">
+                                            <img class="rounded-circle header-profile-user avatar-sm"
+                                                src="{{ user.profile_picture.url }}" alt=".">
+                                        </div>
+                                        <div class="col-9">
+                                            <input type="file" id="image" name="image" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <label for="username" class="mb-2">Username </label>
+                                    <input type="text" id="username" name="username" class="form-control"
+                                        value="{{user.user.username | title }}">
+                                </div>
+                                <div class="col-4">
+                                    <label for="email" class="mb-2">Email </label>
+                                    <input type="text" id="email" name="email" class="form-control text-dark"
+                                        value="{{user.user.email}}" disabled>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-4">
+                                    <label for="phone" class="mb-2">Phone Number </label>
+                                    <input type="text" id="phone" name="phone" class="form-control text-dark"
+                                        value="{{user.user.phone_number}}" disabled>
+                                </div>
+                                <div class="col-4">
+                                    <label for="age" class="mb-2">Age </label>
+                                    <input type="text" id="age" name="age" class="form-control" value="{{user.age}}">
+                                </div>
+                                <div class="col-4">
+                                    <label for="gender" class="mb-2">Gender </label>
+                                    <input type="text" id="gender" name="gender" class="form-control"
+                                        value="{{user.gender | capfirst}}">
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-md-6 col-sm-6 fs-10">
+                                    <label for="country" class="form-label">Country <span style="color:red">*</span></label>
+                                    <select name="country" class="form-select country">
+                                        <option value="{{country.id}}" class="text-muted">{{user.country.country_name}}</option>
+                                        {% for country in countries %}
+                                        <option value="{{country.id}}">{{country.country_name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6 col-sm-6 fs-10">
+                                    <label for="state" class="form-label">State <span style="color:red">*</span></label>
+                                    <select name="state" class="form-select state">
+                                        <option value="{{state.id}}" class="text-muted">{{user.state.state_name}}</option>
+                                        {% for state in states %}
+                                        <option value="{{state.id}}">{{state.state_name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-md-6 col-sm-6 fs-10">
+                                    <label for="city" class="form-label">City <span style="color:red">*</span></label>
+                                    <select name="city" class="form-select city">
+                                        <option value="{{city.id}}" class="text-muted">{{user.city.city_name}}</option>
+                                        {% for city in cities %}
+                                        <option value="{{city.id}}">{{city.city_name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6 col-sm-6 fs-10">
+                                    <label for="area" class="form-label">Area <span style="color:red">*</span></label>
+                                    <select name="area" class="form-select area">
+                                        <option value="{{area.id}}" class="text-muted">{{user.area.area_name}}</option>
+                                        {% for a in area %}
+                                        <option value="{{a.id}}">{{a.area_name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <label for="address" class="mb-2">Address </label>
+                                    <textarea id="address" class="form-control" name="address"
+                                        value="{{user.address}}">{{user.address | title}}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+
+                        </div>
+
+                        <!-- Creating Fields for the popup window ends here -->
+
+                        <!-- Creating Buttons starts Here -->
+                        <div class="modal-footer pt-3 row">
+                            <div class="col-12 text-center">
+                                <button type="submit" id="submitBtn"
+                                    class="btn btn-outline-secondary me-1">Save</button>
+                                <button type="button" class="btn btn-outline-dark ms-1" data-bs-dismiss="modal"
+                                    aria-lable="close">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <!-- Creating Buttons Ends Here -->
+            </div>
+        </div>
+    </div>
+    <!-- Popup end here for order confirmation -->
+    {% endif %}
+
+</div>
+
+
+<script>
+    $(document).ready(function () {
+
+        $.validator.addMethod("noSpace", function (value, element) {
+            return this.optional(element) || (value.trim().length === value.length);
+        }, "Spaces are not allowed");
+
+        // Custom validation method for username (alphanumeric, no special symbols)
+        $.validator.addMethod("usernameFormat", function (value, element) {
+            return this.optional(element) || /^[a-zA-Z0-9_]+$/.test(value);
+        }, "Username contains letters, numbers, underscore, and no special charactors.");
+
+        $.validator.addMethod("noNumbers", function (value, element) {
+            return this.optional(element) || /^[^0-9]+$/.test(value);
+        }, "Numbers are not allowed");
+
+        $.validator.addMethod("noCharacters", function (value, element) {
+            return this.optional(element) || /^[^a-zA-Z]+$/.test(value);
+        }, "Characters are not allowed");
+
+        $.validator.addMethod("noSpecialChars", function (value, element) {
+            return this.optional(element) || /^[a-zA-Z0-9 ]+$/.test(value);
+        }, "Special Characters are not allowed");
+
+        $('#updateProfileForm').validate({
+            rules: {
+                image: {
+                    extension: "jpg|jpeg"
+                },
+                age: {
+                    required: true,
+                    maxlength: 2,
+                    noSpace: true,
+                    noCharacters: true,
+                    noSpecialChars: true
+                },
+                gender: {
+                    required: true,
+                    noNumbers: true,
+                    noSpace: true,
+                    noSpecialChars: true
+                },
+                username: {
+                    required: true,
+                    noSpace: true,
+                    minlength: 3,
+                    usernameFormat: true
+                },
+                address: {
+                    required: true,
+                    minlength: 3,
+                    maxlength: 100,
+                    noSpace: true
+                },
+                country: {
+                    required: true
+                },
+                state: {
+                    required: true
+                },
+                city: {
+                    required: true
+                },
+                area: {
+                    required: true
+                }
+            },
+            messages: {
+                image: {
+                    extension: "Only .jpg and .jpeg extension accepted"
+                },
+                age: {
+                    required: "Please enter age",
+                    maxlength: "Only two digits allowed",
+                    noSpace: "Spaces are not allowed",
+                    noCharacters: "Characters are not allowed",
+                    noSpecialChars: "Special Characters are not allowed"
+                },
+                gender: {
+                    required: "Please enter gender",
+                    noNumbers: "Numbers are not allowed",
+                    noSpace: "Spaces are not allowed",
+                    noSpecialChars: "Special Characters are not allowed"
+                },
+                username: {
+                    required: "Please enter username.",
+                    noSpace: "Spaces not allowed.",
+                    minlength: "Username must be at least 3 characters long.",
+                    usernameFormat: "Username contains letters, numbers, underscore, and no special charactors."
+                },
+                address: {
+                    required: 'Please enter address',
+                    minlength: 'Minimum 3 characters required',
+                    maxlength: 'Maximum 100 characters allowed',
+                    noSpace: "Spaces are not allowed"
+                },
+                country: {
+                    required: "Please select country"
+                },
+                state: {
+                    required: "Please select state"
+                },
+                city: {
+                    required: "Please select city"
+                },
+                area: {
+                    required: "Please select area"
+                },
+                submitHandler: function (form) {
+                    form.submit();
+                }
+            }
+        });
+        // When country get changes, related states will be shown 
+        $('.country').change(function () {
+            var countryId = $(this).val();
+            if (countryId) {
+                $.ajax({
+                    url: "{% url 'get_states' %}",
+                    data: {
+                        'country_id': countryId
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        $('.state').empty();
+                        $('.state').append('<option value="">Select State</option>');
+                        $.each(data.states, function (index, state) {
+                            $('.state').append(
+                                $('<option>').val(state.id).text(state.state_name)
+                            );
+                        });
+
+                        // Clear city and area dropdowns
+                        $('.city').empty();
+                        $('.city').append('<option value=""> Select City</option>');
+                        $('.area').empty();
+                        $('.area').append('<option value=""> Select Area</option>');
+                    }
+                });
+            } else {
+                $('.state').empty();
+                $('.state').append('<option value=""> Select State</option>');
+                $('.city').empty();
+                $('.city').append('<option value=""> Select City</option>');
+                $('.area').empty();
+                $('.area').append('<option value=""> Select Area</option>');
+            }
+        });
+
+        // When state get changes, related city will be shown 
+        $('.state').change(function () {
+            var stateId = $(this).val();
+            if (stateId) {
+                $.ajax({
+                    url: "{% url 'get_cities' %}",
+                    data: {
+                        'state_id': stateId
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        $('.city').empty();
+                        $('.city').append('<option value="">Select City</option>');
+                        $.each(data.cities, function (index, city) {
+                            $('.city').append(
+                                $('<option>').val(city.id).text(city.city_name)
+                            );
+                        });
+
+                        // Clear area dropdowns
+                        $('.area').empty();
+                        $('.area').append('<option value=""> Select Area</option>');
+                    }
+                });
+            } else {
+                $('.city').empty();
+                $('.city').append('<option value=""> Select City</option>');
+                $('.area').empty();
+                $('.area').append('<option value=""> Select Area</option>');
+            }
+        });
+
+
+        // When city get changes, related area will be shown 
+        $('.city').change(function () {
+            var cityId = $(this).val();
+            if (cityId) {
+                $.ajax({
+                    url: "{% url 'get_areas' %}",
+                    data: {
+                        'city_id': cityId
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        $('.area').empty();
+                        $('.area').append('<option value="">Select Area</option>');
+                        $.each(data.areas, function (index, area) {
+                            $('.area').append(
+                                $('<option>').val(area.id).text(area.area_name)
+                            );
+                        });
+                    }
+                });
+            } else {
+                $('.area').empty();
+                $('.area').append('<option value=""> Select Area</option>');
+            }
+        });
+    });
+</script>
+{% endblock content %}

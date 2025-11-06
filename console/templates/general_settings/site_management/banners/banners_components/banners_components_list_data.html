@@ -1,0 +1,141 @@
+{% load static %}
+
+{% if banner_records %}
+    {% for b in banner_records %}
+        <tr>
+            <td>{{ forloop.counter0|add:banner_records.start_index }}</td>
+            <td>{{ b.title }}</td>
+            <td>
+                {% if b.banner_picture %}
+                    <img src="{{ b.banner_picture.url }}" alt="{{ b.title }}" style="max-width: 100px; max-height: 50px;">
+                {% else %}
+                    No Image
+                {% endif %}
+            </td>
+            <td>{{ b.created_at|date:"d M, Y" }}</td>
+            <td class="border-light" id="banner_status_td{{ b.id }}">
+                {% if b.status %}
+                    <span class="badge bg-success">
+                        <a href="#" hx-post="{% url 'bannerStatusChange' b.id %}"
+                           hx-target="#banner_status_td{{ b.id }}"
+                           hx-trigger="click once"
+                           hx-swap="innerHTML"
+                           hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Active</a>
+                    </span>
+                {% else %}
+                    <span class="badge bg-danger">
+                        <a href="#" hx-post="{% url 'bannerStatusChange' b.id %}"
+                           hx-target="#banner_status_td{{ b.id }}"
+                           hx-trigger="click once"
+                           hx-swap="innerHTML"
+                           hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Deactive</a>
+                    </span>
+                {% endif %}
+            </td>
+            <td class="border-light d-flex gap-2 justify-content-center">
+                <a href="#editbannerModal-{{ b.id }}" class="btn btn-sm text-white btn-icon" style="background-color:#405189;" data-bs-toggle="modal" hx-get="{% url 'bannerRenderData' %}?editid={{ b.id }}" hx-target="#banner-edit-form-{{ b.id }}" hx-trigger="click once" hx-swap="outerHTML">
+                    <i class="ri-pencil-fill"></i>
+                </a>
+                <button class="btn btn-sm bg-danger text-white btn-icon" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal-{{ b.id }}">
+                    <i class="ri-delete-bin-5-fill"></i>
+                </button>
+            </td>
+        </tr>
+        <!-- Edit form modal -->
+        <div class="modal fade" id="editbannerModal-{{ b.id }}" tabindex="-1" aria-labelledby="editbannerModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color:#405189;padding:10px 15px 10px 10px;">
+                        <h5 class="modal-title text-white mb-0">Edit Banner Details</h5>
+                        <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" style="background-color: white;" type="button"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="banner-edit-form-{{ b.id }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Delete modal start here -->
+        <div class="modal fade zoomIn" id="deleteConfirmModal-{{ b.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger pb-3">
+                        <h5 class="modal-title text-white" id="deletebannerModalLabel">Delete Banner Details</h5>
+                        <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close" id="btn-close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mt-2 text-center">
+                            <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json" trigger="loop"
+                                      colors="primary:#f7b84b,secondary:#f06548" style="width:100px;height:100px"></lord-icon>
+                            <div class="mt-4 pt-2 fs-15 mx-4 mx-sm-5">
+                                <h4>Are you sure?</h4>
+                                <p class="text-muted mx-4 mb-0">Are you sure you want to remove this Banner - {{ b.title }}?</p>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2 justify-content-center mt-4 mb-2">
+                            <button type="button" class="btn w-sm btn-light" data-bs-dismiss="modal">Close</button>
+                            <a href="{% url 'deleteBanner' b.id %}" class="btn w-sm btn-danger delete-banner-btn" id="delete-record">Yes, delete it!</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Delete modal end here -->
+    {% endfor %}
+{% else %}
+    <tr>
+        <td colspan="6" style="color:red; text-align:center;">No Records Found</td>
+    </tr>
+{% endif %}
+
+<!-- Pagination starts here -->
+<div class="d-flex justify-content-center" id="pagination_div" hx-swap-oob="true">
+    <ul class="pagination pagination-separated pagination-sm justify-content-center justify-content-sm-start mb-0">
+        {% if banner_records.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="#" hx-get="{% url 'bannerRenderData' %}?page={{ banner_records.previous_page_number }}" hx-target="#bannerTableBodyContainer" hx-swap="innerHTML" hx-include="#search-filter-form,#query">Previous</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled text-muted">
+                <a class="page-link" href="#">Previous</a>
+            </li>
+        {% endif %}
+        <!-- First page -->
+        {% if banner_records.number > 3 %}
+            <li class="page-item">
+                <a class="page-link" href="#" hx-get="{% url 'bannerRenderData' %}?page=1" hx-target="#bannerTableBodyContainer" hx-swap="innerHTML" hx-include="#search-filter-form,#query">1</a>
+            </li>
+            {% if banner_records.number == 4 %}
+                <li class="page-item text-muted" style="display: none;"><span class="page-link">...</span></li>
+            {% else %}
+                <li class="page-item text-muted"><span class="page-link">...</span></li>
+            {% endif %}
+        {% endif %}
+        <!-- Pages around the current page -->
+        {% for page_num in banner_records.paginator.page_range %}
+            {% if page_num >= banner_records.number|add:-2 and page_num <= banner_records.number|add:2 %}
+                <li class="page-item {% if page_num == banner_records.number %}active{% endif %}">
+                    <a class="page-link" href="#" hx-get="{% url 'bannerRenderData' %}?page={{ page_num }}" hx-target="#bannerTableBodyContainer" hx-swap="innerHTML" hx-include="#search-filter-form,#query">{{ page_num }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+        <!-- Last page -->
+        {% if banner_records.number < banner_records.paginator.num_pages|add:-2 %}
+            <li class="page-item text-muted"><span class="page-link">...</span></li>
+            <li class="page-item">
+                <a class="page-link" href="#" hx-get="{% url 'bannerRenderData' %}?page={{ banner_records.paginator.num_pages }}" hx-target="#bannerTableBodyContainer" hx-swap="innerHTML" hx-include="#search-filter-form,#query">{{ banner_records.paginator.num_pages }}</a>
+            </li>
+        {% endif %}
+        {% if banner_records.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="#" hx-get="{% url 'bannerRenderData' %}?page={{ banner_records.next_page_number }}" hx-target="#bannerTableBodyContainer" hx-swap="innerHTML" hx-include="#search-filter-form,#query">Next</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled text-muted">
+                <a class="page-link" href="#">Next</a>
+            </li>
+        {% endif %}
+    </ul>
+</div>
+<!-- Pagination ends here -->

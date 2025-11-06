@@ -1,0 +1,91 @@
+<form id="edit_productsize_form" action="{% url 'updateSize' size.id %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                    <label for="uproductsize" class="form-label">Size <span style="color:red;">*</span></label>
+                    <input type="text" id="uproductsize" class="form-control" name="uproductsize" value="{{ size.product_size_name }}" placeholder="Ex:Small">
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                    <label for="uproductsize_shortname" class="form-label">Short Name <span style="color:red;">*</span></label>
+                    <input type="text" id="uproductsize_shortname" class="form-control" name="uproductsize_shortname" value="{{ size.product_size_short_name }}" placeholder="Ex:S">
+                </div>
+
+            </div>
+
+
+
+
+      <div class="modal-footer">
+          <button type="submit" id="editProductsizeFormSubmit" class="btn text-white" style="background-color:#405189;">Save</button>
+          <button type="button" class="btn bg-light" data-bs-dismiss="modal">Close</button>
+      </div>
+  </form>
+<!--base_assests js file-->
+{% include 'base_assets/base_js.html' %}
+
+<!--Script starts here-->
+<script>
+$(document).ready(function() {
+   console.log('hello');
+
+    function capitalizeFirstLetter(str) {
+        if (str.length > 0) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+        return str;
+    }
+
+    // Adding custom validation method for capitalizing first letter
+    $.validator.addMethod("capitalizeFirstLetter", function(value, element) {
+        // Capitalize the input value
+        $(element).val(capitalizeFirstLetter(value));
+        return true;
+    }, "");
+    $.validator.addMethod("letterStartNoLeadingSpace", function(value, element) {
+    return this.optional(element) ||/^[a-zA-Z][a-zA-Z ]*$/.test(value);
+}, "Please start with a letter and use only letters and spaces.");
+
+   $('#edit_productsize_form').validate({
+       rules: {
+           uproductsize:{
+               required:true,
+               minlength: 3,
+                maxlength: 100,
+               capitalizeFirstLetter: true,
+               letterStartNoLeadingSpace:true
+           },
+            uproductsize_shortname:{
+               required:true,
+               minlength: 1,
+                maxlength: 10,
+               capitalizeFirstLetter: true,
+               letterStartNoLeadingSpace:true
+           }
+
+       },
+       messages:{
+
+           uproductsize:{
+               required:" Please enter size.",
+               minlength: "Size should consists at least 3 characters.",
+                maxlength: "Size should not be exceeded 100 characters."
+           },
+           uproductsize_shortname: {
+                required:" Please enter short name.",
+               minlength: "Short name should consists at least 1 characters.",
+                maxlength: "Short name should not be exceeded 10 characters."
+           }
+
+       },
+       submitHandler: function(form) {
+          console.log(" Form is valid.");
+          $('#createProductsizeFormSubmit').prop('disabled',true);
+          form.submit();
+      }
+   });
+});
+
+</script>
+<!--Script ends here-->

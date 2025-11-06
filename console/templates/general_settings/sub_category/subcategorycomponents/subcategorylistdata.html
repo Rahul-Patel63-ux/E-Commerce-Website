@@ -1,0 +1,167 @@
+{% load static %}
+<!--0|add:subcategory_records.start_index-->
+{% if subcategory_records %}
+    {% for j in subcategory_records %}
+        <tr>
+          <td class="border-light">{{forloop.counter0|add:subcategory_records.start_index}}</td>
+            <td>
+                {% if j.sub_category_image %}
+                    <img src="{{ j.sub_category_image.url }}" alt="{{ j.sub_category }}" class="rounded avatar-xs">
+                {% else %}
+                    <div class="rounded-circle  d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                          <i class="ri-file-image-line fs-3"></i>
+                        </div>
+                {% endif %}
+            </td>
+          <td class="border-light">{{j.main_category}}</td>
+          <td class="border-light">{{ j.sub_category }}</td>
+            <td class="border-light">
+                {% if j.short_name %}
+                    {{ j.short_name }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+
+          <td class="border-light">{{ j.sub_category_created_at|date:"d M,Y" }}</td>
+             <td class="border-light" id="subcategory_status_td{{j.id}}">
+              {% if j.sub_category_status %}
+              <span class="badge bg-success">
+                  <a href="#" hx-post="{% url 'subCategoryStatusChange' j.id %}"
+                      hx-target="#subcategory_status_td{{j.id}}"
+                      hx-trigger="click once"
+                      hx-swap="innerHTML"
+                      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Active</a>
+              </span>
+              {% else %}
+              <span class="badge bg-danger">
+                  <a href="#" hx-post="{% url 'subCategoryStatusChange' j.id %}"
+                      hx-target="#subcategory_status_td{{j.id}}"
+                      hx-trigger="click once"
+                      hx-swap="innerHTML"
+                      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Deactive</a>
+              </span>
+              {% endif %}
+          </td>
+          <td class="border-light d-flex gap-2 justify-content-center" >
+                <a href="#editsubcategoryModal-{{j.id}}" style="background-color:#405189;" class="btn btn-sm  text-white btn-icon" data-bs-toggle="modal" hx-get="{% url 'subCategoryRenderData' %}?edit_id={{j.id}}" hx-target="#subcategory-edit-form-{{j.id}}" hx-trigger="click once" hx-swap="outerHTML">
+                    <i class="ri-pencil-fill"></i>
+                </a>
+                <button class="btn btn-sm bg-danger text-white btn-icon" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal-{{j.id}}">
+                    <i class="ri-delete-bin-5-fill"></i>
+                </button>
+          </td>
+        </tr>
+     <!-- Edit form modal-->
+    <div class="modal fade" id="editsubcategoryModal-{{j.id}}" tabindex="-1" aria-labelledby="editsubcategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header " style="background-color:#405189;padding:10px 15px 10px 10px;">
+                    <h5 class="modal-title text-white mb-0">Edit Sub Category Details</h5>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" style="background-color: white;" type="button"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div id="subcategory-edit-form-{{j.id}}">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+     <!-- delete model start here -->
+    <div class="modal fade zoomIn" id="deleteConfirmModal-{{j.id}}" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered ">
+        <div class="modal-content">
+          <div class="modal-header bg-danger pb-3">
+              <h5 class="modal-title text-white" id="deletesubcategoryModalLabel">Delete Sub Category Details</h5>
+              <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close" id="btn-close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mt-2 text-center">
+              <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json" trigger="loop"
+                colors="primary:#f7b84b,secondary:#f06548" style="width:100px;height:100px"></lord-icon>
+              <div class="mt-4 pt-2 fs-15 mx-4 mx-sm-5">
+                <h4>Are you sure ?</h4>
+                <p class="text-muted mx-4 mb-0">Are you sure you want to remove this Sub Category - {{j.sub_category}} ?</p>
+              </div>
+            </div>
+            <div class="d-flex gap-2 justify-content-center mt-4 mb-2">
+              <button type="button" class="btn w-sm btn-light" data-bs-dismiss="modal">Close</button>
+              <a href="{% url 'deleteSubCategory' j.id%}" class="btn w-sm btn-danger delete-subcategory-btn" id="delete-record">Yes,
+                delete it!</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- delete model end here -->
+    {% endfor %}
+{% else %}
+
+    <tr>
+        <td colspan="8" style="color:red; text-align:center;">No Records Found</td>
+    </tr>
+
+{% endif %}
+<!--pagination starts here-->
+   <div class="d-flex justify-content-center" id="pagination_div" hx-swap-oob="true"  >
+        <ul class="pagination pagination-separated pagination-sm justify-content-center justify-content-sm-start mb-0">
+          {% if subcategory_records.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="#" hx-get="{% url 'subCategoryRenderData' %}?page={{ subcategory_records.previous_page_number }}"  hx-target="#subCategoryTableBodyContainer" hx-swap="innerHTML" hx-include="#search-filter-form,#query">Previous</a>
+                </li>
+                {% else %}
+                    <li class="page-item disabled text-muted">
+                        <a class="page-link" href="#" >Previous</a>
+                    </li>
+                {% endif %}
+
+                <!-- First page -->
+                {% if subcategory_records.number > 3  %}
+                    <li class="page-item">
+                        <a class="page-link" href="#" hx-get="{% url 'subCategoryRenderData' %}?page=1" hx-target="#subCategoryTableBodyContainer" hx-swap="innerHTML" hx-include="#search-filter-form,#query">1</a>
+                    </li>
+                    {% if subcategory_records.number == 4 %}
+                    <li class="page-item text-muted" style="display: none;"><span class="page-link">...</span></li>
+                    {% else %}
+                    <li class="page-item text-muted" ><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endif %}
+
+
+
+
+                <!-- Pages around the current page -->
+                {% for page_num in subcategory_records.paginator.page_range %}
+                    {% if page_num >= subcategory_records.number|add:-2 and page_num <= subcategory_records.number|add:2 %}
+                        <li class="page-item {% if page_num == subcategory_records.number %}active{% endif %}">
+                            <a class="page-link" href="#" hx-get="{% url 'subCategoryRenderData' %}?page={{ page_num }}" hx-target="#subCategoryTableBodyContainer" hx-swap="innerHTML" hx-include="#search-filter-form,#query">{{ page_num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                <!-- Last page -->
+                {% if subcategory_records.number < subcategory_records.paginator.num_pages|add:-2 %}
+
+                    <li class="page-item text-muted"><span class="page-link">...</span></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#" hx-get="{% url 'subCategoryRenderData' %}?page={{ subcategory_records.paginator.num_pages }}" hx-target="#subCategoryTableBodyContainer" hx-swap="innerHTML" hx-include="#search-filter-form,#query">{{ subcategory_records.paginator.num_pages }}</a>
+                    </li>
+                {% endif %}
+
+                {% if subcategory_records.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="#" hx-get="{% url 'subCategoryRenderData' %}?page={{ subcategory_records.next_page_number }}" hx-target="#subCategoryTableBodyContainer" hx-swap="innerHTML" hx-include="#search-filter-form,#query">Next</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled text-muted">
+                        <a class="page-link" href="#">Next</a>
+                    </li>
+                {% endif %}
+        </ul>
+      </div>
+
+<!-- pagination ends here-->

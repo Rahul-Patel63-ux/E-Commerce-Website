@@ -1,0 +1,69 @@
+{% include 'base_assets/base_css.html' %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title fs-4">My Orders</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-4 col-sm-12 mb-4">
+                        <select class="form-select" name="search_query"
+                                hx-get="{% url 'myOrderViewRenderData' %}"
+                                hx-target="#my_orders_table_container_block"
+                                hx-swap="innerHTML"
+                                hx-include="[name='search_query'],[name='text_query']"
+                            >
+                            <option value="" {% if not search_query %}selected{% endif %}>All Orders</option>
+                            <option value="today" {% if search_query == 'today' %}selected{% endif %}>Today</option>
+                            <option value="yesterday" {% if search_query == 'yesterday' %}selected{% endif %}>Yesterday</option>
+                            <option value="last_week" {% if search_query == 'last_week' %}selected{% endif %}>Last Week</option>
+                        </select>
+                    </div>
+                    <div class="col-xxl-5 col-xl-2 col-lg-2 col-md-2">
+
+                    </div>
+                    <div class="col-xxl-4 col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                        <input type="text" class="form-control" name="text_query" placeholder="Search by Order ID, Customer, or Products"
+                               value="{{ text_query|default:'' }}"
+                               hx-get="{% url 'myOrderViewRenderData' %}"
+                               hx-target="#my_orders_table_container_block"
+                               hx-swap="innerHTML"
+                               hx-trigger="keyup changed delay:500ms"
+                               hx-include="[name='search_query'],[name='text_query']">
+                    </div>
+                </div>
+                <table class="table table-bordered ">
+                    <thead style="background-color:#405189;">
+                        <tr>
+                            <th class="text-white text-nowrap">S.No</th>
+<!--                            <th class="text-white text-nowrap">Order ID</th>-->
+                            <th class="text-white text-nowrap">Order Item ID</th>
+                            <th class="text-white text-nowrap">Product</th>
+                            <th class="text-white text-nowrap">Quantity</th>
+                            <th class="text-white text-nowrap">Price</th>
+                            <th class="text-white text-nowrap">Customer</th>
+                            <th class="text-white text-nowrap">Order Date</th>
+                            <th class="text-white text-nowrap">Order Status</th>
+                            <th class="text-white text-nowrap">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="my_orders_table_container_block"
+                           hx-get="{% url 'myOrderViewRenderData' %}"
+                           hx-trigger="revealed once"
+                           hx-target="this"
+                           hx-swap="innerHTML"
+                    >
+
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-center" id="pagination_div">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'base_assets/base_js.html' %}

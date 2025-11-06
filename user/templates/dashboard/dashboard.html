@@ -1,0 +1,189 @@
+{% extends "user_base/base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+
+{% include 'alertToast/alerttoasters.html' %}
+
+<div class="mt-5"></div>
+<!-- Search Bar here -->
+<!-- <div class="row d-flex justify-content-center ">
+        <div class="col-md-6">
+                <input type="search" name="query" id="global_search" placeholder="Search by title"
+                        class="form-control rounded-pill bg-light shadow" hx-get="{% url 'product-view' %}"
+                        hx-trigger="input changed delay:500ms" hx-target="#product_view" hx-swap="innerHTML">
+        </div>
+</div> -->
+<!-- Sidebar -->
+
+<!-- Carousel started here -->
+<div id="carouselBanner" class="carousel slide mt-3 shadow-lg" data-bs-ride='carousel'>
+        <div class="carousel-inner ms-4">
+                {% if banners %}
+                {% for ban in banners %}
+                <div class="carousel-item {% if forloop.last %}active{% endif %}">
+                        <img src="{{ ban.banner_picture.url }}" class="d-block img-fluid"
+                                style="height:400px; width:1400px; object-fit:cover;"
+                                alt="something went wrong - {{ ban.banner_picture.url }}">
+                </div>
+                {% endfor %}
+                {% else %}
+                <div>No banners</div>
+                {% endif %}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselBanner" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselBanner" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+        </button>
+</div>
+<!-- Carousel ended here -->
+
+<!-- Brands Slider started -->
+
+<label for="" class="mt-4 fs-4 fw-semibold">BRANDS</label>
+
+<!-- Slider main container -->
+<div class="card p-3 mt-2 swiper swiper-brand">
+        <!-- Additional required wrapper -->
+        <div class="swiper-wrapper">
+                <!-- Slides -->
+                {% for b in brands %}
+                <div class="swiper-slide ">
+                        <div class="card text-center">
+                                <a href="{% url 'related-product' %}?brand={{b}}" class="nav-link text-dark">
+                                        <img src="{{b.brand_logo.url}}" alt="{{b}}"
+                                                class="ms-5 rounded-circle avatar-xl d-block shadow-lg" />
+                                </a>
+                                <span class="ms-2 fw-semibold mt-3">{{b | upper}}</span>
+                        </div>
+                </div>
+                {% endfor %}
+        </div>
+        <!-- If we need pagination -->
+        <div class="swiper-pagination"></div>
+
+        <!-- If we need navigation buttons -->
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+
+        <!-- If we need scrollbar -->
+        <div class="swiper-scrollbar "></div>
+</div>
+
+
+<!-- Filters started here -->
+<div class="row pt-5">
+        <div class="col-2 bg-light shadow-lg mt-2 pt-2">
+                <div class="sidebar ps-3 ">
+                        <div class="pt-2">
+                                <div>
+                                        <div id="main-cat-boxes" hx-get="{% url 'product-view' %}"
+                                                hx-target="#product_view" hx-trigger="change" hx-swap="innerHTML"
+                                                hx-include="#main-cat-boxes" class="mt-1">
+                                                <label for="main-category" class="fw-semibold">MAIN CATEGORY</label>
+                                                {% for main in main_cats %}
+                                                <div class="ms-3">
+                                                        <input type="checkbox" class="me-1"
+                                                                value="{{ main.main_category }}"
+                                                                id="{{ main.main_category }}" name="mainCatInput" />
+                                                        <label
+                                                                for="{{ main.main_category }}">{{ main.main_category |capfirst }}</label>
+                                                </div>
+                                                {% endfor %}
+
+
+                                                <label for="sub-category" class="fw-semibold mt-2">SUB CATEGORY</label>
+
+                                                {% for sub in sub_cats %}
+                                                <div class="ms-3">
+                                                        <input type="checkbox" class="me-1"
+                                                                value="{{ sub.sub_category }}"
+                                                                id="{{ sub.sub_category }}" name="subCatInput">
+                                                        <label
+                                                                for="{{ sub.sub_category }}">{{ sub.sub_category | capfirst}}</label>
+                                                </div>
+                                                {% endfor %}
+
+                                                <label for="sub-brand" class="fw-semibold mt-2">BRAND</label>
+
+                                                {% for brand in brands %}
+                                                <div class="ms-3">
+                                                        <input type="checkbox" class="me-1"
+                                                                value="{{ brand.brand_name }}"
+                                                                id="{{ brand.brand_name }}" name="brandInput">
+                                                        <label
+                                                                for="{{ brand.brand_name }}">{{ brand.brand_name | capfirst}}</label>
+                                                </div>
+                                                {% endfor %}
+                                        </div>
+                                </div>
+                        </div>
+                </div>
+
+        </div>
+
+
+        {% if products %}
+        <div class="col-10" id="product_view" hx-get="{% url 'product-view' %}" hx-trigger="revealed once"
+                hx-target="this" hx-swap="innerHTML">
+
+        </div>
+
+
+
+        {% endif %}
+</div>
+<!-- end main content-->
+
+
+<script src="{% static 'assets/libs/swiper/swiper-bundle.min.js' %}"></script>
+<script>
+        const swiper = new Swiper('.swiper-brand', {
+                // Optional parameters
+                autoplay: {
+                        delay: 1900,
+                },
+
+                slidesPerView: 6,
+                spaceBetween: 50,
+
+                // Responsive breakpoints
+                breakpoints: {
+                        // when window width is >= 320px
+                        320: {
+                                slidesPerView: 3,
+                                spaceBetween: 20
+                        },
+                        // when window width is >= 480px
+                        480: {
+                                slidesPerView: 4,
+                                spaceBetween: 30
+                        },
+                        // when window width is >= 640px
+                        640: {
+                                slidesPerView: 6,
+                                spaceBetween: 40
+                        }
+                },
+
+
+                // If we need pagination
+                pagination: {
+                        el: '.swiper-pagination',
+                },
+
+                // Navigation arrows
+                navigation: {
+                        nextEl: '.swiper-button-next',
+                        prevEl: '.swiper-button-prev',
+                },
+        });
+</script>
+
+{% endblock content %}

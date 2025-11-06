@@ -1,0 +1,27 @@
+{% load static %}
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Order Details</h5>
+        <div class="row">
+            <div class="col-12 mb-3">
+                <strong>Order ID:</strong> {{ order.order_item_reg_id }}
+            </div>
+            <div class="col-12 mb-3">
+                <strong>Shipping Address:</strong><br>
+                {{ order.order_ref.address }}<br>
+                {{ order.order_ref.area.area_name }}, {{ order.city.city_name }}<br>
+                {{ order.order_ref.state.state_name }}, {{ order.country.country_name }}
+            </div>
+            <div class="col-12 mb-3">
+                <strong>Customer Details:</strong><br>
+                Username: {{ order.order_ref.user.username }}<br>
+                Email: {{ order.order_ref.user.email }}
+            </div>
+        </div>
+        <div class="text-center">
+            <a href="{% url 'packingOrderDetailsPDF' order.id %}" class="btn text-white" style="background-color:#405189;">
+                <i class="ri-printer-line"></i> Print
+            </a>
+        </div>
+    </div>
+</div>

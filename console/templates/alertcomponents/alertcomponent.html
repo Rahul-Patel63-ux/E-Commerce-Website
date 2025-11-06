@@ -1,0 +1,28 @@
+
+
+{% load static %}
+{% include 'base_assets/base_css.html' %}
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{message.tags}} alert-dismissible" role="alert">
+    {{message}}
+    <button aria-label="Close" class="btn-close" data-bs-dismiss="alert" type="button">
+    </button>
+</div>
+{% endfor %}
+{% endif %}
+{% if messages %}
+
+<script>
+    setTimeout(function() {
+        document.querySelectorAll('.alert').forEach(function(alert) {
+            alert.style.display = 'none';
+        });
+    }, 10000);
+</script>
+{% endif %}
+
+
+
+

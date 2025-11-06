@@ -1,0 +1,99 @@
+<form action="{% url 'updateContactUs' contact.id %}" id="contactus_edit_form" method="post">
+  {% csrf_token %}
+
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+              <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                  <label for="contact_us_email" class="form-label">Email <span class="text-danger">*</span></label>
+                  <input type="email" class="form-control" id="contact_us_email" name="ucontact_us_email" placeholder="sample@gmail.com" value="{{contact.admin_contactus_email}}">
+              </div>
+
+              <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                  <label for="contact_us_phone_number" class="form-label">Phone Number <span style="color:red;">*</span></label>
+                  <input type="text" id="contact_us_phone_number" class="form-control" name="ucontact_us_phone_number" placeholder="Ex: 9963526356" value="{{contact.admin_contactus_phonenumber}}">
+              </div>
+              <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                    <label for="contact_us_address" class="form-label">Address <span style="color:red;">*</span></label>
+                    <textarea class="form-control" id="contact_us_address"  name="ucontact_us_address" rows="3" placeholder="Ex: 123 Main Street">{{contact.admin_contactus_address}}</textarea>
+              </div>
+          </div>
+        </div>
+      </div>
+
+
+    <div class="modal-footer d-flex justify-content-center">
+        <button type="submit" class="btn text-white update-contact-btn" style="background-color:#405189;" id="contactus_update_form_submit">Save</button>
+        <button type="button" class="btn bg-light" data-bs-dismiss="modal">Cancel</button>
+    </div>
+</form>
+
+<!--base_assests js file-->
+{% include 'base_assets/base_js.html' %}
+
+<!--script starts here-->
+<script>
+
+$(document).ready(function() {
+
+
+
+    // Custom method for phone number
+    $.validator.addMethod("phoneNumber", function(value, element) {
+        const phoneRegex = /^\+?[0-9]{10,15}$/;
+        return this.optional(element) || phoneRegex.test(value);
+    }, "Phone number must be 10-15 digits, with optional + prefix.");
+
+
+    // Form validation
+    $("#contactus_edit_form").validate({
+        rules: {
+                ucontact_us_email: {
+                required: true,
+                email:true
+
+            },
+            ucontact_us_phone_number: {
+                required: true,
+                minlength:10,
+                phoneNumber: true
+
+            },
+            ucontact_us_address: {
+                required: true,
+                minlength: 3,
+                maxlength: 255
+
+            }
+        },
+        messages: {
+            ucontact_us_email: {
+                required: "Email is required.",
+                email:"Please enter valid email."
+            },
+            ucontact_us_phone_number: {
+                required: "Phone number is required.",
+                minlength: "Phone number should contain at least 10 numbers",
+                phoneNumber: "Phone number must be 10-15 digits, with optional + prefix."
+            },
+            ucontact_us_address: {
+                required: "Address is required.",
+                minlength: "Address must contain at least 3 charecters",
+                maxlength: "Address must not exceed 255 characters."
+
+            }
+        },
+        errorPlacement: function(error, element) {
+            error.appendTo(element.parent());
+        },
+        submitHandler: function(form) {
+          console.log(" Form is valid.");
+          $('#contactus_update_form_submit').prop('disabled',true);
+          form.submit();
+      }
+    });
+});
+</script>
+
+
+<!--script ends here-->

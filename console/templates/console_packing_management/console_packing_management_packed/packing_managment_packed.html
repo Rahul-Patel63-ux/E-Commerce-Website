@@ -1,0 +1,47 @@
+{% include 'base_assets/base_css.html' %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-6">
+                        <h1 class="card-title fs-4">Packed Orders</h1>
+                    </div>
+                    <div class="col-1"></div>
+                    <div class="col-5">
+                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="query" hx-get="{% url 'packingManagementPackedRenderData' %}" hx-trigger="input changed delay:500ms, query" hx-swap="innerHTML" hx-target="#packed_table_container_block">
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+
+                <table class="table table-bordered ">
+                    <thead style="background-color:#405189;">
+                        <tr>
+                            <th class="text-white text-nowrap">S.No</th>
+                            <th class="text-white text-nowrap">Order ID</th>
+                            <th class="text-white text-nowrap">Packing Status</th>
+                            <th class="text-white text-nowrap">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="packed_table_container_block"
+                           hx-get="{% url 'packingManagementPackedRenderData' %}"
+                           hx-trigger="revealed once"
+                           hx-target="this"
+                           hx-swap="innerHTML"
+                    >
+                    {% include 'console_packing_management/console_packing_management_packed/packing_management_packed_partials/packing_management_packed_partials.html' %}
+
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-center" id="pagination_div">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'base_assets/base_js.html' %}
+

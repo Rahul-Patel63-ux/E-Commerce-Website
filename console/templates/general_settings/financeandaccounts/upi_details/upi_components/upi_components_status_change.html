@@ -1,0 +1,21 @@
+{% if status_page == 'upi_page' %}
+<td class="border-light" id="upi_status_td{{ upi.id }}">
+    {% if upi.upi_status %}
+        <span class="badge bg-success">
+            <a href="#" hx-post="{% url 'upiStatusChange' upi.id %}"
+               hx-target="#upi_status_td{{ upi.id }}"
+               hx-trigger="click once"
+               hx-swap="innerHTML"
+               hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Active</a>
+        </span>
+    {% else %}
+        <span class="badge bg-danger">
+            <a href="#" hx-post="{% url 'upiStatusChange' upi.id %}"
+               hx-target="#upi_status_td{{ upi.id }}"
+               hx-trigger="click once"
+               hx-swap="innerHTML"
+               hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Deactive</a>
+        </span>
+    {% endif %}
+</td>
+{% endif %}

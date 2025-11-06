@@ -1,0 +1,30 @@
+{% load static %}
+{% if page_name == 'gender' %}
+   <td id="gender_status_td{{gender.id}}">
+    {% if gender.gender_status %}
+    <span class="badge bg-success">
+        <a href="#"
+        hx-post="{% url 'gender-status-change' gender.id %}"
+        hx-target="#gender_status_td{{gender.id}}"
+        hx-trigger="click once"
+        hx-swap="innerHTML"
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        class="text-white">
+        Active
+        </a>
+    </span>
+    {% else %}
+    <span class="badge bg-danger">
+        <a href="#" 
+        hx-post="{% url 'gender-status-change' gender.id %}"
+        hx-target="#gender_status_td{{gender.id}}"
+        hx-trigger="click once"
+        hx-swap="innerHTML"
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        class="text-white">
+        Deactive
+        </a>
+    </span>
+    {% endif %}
+   </td>
+{% endif %}

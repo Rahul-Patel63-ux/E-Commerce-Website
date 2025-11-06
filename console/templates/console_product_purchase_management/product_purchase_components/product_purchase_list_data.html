@@ -1,0 +1,238 @@
+{% load static %}
+
+{% if purchases %}
+    {% for purchase in purchases %}
+        <tr class="fs-7">
+            <td class="text-nowrap">{{ forloop.counter0|add:purchases.start_index }}</td>
+            <td class="text-nowrap">
+                <a href="#"
+                   hx-get="{% url 'viewPurchaseInvoice' purchase.id %}"
+                   hx-target="#invoiceModalBody"
+                   hx-swap="innerHTML"
+                   data-bs-toggle="modal"
+                   data-bs-target="#invoiceModal">
+                    <small> {{ purchase.invoice_id }}</small>
+
+                </a>
+            </td>
+            <td class="text-nowrap">{{ purchase.vendor.vendor_name }}</td>
+            <td class="text-nowrap">{{ purchase.num_products }}</td>
+            <td class="text-nowrap">{{ purchase.total_quantity }}</td>
+            <td class="text-nowrap">Rs. {{ purchase.grand_total|default:"0.00" }}</td>
+            <td class="text-nowrap">{{ purchase.total_gst|default:"0.00" }}</td>
+            <td class="text-nowrap">Rs. {{ purchase.advance_amount|default:"0.00" }}</td>
+            <td class="text-nowrap">Rs. {{ purchase.pending_amount|default:"0.00" }}</td>
+<!--            <td>Rs. {{ credit_map.credit_amount|default:"0.00" }}</td>-->
+            <td class="text-nowrap">{{ purchase.purchase_ref.created_at|date:"d M,Y" }}</td>
+            <td class="text-nowrap">
+                {% if purchase.purchase_ref.purchase_status %}
+                    <span class="badge bg-success">
+                        <a href="#" class="text-white">Success</a>
+                    </span>
+                {% else %}
+                    <span class="badge bg-danger">
+                        <a href="#" class="text-white">Pending</a>
+                    </span>
+                {% endif %}
+            </td>
+
+            <td class="border-light d-flex gap-2 justify-content-center text-nowrap">
+                {% if  purchase.pending_amount == 0 %}
+                  <a href="" class="btn btn-sm text-white btn-icon disabled" style="background-color:#405189; " data-bs-toggle="modal">
+                            <i class="ri-pencil-fill"></i>
+                        </a>
+                    <button class="btn btn-sm bg-danger text-white btn-icon" data-bs-toggle="modal"
+                            data-bs-target="#deleteConfirmModal-{{ purchase.id }}" disabled>
+                        <i class="ri-delete-bin-5-fill"></i>
+                    </button>
+                {% else %}
+
+                    <a href="#editPurchaseModal-{{purchase.id}}" class="btn btn-sm text-white btn-icon" style="background-color:#405189;" data-bs-toggle="modal" hx-get="{% url 'purchaseRenderData' %}?editid={{purchase.id}}" hx-target="#purchase-edit-form-{{purchase.id}}" hx-trigger="click once" hx-swap="outerHTML">
+                            <i class="ri-pencil-fill"></i>
+                        </a>
+                    <button class="btn btn-sm bg-danger text-white btn-icon" data-bs-toggle="modal"
+                            data-bs-target="#deleteConfirmModal-{{ purchase.id }}">
+                        <i class="ri-delete-bin-5-fill"></i>
+                    </button>
+                {% endif %}
+            </td>
+
+        </tr>
+
+<!--         Edit form modal -->
+        <div class="modal fade" id="editPurchaseModal-{{ purchase.id }}" tabindex="-1" aria-labelledby="editPurchaseModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color:#405189;padding:10px 15px 10px 10px;">
+                        <h5 class="modal-title text-white mb-0">Edit Purchase</h5>
+                        <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" style="background-color: white;" type="button"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="purchase-edit-form-{{ purchase.id }}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete modal -->
+        <div class="modal fade zoomIn" id="deleteConfirmModal-{{ purchase.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger pb-3">
+                        <h5 class="modal-title text-white" id="deletePurchaseModalLabel">Delete Purchase</h5>
+                        <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mt-2 text-center">
+                            <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json" trigger="loop"
+                                      colors="primary:#f7b84b,secondary:#f06548" style="width:100px;height:100px"></lord-icon>
+                            <div class="mt-4 pt-2 fs-15 mx-4 mx-sm-5">
+                                <h4>Are you sure?</h4>
+                                <p class="text-muted mx-4 mb-0">Are you sure you want to remove this Purchase  - {{ purchase.invoice_id }}?</p>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2 justify-content-center mt-4 mb-2">
+                            <button type="button" class="btn w-sm btn-light" data-bs-dismiss="modal">Close</button>
+                            <a href="{% url 'deletePurchase' purchase.id %}" class="btn w-sm btn-danger" id="delete-record">Yes, delete it!</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <tr>
+        <td colspan="13" style="color:red; text-align:center;">No Records Found</td>
+    </tr>
+{% endif %}
+
+<!-- Invoice Modal (Add this once, outside the loop) -->
+<div class="modal fade" id="invoiceModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+<!--            <div class="modal-header" style="background-color:#405189;padding:10px 15px;">-->
+<!--                <h5 class="modal-title text-white" id="invoiceModalLabel">Invoice Details</h5>-->
+<!--                <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>-->
+<!--            </div>-->
+            <div class="modal-body" id="invoiceModalBody">
+                <!-- Invoice details will be loaded here via HTMX -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--pagination-->
+<!-- Pagination -->
+<div class="d-flex justify-content-center" id="pagination_div" hx-swap-oob="true">
+    <ul class="pagination pagination-separated pagination-sm justify-content-center justify-content-sm-start mb-0">
+        {% if purchases.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="#" hx-get="{% url 'purchaseRenderData' %}?page={{ purchases.previous_page_number }}"
+                   hx-target="#purchasesTableBodyContainer" hx-swap="innerHTML">Previous</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled text-muted">
+                <a class="page-link" href="#">Previous</a>
+            </li>
+        {% endif %}
+
+        {% if purchases.number > 3 %}
+            <li class="page-item">
+                <a class="page-link" href="#" hx-get="{% url 'purchaseRenderData' %}?page=1"
+                   hx-target="#purchasesTableBodyContainer" hx-swap="innerHTML">1</a>
+            </li>
+            {% if purchases.number == 4 %}
+                <li class="page-item text-muted" style="display: none;"><span class="page-link">...</span></li>
+            {% else %}
+                <li class="page-item text-muted"><span class="page-link">...</span></li>
+            {% endif %}
+        {% endif %}
+
+        {% for page_num in purchases.paginator.page_range %}
+            {% if page_num >= purchases.number|add:-2 and page_num <= purchases.number|add:2 %}
+                <li class="page-item {% if page_num == purchases.number %}active{% endif %}">
+                    <a class="page-link" href="#" hx-get="{% url 'purchaseRenderData' %}?page={{ page_num }}"
+                       hx-target="#purchasesTableBodyContainer" hx-swap="innerHTML">{{ page_num }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if purchases.number < purchases.paginator.num_pages|add:-2 %}
+            <li class="page-item text-muted"><span class="page-link">...</span></li>
+            <li class="page-item">
+                <a class="page-link" href="#" hx-get="{% url 'purchaseRenderData' %}?page={{ purchases.paginator.num_pages }}"
+                   hx-target="#purchasesTableBodyContainer" hx-swap="innerHTML">{{ purchases.paginator.num_pages }}</a>
+            </li>
+        {% endif %}
+
+        {% if purchases.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="#" hx-get="{% url 'purchaseRenderData' %}?page={{ purchases.next_page_number }}"
+                   hx-target="#purchasesTableBodyContainer" hx-swap="innerHTML">Next</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled text-muted">
+                <a class="page-link" href="#">Next</a>
+            </li>
+        {% endif %}
+    </ul>
+</div>
+
+<!-- Pagination -->
+<!--<div class="d-flex justify-content-center" id="pagination_div" hx-swap-oob="true">-->
+<!--    <ul class="pagination pagination-separated pagination-sm justify-content-center justify-content-sm-start mb-0">-->
+<!--        {% if purchase_items.has_previous %}-->
+<!--            <li class="page-item">-->
+<!--                <a class="page-link" href="#" hx-get="{% url 'purchaseRenderData' %}?page={{ purchase_items.previous_page_number }}"-->
+<!--                   hx-target="#purchasesTableBodyContainer" hx-swap="innerHTML">Previous</a>-->
+<!--            </li>-->
+<!--        {% else %}-->
+<!--            <li class="page-item disabled text-muted">-->
+<!--                <a class="page-link" href="#">Previous</a>-->
+<!--            </li>-->
+<!--        {% endif %}-->
+
+<!--        &lt;!&ndash; First page &ndash;&gt;-->
+<!--        {% if purchase_items.number > 3 %}-->
+<!--            <li class="page-item">-->
+<!--                <a class="page-link" href="#" hx-get="{% url 'purchaseRenderData' %}?page=1"-->
+<!--                   hx-target="#purchasesTableBodyContainer" hx-swap="innerHTML">1</a>-->
+<!--            </li>-->
+<!--            {% if purchase_items.number == 4 %}-->
+<!--                <li class="page-item text-muted" style="display: none;"><span class="page-link">...</span></li>-->
+<!--            {% else %}-->
+<!--                <li class="page-item text-muted"><span class="page-link">...</span></li>-->
+<!--            {% endif %}-->
+<!--        {% endif %}-->
+
+<!--        &lt;!&ndash; Pages around the current page &ndash;&gt;-->
+<!--        {% for page_num in purchase_items.paginator.page_range %}-->
+<!--            {% if page_num >= purchase_items.number|add:-2 and page_num <= purchase_items.number|add:2 %}-->
+<!--                <li class="page-item {% if page_num == purchase_items.number %}active{% endif %}">-->
+<!--                    <a class="page-link" href="#" hx-get="{% url 'purchaseRenderData' %}?page={{ page_num }}"-->
+<!--                       hx-target="#purchasesTableBodyContainer" hx-swap="innerHTML">{{ page_num }}</a>-->
+<!--                </li>-->
+<!--            {% endif %}-->
+<!--        {% endfor %}-->
+
+<!--        &lt;!&ndash; Last page &ndash;&gt;-->
+<!--        {% if purchase_items.number < purchase_items.paginator.num_pages|add:-2 %}-->
+<!--            <li class="page-item text-muted"><span class="page-link">...</span></li>-->
+<!--            <li class="page-item">-->
+<!--                <a class="page-link" href="#" hx-get="{% url 'purchaseRenderData' %}?page={{ purchase_items.paginator.num_pages }}"-->
+<!--                   hx-target="#purchasesTableBodyContainer" hx-swap="innerHTML">{{ purchase_items.paginator.num_pages }}</a>-->
+<!--            </li>-->
+<!--        {% endif %}-->
+
+<!--        {% if purchase_items.has_next %}-->
+<!--            <li class="page-item">-->
+<!--                <a class="page-link" href="#" hx-get="{% url 'purchaseRenderData' %}?page={{ purchase_items.next_page_number }}"-->
+<!--                   hx-target="#purchasesTableBodyContainer" hx-swap="innerHTML">Next</a>-->
+<!--            </li>-->
+<!--        {% else %}-->
+<!--            <li class="page-item disabled text-muted">-->
+<!--                <a class="page-link" href="#">Next</a>-->
+<!--            </li>-->
+<!--        {% endif %}-->
+<!--    </ul>-->
+<!--</div>-->

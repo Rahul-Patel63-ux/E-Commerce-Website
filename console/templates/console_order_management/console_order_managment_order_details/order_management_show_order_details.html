@@ -1,0 +1,314 @@
+<!--{% load static %}-->
+<!--{% include 'base_assets/base_css.html' %}-->
+
+
+<!--{% if orders %}-->
+<!--    {% for order_item in orders %}-->
+<!--        <tr>-->
+<!--            <td class="text-nowrap">{{ forloop.counter0|add:orders.start_index }}</td>-->
+<!--            <td class="text-nowrap">-->
+<!--                <a href="#"-->
+<!--                   hx-get="{% url 'viewOrderDetails' order_item.order_ref.id %}"-->
+<!--                   hx-target="#orderDetailsModalBody"-->
+<!--                   hx-swap="innerHTML"-->
+<!--                   data-bs-toggle="modal"-->
+<!--                   data-bs-target="#orderDetailsModal">-->
+<!--                    <small>{{ order_item.order_ref.order_reg_id }}</small>-->
+<!--                </a>-->
+<!--            </td>-->
+<!--            <td class="text-nowrap">{{ order_item.order_item_reg_id }}</td>-->
+<!--            <td class="text-nowrap">{{ order_item.product_name|truncatechars:50 }}</td>-->
+<!--            <td class="text-nowrap">{{ order_item.quantity }}</td>-->
+<!--            <td class="text-nowrap">{{ order_item.price }}</td>-->
+<!--            <td class="text-nowrap">{{ order_item.order_ref.user.username }}</td>-->
+<!--            <td class="text-nowrap">{{ order_item.order_ref.created_at|date:"d M Y, H:i" }}</td>-->
+<!--            <td class="text-nowrap">-->
+<!--                {% if order_item.order_ref.order_status == 'new' %}-->
+<!--                    <span class="badge bg-body-secondary border border-success text-success">New</span>-->
+<!--                {% elif order_item.order_ref.order_status == 'accept' %}-->
+<!--                    <span class="badge bg-body-secondary border border-secondary text-secondary">Accepted</span>-->
+<!--                {% elif order_item.order_ref.order_status == 'pending' %}-->
+<!--                    <span class="badge bg-body-secondary border border-warning text-warning">Pending</span>-->
+<!--                {% else %}-->
+<!--                    <span class="badge bg-body-secondary border border-danger text-danger">Cancelled</span>-->
+<!--                {% endif %}-->
+<!--            </td>-->
+<!--            <td class="text-nowrap">-->
+<!--                <a href="#editorder_statusModal-{{order_item.order_ref.id}}"-->
+<!--                   class="btn btn-sm text-white btn-icon"-->
+<!--                   style="background-color:#405189;"-->
+<!--                   data-bs-toggle="modal"-->
+<!--                   hx-get="{% url 'myOrderViewRenderData' %}?editid={{order_item.order_ref.id}}"-->
+<!--                   hx-target="#order_status-edit-form-{{order_item.order_ref.id}}"-->
+<!--                   hx-trigger="click once"-->
+<!--                   hx-swap="outerHTML">-->
+<!--                    <i class="ri-pencil-fill"></i>-->
+<!--                </a>-->
+<!--            </td>-->
+<!--        </tr>-->
+<!--        &lt;!&ndash; Edit form modal &ndash;&gt;-->
+<!--        <div class="modal fade" id="editorder_statusModal-{{order_item.order_ref.id}}" tabindex="-1" aria-labelledby="editorder_statusModalLabel" aria-hidden="true">-->
+<!--            <div class="modal-dialog modal-dialog-centered">-->
+<!--                <div class="modal-content">-->
+<!--                    <div class="modal-header" style="background-color:#405189;padding:10px 15px 10px 10px;">-->
+<!--                        <h5 class="modal-title text-white mb-0">Edit Order Status</h5>-->
+<!--                        <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" style="background-color: white;" type="button"></button>-->
+<!--                    </div>-->
+<!--                    <div class="modal-body">-->
+<!--                        <div id="order_status-edit-form-{{order_item.order_ref.id}}"></div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    {% endfor %}-->
+<!--{% else %}-->
+<!--    <tr>-->
+<!--        <td colspan="10" style="color:red; text-align:center;">No order items found.</td>-->
+<!--    </tr>-->
+<!--{% endif %}-->
+
+<!--&lt;!&ndash; Order Details Modal &ndash;&gt;-->
+<!--<div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">-->
+<!--    <div class="modal-dialog modal-xl">-->
+<!--        <div class="modal-content">-->
+<!--            <div class="modal-header" style="background-color:#405189;padding:10px 15px;">-->
+<!--                <h5 class="modal-title text-white" id="orderDetailsModalLabel">Order Details</h5>-->
+<!--                <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>-->
+<!--            </div>-->
+<!--            <div class="modal-body" id="orderDetailsModalBody">-->
+<!--                &lt;!&ndash; Order details will be loaded here via HTMX &ndash;&gt;-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--&lt;!&ndash; Pagination &ndash;&gt;-->
+<!--<div class="d-flex justify-content-center" id="pagination_div" hx-swap-oob="true">-->
+<!--    <ul class="pagination pagination-separated pagination-sm justify-content-center justify-content-sm-start mb-0">-->
+<!--        {% if page_obj.has_previous %}-->
+<!--            <li class="page-item">-->
+<!--                <a class="page-link" href="#"-->
+<!--                   hx-get="{% url 'myOrderViewRenderData' %}?page={{ page_obj.previous_page_number }}&search_query={{ search_query|default:'' }}&text_query={{ text_query|default:'' }}"-->
+<!--                   hx-target="#my_orders_table_container_block"-->
+<!--                   hx-swap="innerHTML">Previous</a>-->
+<!--            </li>-->
+<!--        {% else %}-->
+<!--            <li class="page-item disabled text-muted">-->
+<!--                <a class="page-link" href="#">Previous</a>-->
+<!--            </li>-->
+<!--        {% endif %}-->
+
+<!--        {% if page_obj.number > 3 %}-->
+<!--            <li class="page-item">-->
+<!--                <a class="page-link" href="#"-->
+<!--                   hx-get="{% url 'myOrderViewRenderData' %}?page=1&search_query={{ search_query|default:'' }}&text_query={{ text_query|default:'' }}"-->
+<!--                   hx-target="#my_orders_table_container_block"-->
+<!--                   hx-swap="innerHTML">1</a>-->
+<!--            </li>-->
+<!--            {% if page_obj.number == 4 %}-->
+<!--                <li class="page-item text-muted" style="display: none;"><span class="page-link">...</span></li>-->
+<!--            {% else %}-->
+<!--                <li class="page-item text-muted"><span class="page-link">...</span></li>-->
+<!--            {% endif %}-->
+<!--        {% endif %}-->
+
+<!--        {% for page_num in page_obj.paginator.page_range %}-->
+<!--            {% if page_num >= page_obj.number|add:-2 and page_num <= page_obj.number|add:2 %}-->
+<!--                <li class="page-item {% if page_num == page_obj.number %}active{% endif %}">-->
+<!--                    <a class="page-link" href="#"-->
+<!--                       hx-get="{% url 'myOrderViewRenderData' %}?page={{ page_num }}&search_query={{ search_query|default:'' }}&text_query={{ text_query|default:'' }}"-->
+<!--                       hx-target="#my_orders_table_container_block"-->
+<!--                       hx-swap="innerHTML">{{ page_num }}</a>-->
+<!--                </li>-->
+<!--            {% endif %}-->
+<!--        {% endfor %}-->
+
+<!--        {% if page_obj.number < page_obj.paginator.num_pages|add:-2 %}-->
+<!--            <li class="page-item text-muted"><span class="page-link">...</span></li>-->
+<!--            <li class="page-item">-->
+<!--                <a class="page-link" href="#"-->
+<!--                   hx-get="{% url 'myOrderViewRenderData' %}?page={{ page_obj.paginator.num_pages }}&search_query={{ search_query|default:'' }}&text_query={{ text_query|default:'' }}"-->
+<!--                   hx-target="#my_orders_table_container_block"-->
+<!--                   hx-swap="innerHTML">{{ page_obj.paginator.num_pages }}</a>-->
+<!--            </li>-->
+<!--        {% endif %}-->
+
+<!--        {% if page_obj.has_next %}-->
+<!--            <li class="page-item">-->
+<!--                <a class="page-link" href="#"-->
+<!--                   hx-get="{% url 'myOrderViewRenderData' %}?page={{ page_obj.next_page_number }}&search_query={{ search_query|default:'' }}&text_query={{ text_query|default:'' }}"-->
+<!--                   hx-target="#my_orders_table_container_block"-->
+<!--                   hx-swap="innerHTML">Next</a>-->
+<!--            </li>-->
+<!--        {% else %}-->
+<!--            <li class="page-item disabled text-muted">-->
+<!--                <a class="page-link" href="#">Next</a>-->
+<!--            </li>-->
+<!--        {% endif %}-->
+<!--    </ul>-->
+<!--</div>-->
+
+<!--{% include 'base_assets/base_js.html' %}-->
+
+<div class="container-fluid">
+    <!-- Order Details Table -->
+    <h5>Order Summary</h5>
+    <div class="table-responsive mb-4">
+        <table class="table table-bordered table-hover">
+            <thead class="bg-light">
+                <tr>
+                    <th class="text-nowrap">Order ID</th>
+                    <th class="text-nowrap">Date</th>
+                    <th class="text-nowrap">No. of Products</th>
+                    <th class="text-nowrap">Status</th>
+                    <th class="text-nowrap">Rejection Reason</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-nowrap">{{ order.order_item_reg_id }}</td>
+                    <td class="text-nowrap">{{ order.order_item_created_at|date:"d M, Y H:i" }}</td>
+                    <td class="text-nowrap">
+                        {% if order.quantity %}
+                            {{ order.quantity }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td class="text-nowrap">
+                        {% if order.order_item_status == 'new' %}
+                            <span class="badge bg-info">New</span>
+                        {% elif order.order_item_status == 'accept' %}
+                            <span class="badge bg-success">Accepted</span>
+                        {% elif order.order_item_status == 'pending' %}
+                            <span class="badge bg-warning">Pending</span>
+                        {% else %}
+                            <span class="badge bg-danger">Cancelled</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-nowrap">
+                        {% if order.rejection_reason %}
+                            {{ order.rejection_reason }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Customer Details Table -->
+        <div class="col-lg-6">
+            <h5>Customer Details</h5>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-nowrap">{{ order.order_ref.user.username|default:"N/A" }}</td>
+                            <td class="text-nowrap">{{ order.order_ref.user.email|default:"N/A" }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Shipping Details Table -->
+        <div class="col-lg-6">
+            <h5>Shipping Details</h5>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Address</th>
+                            <th>Area</th>
+                            <th>City</th>
+                            <th>State</th>
+                            <th>Country</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-nowrap">{{ order.order_ref.address|default:"N/A" }}</td>
+                            <td class="text-nowrap">{{ order.order_ref.area|default:"N/A" }}</td>
+                            <td class="text-nowrap">{{ order.order_ref.city|default:"N/A" }}</td>
+                            <td class="text-nowrap">{{ order.order_ref.state|default:"N/A" }}</td>
+                            <td class="text-nowrap">{{ order.order_ref.country|default:"N/A" }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Items Table -->
+    <h5>Order Items</h5>
+    <div class="table-responsive mb-4">
+        <table class="table table-bordered table-hover">
+            <thead class="bg-light">
+                <tr>
+<!--                    <th>S.No</th>-->
+                    <th>Product</th>
+                    <th>Price</th>
+<!--                    <th>Selling Price</th>-->
+                    <th>Quantity</th>
+<!--                    <th>Subtotal</th>-->
+<!--                    <th>Discount</th>-->
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    <td class="text-nowrap">{{ order.product_name|default:"N/A" }}</td>
+                    <td class="text-nowrap">{{ order.price|default:"N/A" }}</td>
+<!--                    <td class="text-nowrap">{{ order.quantity_mul_price|default:"N/A" }}</td>-->
+                    <td class="text-nowrap">{{ order.quantity|default:"N/A" }}</td>
+<!--                    <td class="text-nowrap">{{ order.subtotal|default:"N/A" }}</td>-->
+<!--                    <td class="text-nowrap">{{ order.discount|default:"N/A" }}</td>-->
+                    <td class="text-nowrap">{{ order.quantity_mul_price|default:"N/A" }}</td>
+                </tr>
+
+            </tbody>
+            <tfoot>
+                <tr>
+<!--                    <td colspan="7" class="text-end text-nowrap"><strong>Grand Total:</strong></td>-->
+<!--                    <td class="text-nowrap">{{ order.grandtotal|default:"0.00" }}</td>-->
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- Coupon Information -->
+<!--    {% if order.coupon_code %}-->
+<!--        <h5>Coupon Information</h5>-->
+<!--        <div class="table-responsive mb-4">-->
+<!--            <table class="table table-bordered table-hover">-->
+<!--                <thead class="bg-light">-->
+<!--                    <tr>-->
+<!--                        <th>Coupon Code</th>-->
+<!--                        <th>Coupon Discount</th>-->
+<!--                    </tr>-->
+<!--                </thead>-->
+<!--                <tbody>-->
+<!--                    <tr>-->
+<!--                        <td>{{ order.coupon_code }}</td>-->
+<!--                        <td>{{ order.coupon_discount_percent }}%</td>-->
+<!--                    </tr>-->
+<!--                </tbody>-->
+<!--            </table>-->
+<!--        </div>-->
+<!--    {% endif %}-->
+<!--    &lt;!&ndash; Thank You Message &ndash;&gt;-->
+<!--    <div class="text-center">-->
+<!--        <h5>Thank you for your order!</h5>-->
+<!--    </div>-->
+</div>
+
+{% include 'base_assets/base_js.html' %}

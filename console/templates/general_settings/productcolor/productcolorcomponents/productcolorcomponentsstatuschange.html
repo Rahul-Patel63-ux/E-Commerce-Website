@@ -1,0 +1,22 @@
+{% if status_page == 'color_page' %}
+    <td class="border-light" id="color_status_td{{color.id}}">
+                      {% if color.product_color_status %}
+                      <span class="badge bg-success">
+                          <a href="#" hx-post="{% url 'colorStatusChange' color.id %}"
+                              hx-target="#color_status_td{{color.id}}"
+                              hx-trigger="click once"
+                              hx-swap="innerHTML"
+                              hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Active</a>
+                      </span>
+                      {% else %}
+                      <span class="badge bg-danger">
+                          <a href="#" hx-post="{% url 'colorStatusChange' color.id %}"
+                              hx-target="#color_status_td{{color.id}}"
+                              hx-trigger="click once"
+                              hx-swap="innerHTML"
+                              hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Deactive</a>
+                      </span>
+                      {% endif %}
+                  </td>
+
+{% endif %}

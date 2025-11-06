@@ -1,0 +1,159 @@
+{% load static %}
+{% block style %}
+    <style>
+        .error{
+            color: red;
+        }
+    </style>
+
+{% endblock %}
+{% include 'base_assets/base_css.html' %}
+
+<!--alert starts here-->
+{% include 'alertcomponents/alertcomponent.html' %}
+<!--alert ends here-->
+
+<form method="post" id="inventory_form" action="{% url 'stockManagementInventory' i.id%}">
+    {% csrf_token %}
+    <div class="row">
+
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-4">
+            <label for="inventory_productTitle" class="form-label text-dark">Product Title <span class="text-light-emphasis">*</span></label>
+            <input type="text" class="form-control" id="inventory_productTitle" name="inventory_productTitle" placeholder="Ex: Shirts" value="{{ i.product.product_title }}" readonly>
+        </div>
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-4">
+            <label for="available_quantity" class="form-label text-dark">Available Quantity <span class="text-light-emphasis">*</span></label>
+            <input type="number" class="form-control" id="available_quantity" name="available_quantity" placeholder="Ex: 100" value="{{ i.remaining_quantity }}" readonly>
+        </div>
+
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-4">
+            <label for="mrp" class="form-label text-dark">MRP <span class="text-light-emphasis">*</span></label>
+            <input type="number" class="form-control" id="mrp" name="mrp" placeholder="Ex: 999.00" value="{{ i.mrp }}" readonly>
+        </div>
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-4">
+            <label for="purchasePrice" class="form-label text-dark">Purchase Price <span class="text-light-emphasis">*</span></label>
+            <input type="number" class="form-control" id="purchasePrice" name="purchasePrice" placeholder="Ex: 222" value="{{ i.purchase_price }}" readonly>
+        </div>
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-4">
+            <label for="allocated_Quantity" class="form-label text-dark">Allocated Quantity <span style="color:red;">*</span></label>
+            <input type="number" class="form-control" id="allocated_Quantity" name="allocated_quantity" placeholder="Ex: 50" min="1" max="{{ i.quantity }}" >
+        </div>
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-4">
+            <label for="salePrice" class="form-label text-dark">Sale Price <span style="color:red;">*</span></label>
+            <input type="number" class="form-control" id="salePrice" name="sale_price" step="0.01" placeholder="Ex: 566.00" min="0" >
+        </div>
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-4">
+            <label for="discountPercent" class="form-label text-dark">Discount Percent (%) <span style="color:red;">*</span></label>
+            <input type="number" class="form-control" id="discountPercent" name="discount_percent" placeholder="Ex: 2.00" step="0.01" min="0" max="100"  >
+        </div>
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-4">
+            <label for="sellingPrice" class="form-label text-dark">Selling Price <span style="color:red;">*</span></label>
+            <input type="number" class="form-control" id="sellingPrice" placeholder="Ex: 554.68" name="selling_price" value="0.00" readonly>
+        </div>
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mt-4 d-flex justify-content-center">
+            <button type="submit" class="btn text-white" style="background-color:#405189;">Move to Inventory</button>
+        </div>
+
+    </div>
+</form>
+
+
+{% include 'base_assets/base_js.html' %}
+
+
+<script>
+    $(document).ready(function() {
+        // Add custom validation method for allocated quantity
+        $.validator.addMethod("maxAvailableQuantity", function(value, element) {
+            var availableQuantity = parseInt($('#available_quantity').val());
+            return this.optional(element) || (parseInt(value) <= availableQuantity);
+        }, "Allocated quantity cannot exceed available quantity.");
+
+        // Add custom validation method for sale price range
+        $.validator.addMethod("priceInRange", function(value, element) {
+            var mrp = parseFloat($('#mrp').val());
+            var purchasePrice = parseFloat($('#purchasePrice').val());
+            var salePrice = parseFloat(value);
+            return this.optional(element) || (salePrice <= mrp && salePrice >= purchasePrice);
+        }, "Sale price must be between Purchase Price and MRP.");
+
+        // Initialize form validation
+        $('#inventory_form').validate({
+            rules: {
+                allocated_quantity: {
+                    required: true,
+                    number: true,
+                    min: 1,
+                    maxAvailableQuantity: true
+                },
+                sale_price: {
+                    required: true,
+                    number: true,
+                    min: 0,
+                    priceInRange: true
+                },
+                discount_percent: {
+                    required: true,
+                    number: true,
+                    min: 0,
+                    max: 100
+                }
+            },
+            messages: {
+                allocated_quantity: {
+                    required: "Please enter allocated quantity",
+                    number: "Please enter a valid number",
+                    min: "Allocated quantity must be at least 1"
+                },
+                sale_price: {
+                    required: "Please enter sale price",
+                    number: "Please enter a valid number",
+                    min: "Sale price cannot be negative"
+                },
+                discount_percent: {
+                    required: "Please enter discount percentage",
+                    number: "Please enter a valid number",
+                    min: "Discount percentage cannot be negative",
+                    max: "Discount percentage cannot exceed 100%"
+                }
+            },
+            // Calculate selling price on input change
+            onkeyup: function(element) {
+                this.element(element); // Trigger validation on keyup
+
+                // Calculate selling price
+                var salePrice = parseFloat($('#salePrice').val()) || 0;
+                var discountPercent = parseFloat($('#discountPercent').val()) || 0;
+
+                if (salePrice > 0 && discountPercent >= 0) {
+                    var discountAmount = salePrice * (discountPercent / 100);
+                    var sellingPrice = salePrice - discountAmount;
+                    $('#sellingPrice').val(sellingPrice.toFixed(2));
+                } else {
+                    $('#sellingPrice').val('0.00');
+                }
+            },
+            // Submit handler
+            submitHandler: function(form) {
+                // Optional: Perform custom actions before submission
+                console.log("Form is valid and ready to submit!");
+                // You can add custom logic here, e.g., AJAX submission or alerts
+                // alert("Form submitted successfully!");
+
+                // Submit the form
+                form.submit();
+            },
+<!--            errorElement: 'div',-->
+<!--            errorClass: 'invalid-feedback',-->
+<!--            highlight: function(element) {-->
+<!--                $(element).addClass('is-invalid').removeClass('is-valid');-->
+<!--            },-->
+<!--            unhighlight: function(element) {-->
+<!--                $(element).removeClass('is-invalid').addClass('is-valid');-->
+<!--            },-->
+<!--            errorPlacement: function(error, element) {-->
+<!--                error.insertAfter(element);-->
+<!--            }-->
+        });
+    });
+</script>

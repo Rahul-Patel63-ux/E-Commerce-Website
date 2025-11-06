@@ -1,0 +1,67 @@
+<form action="{% url 'updateNationality' n.id %}" method="post" enctype="multipart/form-data" class="update_nationality" id="update_nationality">
+  {% csrf_token %}
+
+          <div class="row">
+              <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                  <label for="unationality" class="form-label">Nationality <span style="color:red;">*</span></label>
+                  <input type="text" id="unationality" class="form-control" name="unationality" value="{{n.nationality}}" placeholder="Ex:Indian">
+              </div>
+
+          </div>
+    <div class="modal-footer">
+        <button type="submit" id="editNationalityFormSubmit" class="btn text-white" style="background-color:#405189;">Save</button>
+        <button type="button" class="btn bg-light" data-bs-dismiss="modal">Close</button>
+    </div>
+</form>
+<!--base_assests js file-->
+{% include 'base_assets/base_js.html' %}
+
+<!--Script starts here-->
+<script>
+$(document).ready(function() {
+   console.log('hello');
+
+    function capitalizeFirstLetter(str) {
+        if (str.length > 0) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+        return str;
+    }
+
+    // Adding custom validation method for capitalizing first letter
+    $.validator.addMethod("capitalizeFirstLetter", function(value, element) {
+        // Capitalize the input value
+        $(element).val(capitalizeFirstLetter(value));
+        return true;
+    }, "");
+
+   $('#update_nationality').validate({
+       rules: {
+           unationality:{
+               required:true,
+               minlength: 3,
+                maxlength: 100,
+               capitalizeFirstLetter: true
+           }
+
+       },
+       messages:{
+
+           unationality:{
+               required:" Plaese enter Nationality.",
+               minlength: "Nationality should consist at least 3 charecters.",
+                maxlength: "Nationality should not be exceeded 100 charecters."
+           }
+
+       },
+       submitHandler: function(form) {
+          console.log(" Form is valid.");
+          $('#editNationalityFormSubmit').prop('disabled',true);
+          form.submit();
+      }
+   });
+});
+
+<!--Script ends here-->
+</script>
+<!--Script ends here-->

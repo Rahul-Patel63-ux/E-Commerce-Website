@@ -1,0 +1,181 @@
+{% extends 'console_base/base.html' %}
+
+{% block content %}
+<!-- alert starts here -->
+{% include 'alertcomponents/alertcomponent.html' %}
+<!-- alert ends here -->
+
+<!-- breadcrumb starts here -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="{% url 'consoleGeneralSettings' %}">General Settings</a></li>
+                    <li class="breadcrumb-item active">Services</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- breadcrumb ends here -->
+
+<!-- Services start here -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-6">
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn text-white" style="background-color:#405189;" data-bs-toggle="modal" data-bs-target="#servicesModal">
+                            <i class="bx bx-plus-circle"></i> Add Service
+                        </button>
+                        <!-- Services creation modal starts here -->
+                        <div class="modal fade" id="servicesModal" tabindex="-1" aria-labelledby="servicesModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header" style="background-color:#405189;padding:10px 15px 10px 10px;">
+                                        <h1 class="modal-title text-white mb-0 fs-5" id="servicesModalLabel">Add Service</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: white;"></button>
+                                    </div>
+                                    <form id="services_form" method="post" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                                                    <label for="service_title" class="form-label">Service Title <span style="color:red;">*</span></label>
+                                                    <input type="text" id="service_title" class="form-control" name="service_title" placeholder="Ex: Customer support">
+                                                </div>
+                                                <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                                                    <label for="content" class="form-label">Content <span style="color:red;">*</span></label>
+                                                    <textarea id="content" class="form-control" name="content" placeholder="Enter service description" rows="4"></textarea>
+                                                </div>
+                                                <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                                                    <label for="image" class="form-label">Service Image <span style="color:red;">*</span></label>
+                                                    <input type="file" id="image" class="form-control" name="image" accept="image/*">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="submit" id="createServicesFormSubmit" class="btn text-white" style="background-color:#405189;">Submit</button>
+                                            <button type="button" class="btn bg-light" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Services creation modal ends here -->
+                    </div>
+                    <div class="col-1"></div>
+                    <div class="col-5">
+                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="query" hx-get="{% url 'servicesRenderData' %}" hx-trigger="input changed delay:500ms, query" hx-swap="innerHTML" hx-target="#servicesTableBodyContainer">
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- card body starts here -->
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>Title</th>
+                                <th>Content</th>
+                                <th>Image</th>
+                                <th>Created On</th>
+                                <th>Status</th>
+                                <th style="text-align:center;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody
+                            hx-get="{% url 'servicesRenderData' %}"
+                            hx-swap="innerHTML"
+                            hx-target="this"
+                            hx-trigger="revealed once"
+                            id="servicesTableBodyContainer">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-center" id="pagination_div">
+                </div>
+                <!-- card body ends here -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Services ends here -->
+
+<!-- base assets js file -->
+{% include 'base_assets/base_js.html' %}
+
+<!-- Script starts here -->
+<script>
+$(document).ready(function() {
+    console.log('hello');
+
+    function capitalizeFirstLetter(str) {
+        if (str.length > 0) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+        return str;
+    }
+
+    $.validator.addMethod("capitalizeFirstLetter", function(value, element) {
+        $(element).val(capitalizeFirstLetter(value));
+        return true;
+    }, "");
+
+    $.validator.addMethod("letterStartNoLeadingSpace", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z][a-zA-Z0-9 ]*$/.test(value);
+    }, "Please start with a letter and use only letters, numbers, and spaces.");
+
+    $.validator.addMethod("fileExtension", function(value, element) {
+        return this.optional(element) || /\.(jpg|jpeg|png|gif)$/i.test(value);
+    }, "Please upload an image file (jpg, jpeg, png, gif).");
+
+    $('#services_form').validate({
+        rules: {
+            service_title: {
+                required: true,
+                minlength: 3,
+                maxlength: 200,
+                capitalizeFirstLetter: true,
+                letterStartNoLeadingSpace: true
+            },
+            content: {
+                required: true,
+                minlength: 10,
+                maxlength: 500
+            },
+            image: {
+                required: true,
+                fileExtension: true
+            }
+        },
+        messages: {
+            service_title: {
+                required: "Please enter a service title.",
+                minlength: "Title should be at least 3 characters.",
+                maxlength: "Title should not exceed 200 characters."
+            },
+            content: {
+                required: "Please enter service content.",
+                minlength: "Content should be at least 10 characters.",
+                maxlength: "Content should not exceed 500 characters."
+            },
+            image: {
+                required: "Please upload a service image.",
+                fileExtension: "Please upload a valid image file (jpg, jpeg, png, gif)."
+            }
+        },
+        submitHandler: function(form) {
+            console.log("Form is valid.");
+            $('#createServicesFormSubmit').prop('disabled', true);
+            form.submit();
+        }
+    });
+});
+</script>
+<!-- Script ends here -->
+{% endblock %}

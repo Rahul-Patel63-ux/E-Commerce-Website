@@ -1,0 +1,220 @@
+{% load static %}
+
+{% include 'base_assets/base_css.html' %}
+
+<div class="row">
+    <div class="col-xxl-4">
+        <div class="card p-3 sticky-side-div">
+            <div class="product-img-slider">
+<!--                <div class="swiper product-thumbnail-slider p-2 rounded bg-light swiper-initialized swiper-horizontal swiper-backface-hidden">-->
+<!--                    <div class="swiper-wrapper" >-->
+<!--                        {% for image in product_images %}-->
+
+<!--                        <div class="swiper-slide swiper-slide-next" role="group" aria-label="4 / 5" data-swiper-slide-index="3" style="width: 346px; margin-right: 24px;">-->
+<!--                                <div class="p-5 mx-4">-->
+<!--                                    <img src="{{ image.image.url }}" alt="{{ product.product_title}}" class="img-fluid d-block">-->
+<!--                                </div>-->
+<!--                        </div>-->
+<!--                        {% empty %}-->
+<!--                        <div class="swiper-slide" role="group" aria-label="5 / 5" data-swiper-slide-index="4" style="width: 346px; margin-right: 24px;">-->
+
+<!--                            <div class="p-5 mx-4">-->
+<!--                                <img src="{% static 'images/default-product.png' %}" alt="" class="img-fluid d-block">-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        {% endfor %}-->
+<!--                    </div>-->
+<!--                    <div class="swiper-button-next" tabindex="0" role="button" aria-label="Next slide" aria-controls="swiper-wrapper-ac3cd647733701d2"></div>-->
+<!--                    <div class="swiper-button-prev" tabindex="0" role="button" aria-label="Previous slide" aria-controls="swiper-wrapper-ac3cd647733701d2"></div>-->
+<!--                    <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>-->
+<!--                </div>-->
+<!--                &lt;!&ndash; end swiper thumbnail slide &ndash;&gt;-->
+<!--                <div class="swiper product-nav-slider mt-2 swiper-initialized swiper-horizontal swiper-free-mode swiper-watch-progress swiper-backface-hidden swiper-thumbs">-->
+<!--                    <div class="swiper-wrapper" id="swiper-wrapper-9574e7226c624a32" aria-live="polite" style="transform: translate3d(0px, 0px, 0px); transition-duration: 0ms; transition-delay: 0ms;">-->
+<!--                        {% for image in product_images%}-->
+<!--                        <div class="swiper-slide swiper-slide-visible swiper-slide-fully-visible swiper-slide-active" role="group" aria-label="1 / 5" data-swiper-slide-index="0" style="width: 83px; margin-right: 10px;">-->
+<!--                            <div class="nav-slide-item">-->
+<!--                                <img src="{{ image.image.url }}" alt="{{ product.product_title}}" class="img-fluid d-block">-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        {% empty %}-->
+<!--                        <div class="swiper-slide swiper-slide-visible swiper-slide-fully-visible swiper-slide-next" role="group" aria-label="2 / 5" data-swiper-slide-index="1" style="width: 83px; margin-right: 10px;">-->
+<!--                            <div class="nav-slide-item">-->
+<!--                                <img src="{% static 'images/default-product.png' %}" alt="" class="img-fluid d-block">-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        {% endfor %}-->
+
+<!--                    </div>-->
+<!--                <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>-->
+                <!-- end swiper nav slide -->
+                <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+
+                    <div class="carousel-inner">
+                        {% for image in product_images %}
+                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                <div class="p-5 mx-4">
+                                    <img src="{{ image.image.url }}" alt="{{ product.product_title }}" class="img-fluid d-block w-100">
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="carousel-item active">
+                                <div class="p-5 mx-4">
+                                    <img src="{% static 'images/default-product.png' %}" alt="Default Product" class="img-fluid d-block w-100">
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xxl-8">
+        <div class="row g-0">
+            <div class="col-xxl-8">
+                <div class="card rounded-end-0 card-height-100">
+                    <div class="card-body p-4">
+
+                        <h5 class="text-capitalize mb-3">{{product.product_title}}</h5>
+                        <div class="hstack gap-3 flex-wrap mb-4">
+
+                            <div class="text-muted">Published: <span class="text-body fw-medium">{{ product.product_created_at|date:'d M, Y' }}</span></div>
+                            <div class="text-muted">Category: <span class="text-body fw-medium">{{ product.main_category_ref.main_category }}</span></div>
+                            <div class="text-muted">Sub Category: <span class="text-body fw-medium">{{ product.sub_category_ref.sub_category }}</span></div>
+                            <div class="text-muted">Brand: <span class="text-body fw-medium">{{ product.product_brand_ref.brand_name }}</span></div>
+                        </div>
+
+                        <h6 class="fs-md mb-3">Choose Size:</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for size in product.product_size_ref.all %}
+                            <div data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-original-title="{{ size.product_size_name }} ({{ product.product_stock_quantity }} Available)">
+                                <input type="radio" class="btn-check" name="productsize-radio" id="productsize-radio-{{ size.id }}">
+                                <label class="btn btn-subtle-primary avatar-xs rounded-circle p-0 d-flex justify-content-center align-items-center" for="productsize-radio-{{ size.id }}">{{ size.product_size_short_name }}</label>
+                            </div>
+                            {% empty %}
+                            <p>No sizes available.</p>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mt-4">
+                            <h5 class="fs-md mb-3">Colors :</h5>
+                            <div class="d-flex flex-wrap gap-2">
+                                {% if product.product_color_ref %}
+                                <div data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-original-title="{{ product.product_color_ref.product_color_name }} ({{ product.product_stock_quantity }} Available)">
+                                    <button type="button" class="btn avatar-xs p-0 d-flex align-items-center justify-content-center border rounded-circle fs-5xl" style="color: {{ product.product_color_ref.product_color_code }};">
+                                        <i class="ri-checkbox-blank-circle-fill"></i>
+                                    </button>
+                                </div>
+                                {% else %}
+                                <p>No colors available.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    </div>
+                </div><!--end card-->
+            </div><!--end col-->
+            <div class="col-xxl-4">
+                <div class="card card-height-100 border-start rounded-start-0">
+                    <div class="card-body p-4">
+                        <div class="row">
+
+                            <div class="col-lg-12">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="card border shadow-none mb-0">
+                                            <div class="card-body p-2">
+                                                <div class="text-center">
+                                                    <p class="text-muted text-truncate mb-2">PRICE</p>
+                                                    {% if product.product_price %}
+                                                    <h6 class="fs-lg">Rs. {{ product.product_price }}</h6>
+                                                    {% else %}
+                                                    <h6 class="fs-lg">-</h6>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div><!--end col-->
+                                    <div class="col-md-6">
+                                        <div class="card border shadow-none mb-0">
+                                            <div class="card-body p-2">
+                                                <div class="text-center">
+                                                    <p class="text-muted text-truncate mb-2">Quantity</p>
+                                                    <h6 class="fs-lg">{{ product.product_stock_quantity }}</h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div><!--end col-->
+
+
+                                </div><!--end row-->
+                            </div><!--end col-->
+                        </div><!--end row-->
+
+                    </div>
+                </div><!--end col-->
+            </div><!--end col-->
+        </div><!--end row-->
+        <div class="card">
+            <div class="card-body p-4">
+                <div>
+                    <h5 class="fs-md mb-3">Description:</h5>
+                    {{ product.product_description|safe }}
+                </div>
+
+                <div class="mt-4">
+                    <h5 class="fs-md mb-3">Product Details:</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-borderless align-middle description-table mb-0">
+                            <tbody>
+                                <tr>
+                                    <th>Main Category</th>
+                                    <td>{{ product.main_category_ref.main_category }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Sub Category</th>
+                                    <td>{{ product.sub_category_ref.sub_category }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Brand</th>
+                                    <td>{{ product.product_brand_ref.brand_name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Material</th>
+                                    <td>{{ product.product_material.product_material }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Color</th>
+                                    <td>{{ product.product_color_ref.product_color_name }}</td>
+                                </tr>
+
+                                <tr>
+                                    <th>Stock Quantity</th>
+                                    <td>{{ product.product_stock_quantity }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Price</th>
+                                    {% if product.product_price %}
+                                    <td>Rs. {{ product.product_price }}</td>
+                                    {% else %}
+                                    <td>-</td>
+                                    {% endif %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><!--end col-->
+</div>
+
+{% include 'base_assets/base_js.html' %}

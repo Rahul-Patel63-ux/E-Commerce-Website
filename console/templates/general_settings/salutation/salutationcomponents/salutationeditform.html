@@ -1,0 +1,62 @@
+<form id="salutation_edit_form" action="{% url 'updateSalutation' s.id %}" method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+      <div class="row">
+          <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+              <label for="usalutation" class="form-label">Salutation <span style="color:red;">*</span></label>
+              <input type="text" id="usalutation" class="form-control" name="usalutation" value="{{s.salutation}}" placeholder="Ex:Mr">
+          </div>
+
+      </div>
+    <div class="modal-footer">
+        <button type="submit" id="editSalutationFormSubmit" class="btn text-white" style="background-color:#405189;">save</button>
+        <button type="button" class="btn bg-light" data-bs-dismiss="modal">Close</button>
+    </div>
+</form>
+<!--base_assests js file-->
+{% include 'base_assets/base_js.html' %}
+<!--script start here-->
+<script>
+
+    $(document).ready(function(){
+        function capitalizeFirstLetter(str) {
+            if (str.length > 0) {
+                return str.charAt(0).toUpperCase() + str.slice(1);
+            }
+            return str;
+        }
+
+        // Adding custom validation method for capitalizing first letter
+        $.validator.addMethod("capitalizeFirstLetter", function(value, element) {
+            // Capitalize the input value
+            $(element).val(capitalizeFirstLetter(value));
+            return true;
+        }, "");
+
+        $.validator.addMethod("validSalutation", function (value, element) {
+          return /^[A-Za-z][A-Za-z.]*$/.test(value);
+        }, "Please enter a valid salutation using letters. Dots are fine after the first letter.");
+
+        $('#salutation_edit_form').validate({
+            rules: {
+                usalutation :{
+                    required: true,
+                    minlength: 2,
+                    maxlength : 10,
+                    validSalutation: true,
+                    capitalizeFirstLetter:true
+                }
+            },
+            messages: {
+                usalutation: {
+                    required: "Please enter salutation.",
+                    minlength: "Salutation should consist at least 2 characters.",
+                    maxlength: "Salutation should not exceed 10 characters.",
+                    validSalutation: "Please enter a valid salutation using letters. Dots are fine after the first letter."
+                }
+            }
+        })
+    })
+
+</script>
+
+<!--script ends here-->

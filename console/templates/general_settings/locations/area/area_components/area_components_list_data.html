@@ -1,0 +1,140 @@
+{% if area_records %}
+    {% for s in area_records %}
+        <tr>
+            <td>{{ forloop.counter0|add:area_records.start_index }}</td>
+            <td>{{ s.area_name }}</td>
+            <td>{{ s.city_ref.city_name }}</td>
+            <td>{{ s.state_ref.state_name }}</td>
+            <td>{{ s.country_ref.country_name }}</td>
+            <td>{{ s.area_created_at|date:"d M,Y" }}</td>
+            <td class="border-light" id="area_status_td{{ s.id }}">
+                {% if s.area_status %}
+                    <span class="badge bg-success">
+                        <a href="#" hx-post="{% url 'areaStatusChange' s.id %}"
+                           hx-target="#area_status_td{{ s.id }}"
+                           hx-trigger="click once"
+                           hx-swap="innerHTML"
+                           hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Active</a>
+                    </span>
+                {% else %}
+                    <span class="badge bg-danger">
+                        <a href="#" hx-post="{% url 'areaStatusChange' s.id %}"
+                           hx-target="#area_status_td{{ s.id }}"
+                           hx-trigger="click once"
+                           hx-swap="innerHTML"
+                           hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Deactive</a>
+                    </span>
+                {% endif %}
+            </td>
+            <td class="border-light d-flex gap-2 justify-content-center">
+                <a href="#editareaModal-{{ s.id }}" class="btn btn-sm text-white btn-icon" style="background-color:#405189;" data-bs-toggle="modal" hx-get="{% url 'areaRenderData' %}?editid={{ s.id }}" hx-target="#area-edit-form-{{ s.id }}" hx-trigger="click once" hx-swap="outerHTML">
+                    <i class="ri-pencil-fill"></i>
+                </a>
+                <button class="btn btn-sm bg-danger text-white btn-icon" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal-{{ s.id }}">
+                    <i class="ri-delete-bin-5-fill"></i>
+                </button>
+            </td>
+        </tr>
+
+        <!-- delete modal start here -->
+        <div class="modal fade zoomIn" id="deleteConfirmModal-{{ s.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger pb-3">
+                        <h5 class="modal-title text-white" id="deleteareaModalLabel">Delete Area</h5>
+                        <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mt-2 text-center">
+                            <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json" trigger="loop"
+                                       colors="primary:#f7b84b,secondary:#f06548" style="width:100px;height:100px"></lord-icon>
+                            <div class="mt-4 pt-2 fs-15 mx-4 mx-sm-5">
+                                <h4>Are you sure?</h4>
+                                <p class="text-muted mx-4 mb-0">Are you sure you want to remove this Area - {{ s.area_name }}?</p>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2 justify-content-center mt-4 mb-2">
+                            <button type="button" class="btn w-sm btn-light" data-bs-dismiss="modal">Close</button>
+                            <a href="{% url 'deleteArea' s.id %}" class="btn w-sm btn-danger delete-area-btn" id="delete-record">Yes, delete it!</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- delete modal end here -->
+
+        <!-- Edit form modal-->
+        <div class="modal fade" id="editareaModal-{{ s.id }}" tabindex="-1" aria-labelledby="editareaModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color:#405189;padding:10px 15px 10px 10px;">
+                        <h5 class="modal-title text-white mb-0">Edit Area</h5>
+                        <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" style="background-color: white;" type="button"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="area-edit-form-{{ s.id }}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <tr>
+        <td colspan="8" style="color:red; text-align:center;">No Records Found</td>
+    </tr>
+{% endif %}
+
+<!--pagination starts here-->
+<div class="d-flex justify-content-center" id="pagination_div" hx-swap-oob="true">
+    <ul class="pagination pagination-separated pagination-sm justify-content-center justify-content-sm-start mb-0">
+        {% if area_records.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="#" hx-get="{% url 'areaRenderData' %}?page={{ area_records.previous_page_number }}" hx-target="#areaTableBodyContainer" hx-swap="innerHTML" hx-include="#search-filter-form,#query">Previous</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled text-muted">
+                <a class="page-link" href="#">Previous</a>
+            </li>
+        {% endif %}
+
+        <!-- First page -->
+        {% if area_records.number > 3 %}
+            <li class="page-item">
+                <a class="page-link" href="#" hx-get="{% url 'areaRenderData' %}?page=1" hx-target="#areaTableBodyContainer" hx-swap="innerHTML" hx-include="#search-filter-form,#query">1</a>
+            </li>
+            {% if area_records.number == 4 %}
+                <li class="page-item text-muted" style="display: none;"><span class="page-link">...</span></li>
+            {% else %}
+                <li class="page-item text-muted"><span class="page-link">...</span></li>
+            {% endif %}
+        {% endif %}
+
+        <!-- Pages around the current page -->
+        {% for page_num in area_records.paginator.page_range %}
+            {% if page_num >= area_records.number|add:-2 and page_num <= area_records.number|add:2 %}
+                <li class="page-item {% if page_num == area_records.number %}active{% endif %}">
+                    <a class="page-link" href="#" hx-get="{% url 'areaRenderData' %}?page={{ page_num }}" hx-target="#areaTableBodyContainer" hx-swap="innerHTML" hx-include="#search-filter-form,#query">{{ page_num }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        <!-- Last page -->
+        {% if area_records.number < area_records.paginator.num_pages|add:-2 %}
+            <li class="page-item text-muted"><span class="page-link">...</span></li>
+            <li class="page-item">
+                <a class="page-link" href="#" hx-get="{% url 'areaRenderData' %}?page={{ area_records.paginator.num_pages }}" hx-target="#areaTableBodyContainer" hx-swap="innerHTML" hx-include="#search-filter-form,#query">{{ area_records.paginator.num_pages }}</a>
+            </li>
+        {% endif %}
+
+        {% if area_records.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="#" hx-get="{% url 'areaRenderData' %}?page={{ area_records.next_page_number }}" hx-target="#areaTableBodyContainer" hx-swap="innerHTML" hx-include="#search-filter-form,#query">Next</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled text-muted">
+                <a class="page-link" href="#">Next</a>
+            </li>
+        {% endif %}
+    </ul>
+</div>
+<!-- pagination ends here-->

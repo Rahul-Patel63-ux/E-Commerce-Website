@@ -1,0 +1,75 @@
+<form id="productmaterialedit__form" action="{% url 'updateMaterial' m.id %}" method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+
+
+          <div class="row">
+              <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                  <label for="uproductmaterial" class="form-label">Material <span style="color:red;">*</span></label>
+                  <input type="text" id="uproductmaterial" class="form-control" name="uproductmaterial" value="{{m.product_material}}" placeholder="Ex:Fabric">
+              </div>
+
+          </div>
+
+
+    <div class="modal-footer">
+        <button type="submit" id="editProductMaterialFormSubmit" class="btn text-white" style="background-color:#405189;">Submit</button>
+        <button type="button" class="btn bg-light" data-bs-dismiss="modal">Close</button>
+    </div>
+</form>
+<!--base_assests js file-->
+{% include 'base_assets/base_js.html' %}
+
+<!--Script starts here-->
+<script>
+$(document).ready(function() {
+   console.log('hello');
+
+    function capitalizeFirstLetter(str) {
+        if (str.length > 0) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+        return str;
+    }
+
+    // Adding custom validation method for capitalizing first letter
+    $.validator.addMethod("capitalizeFirstLetter", function(value, element) {
+        // Capitalize the input value
+        $(element).val(capitalizeFirstLetter(value));
+        return true;
+    }, "");
+
+    $.validator.addMethod("alphabetOnly", function(value, element) {
+    return this.optional(element) || /^[a-zA-Z]+$/.test(value);
+}, "Please enter only alphabetic characters.");
+
+   $('#productmaterialedit__form').validate({
+       rules: {
+           uproductmaterial:{
+               required:true,
+               minlength: 1,
+                maxlength: 100,
+               capitalizeFirstLetter: true,
+               alphabetOnly:true
+           }
+
+       },
+       messages:{
+
+           uproductmaterial:{
+               required:" Please enter Material.",
+               minlength: "Material should consist at least 1 characters.",
+                maxlength: "Material should not be exceeded 100 characters."
+           }
+
+       },
+       submitHandler: function(form) {
+          console.log(" Form is valid.");
+          $('#editProductMaterialFormSubmit').prop('disabled',true);
+          form.submit();
+      }
+   });
+});
+
+
+</script>
+<!--Script ends here-->

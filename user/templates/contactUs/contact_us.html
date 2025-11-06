@@ -1,0 +1,90 @@
+{% extends "user_base/base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+{% include "alertToast/alerttoasters.html" %}
+
+
+<div class="main-content mt-5">
+
+    <div class="row ">
+        <div class="col-7">
+            <div class="card p-4">
+                <div class="row border-2">
+                    <label for="" class="col text-secondary fw-semibold fs-5xl"> Reachout Us by </label>
+                    <div class="col d-flex text-end mb-3">
+                        <div class="dropdown flex-shrink-0 ms-auto">
+                            <button class="btn btn-outline-dark btn-icon btn-sm" type="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                <i class="bi bi-share"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="https://api.whatsapp.com/send/?phone=918919889057" target="_blank"><i
+                                            class="bi bi-whatsapp me-1 text-success align-baseline"></i> Whatsapp</a></li>
+                                <li><a class="dropdown-item" href="https://www.instagram.com/peramsonsacademy/" target="_blank"><i
+                                            class="bi bi-instagram me-1 text-danger align-baseline"></i> Instagram</a></li>
+                                <li><a class="dropdown-item" href="https://www.facebook.com/peramsonsacademy/" target="_blank"><i
+                                            class="bi bi-facebook me-1 text-primary align-baseline"></i> Facebook</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-4 fs-6 text-muted fw-medium">Name </div>
+                    <div class="col-2">:</div>
+                    <div class="col-6 fs-6 fw-medium">PERAMSONS ACADEMY</div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-4 fs-6 text-muted fw-medium">Email </div>
+                    <div class="col-2">:</div>
+                    <div class="col-6 fs-6 fw-medium">academy@peramsons.com, <br>peramsonsacademy@gmail.com</div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-4 fs-6 text-muted fw-medium">Contact </div>
+                    <div class="col-2">:</div>
+                    <div class="col-6 fs-6 fw-medium">+91 8919889057</div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-4 fs-6 text-muted fw-medium">About </div>
+                    <div class="col-2">:</div>
+                    <div class="col-6 fs-6 fw-medium">At Peramsons Academy, our mission is to empower every student on
+                        the planet to achieve more. Core to our mission is creating immersive and inclusive learning
+                        experiences that inspire lifelong learning. For students, these experiences stimulate the
+                        development of essential life skills like communication, collaboration, critical thinking, and
+                        creativity.</div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-4 fs-6 text-muted fw-medium">Address </div>
+                    <div class="col-2">:</div>
+                    <div class="col-6 fs-6 fw-medium">#408, Annapurna Block, Adithya Enclave, Ameerpet, Hyderabad,
+                        Telangana - 500038</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Location</h4>
+                </div><!-- end card header -->
+
+                <div class="card-body">
+                    <!-- <div id="gmaps-markers" class="gmaps"></div> -->
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3618.140916465719!2d78.44490909999999!3d17.436605599999996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb91a81a898a8d%3A0x708e87f41074d830!2sPeramsons%20Academy!5e1!3m2!1sen!2sin!4v1752156855258!5m2!1sen!2sin"
+                        width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div><!-- end card-body -->
+            </div><!-- end card -->
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="https://maps.google.com/maps/api/js?key=AIzaSyCtSAR45TFgZjOs4nBFFZnII-6mMHLfSYI"></script>
+
+
+{% endblock content %}

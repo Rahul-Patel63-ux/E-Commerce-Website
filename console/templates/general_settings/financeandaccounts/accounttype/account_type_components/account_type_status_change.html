@@ -1,0 +1,22 @@
+{% if status_page == 'account_page' %}
+    <td class="border-light" id="accounttype_status_td{{account.id}}">
+                      {% if account.account_type_status %}
+                      <span class="badge bg-success">
+                          <a href="#" hx-post="{% url 'accountStatusChange' account.id %}"
+                              hx-target="#accounttype_status_td{{account.id}}"
+                              hx-trigger="click once"
+                              hx-swap="innerHTML"
+                              hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Active</a>
+                      </span>
+                      {% else %}
+                      <span class="badge bg-danger">
+                          <a href="#" hx-post="{% url 'accountStatusChange' account.id %}"
+                              hx-target="#accounttype_status_td{{account.id}}"
+                              hx-trigger="click once"
+                              hx-swap="innerHTML"
+                              hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Deactive</a>
+                      </span>
+                      {% endif %}
+                  </td>
+
+{% endif %}

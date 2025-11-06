@@ -1,0 +1,41 @@
+<form action="{% url 'packingManagementStatusChange' packing_status.id %}" method="post" class="update_packing_status" id="update_packing_status">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+            <label for="packing_status" class="form-label">Packing Status <span style="color:red;">*</span></label>
+            <select id="packing_status" class="form-control form-select" name="packing_status" required>
+                <option value="yet_to_pack" {% if packing_status.packing_status == 'yet_to_pack' %}selected{% endif %}>Yet To Pack</option>
+                <option value="packed" {% if packing_status.packing_status == 'packed' %}selected{% endif %}>Packed</option>
+            </select>
+        </div>
+    </div>
+    <div class="modal-footer d-flex justify-content-center">
+        <button type="submit" id="editPackingStatusFormSubmit" class="btn text-white" style="background-color:#405189;">Save</button>
+        <button type="button" class="btn bg-light" data-bs-dismiss="modal">Close</button>
+    </div>
+</form>
+{% include 'base_assets/base_js.html' %}
+
+<script>
+$(document).ready(function() {
+    console.log('hello');
+
+    $('#update_packing_status').validate({
+        rules: {
+            packing_status: {
+                required: true
+            }
+        },
+        messages: {
+            packing_status: {
+                required: "Please select a packing status."
+            }
+        },
+        submitHandler: function(form) {
+            console.log("Form is valid.");
+            $('#editPackingStatusFormSubmit').prop('disabled', true);
+            form.submit();
+        }
+    });
+});
+</script>

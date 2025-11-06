@@ -1,0 +1,285 @@
+{% extends "user_base/mock_base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+{% include 'alertToast/alerttoasters.html' %}
+
+<div class="row mt-5 p-4 justify-content-center">
+    <div class="col-xxl-12">
+        <div class="card shadow-lg p-5">
+            <div class="card-header">
+                <div class="row mb-4">
+                    <div class="col-12 p-2 text-center bg-info fw-semibold fs-5 rounded text-white">
+                        Please fillup your one time profile setup
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <form action="" method="post" id="profileSetupForm" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-4">
+                            <label for="image" class="mb-2">Profile Image <span style="color:red">*</span> <sub><span
+                                        class="text-primary">(.jpg/.jpeg)</span></sub> </label>
+                            <input type="file" id="image" name="image" class="form-control">
+                        </div>
+                        <div class="col-4">
+                            <label for="age" class="mb-2">Age <span style="color:red">*</span></label>
+                            <input type="text" id="age" name="age" class="form-control" placeholder="Ex. 18">
+                        </div>
+                        <div class="col-4">
+                            <label for="gender" class="mb-2">Gender <span style="color:red">*</span></label>
+                            <input type="text" id="gender" name="gender" class="form-control"
+                                placeholder="Ex. Male/Female">
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-6 col-sm-6 fs-10">
+                            <label for="country" class="form-label">Country <span style="color:red">*</span></label>
+                            <select name="country" class="form-select country">
+                                <option value="" class="text-muted">Select Country</option>
+                                {% for country in countries %}
+                                <option value="{{country.id}}">{{country.country_name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 col-sm-6 fs-10">
+                            <label for="state" class="form-label">State <span style="color:red">*</span></label>
+                            <select name="state" class="form-select state">
+                                <option value="" class="text-muted">Select State</option>
+                                {% for state in states %}
+                                <option value="{{state.id}}">{{state.state_name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-6 col-sm-6 fs-10">
+                            <label for="city" class="form-label">City <span style="color:red">*</span></label>
+                            <select name="city" class="form-select city">
+                                <option value="" class="text-muted">Select City</option>
+                                {% for city in cities %}
+                                <option value="{{city.id}}">{{city.city_name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 col-sm-6 fs-10">
+                            <label for="area" class="form-label">Area <span style="color:red">*</span></label>
+                            <select name="area" class="form-select area">
+                                <option value="" class="text-muted">Select Area</option>
+                                {% for a in area %}
+                                <option value="{{a.id}}">{{a.area_name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12 col-sm-12">
+                            <label for="address">Address <span style="color:red">*</span></label>
+                            <textarea id="address" class="form-control mt-1" name="address"
+                                placeholder="Ex. 24/60 First Floor Bapu Nagar - 500038"></textarea>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-12 text-center">
+                            <button type="submit" id="submitBtn" class="btn btn-primary">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        $.validator.addMethod("noSpace", function (value, element) {
+            return this.optional(element) || (value.trim().length === value.length);
+        }, "Spaces are not allowed");
+
+        $.validator.addMethod("noNumbers", function (value, element) {
+            return this.optional(element) || /^[^0-9]+$/.test(value);
+        }, "Numbers are not allowed");
+
+        $.validator.addMethod("noCharacters", function (value, element) {
+            return this.optional(element) || /^[^a-zA-Z]+$/.test(value);
+        }, "Characters are not allowed");
+
+        $.validator.addMethod("noSpecialChars", function (value, element) {
+            return this.optional(element) || /^[a-zA-Z0-9 ]+$/.test(value);
+        }, "Special Characters are not allowed");
+
+        $('#profileSetupForm').validate({
+            rules: {
+                image: {
+                    required: true,
+                    extension: "jpg|jpeg"
+                },
+                age: {
+                    required: true,
+                    noSpace: true,
+                    noCharacters: true,
+                    noSpecialChars: true
+                },
+                gender: {
+                    required: true,
+                    noNumbers: true,
+                    noSpace: true,
+                    noSpecialChars: true
+                },
+                country: {
+                    required: true,
+                },
+                state: {
+                    required: true,
+                },
+                city: {
+                    required: true,
+                },
+                area: {
+                    required: true,
+                },
+                address:{
+                    required: true
+                }
+            },
+            messages: {
+                image: {
+                    required: "Please select an image",
+                    extension: "Only .jpg and .jpeg extension accepted"
+                },
+                age: {
+                    required: "Please enter age",
+                    noSpace: "Spaces are not allowed",
+                    noCharacters: "Characters are not allowed",
+                    noSpecialChars: "Special Characters are not allowed"
+                },
+                gender: {
+                    required: "Please enter gender",
+                    noNumbers: "Numbers are not allowed",
+                    noSpace: "Spaces are not allowed",
+                    noSpecialChars: "Special Characters are not allowed"
+                },
+                country: {
+                    required: 'Please select country',
+                },
+                state: {
+                    required: 'Please select state',
+                },
+                city: {
+                    required: 'Please select city',
+                },
+                area: {
+                    required: 'Please select area',
+                },
+                address:{
+                    required: "Please enter address"
+                }
+
+            },
+            submitHandler: function (form) {
+                form.submit();
+            }
+        });
+
+        // When country get changes, related states will be shown 
+        $('.country').change(function () {
+            var countryId = $(this).val();
+            if (countryId) {
+                $.ajax({
+                    url: "{% url 'get_states' %}",
+                    data: {
+                        'country_id': countryId
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        $('.state').empty();
+                        $('.state').append('<option value="">Select State</option>');
+                        $.each(data.states, function (index, state) {
+                            $('.state').append(
+                                $('<option>').val(state.id).text(state.state_name)
+                            );
+                        });
+
+                        // Clear city and area dropdowns
+                        $('.city').empty();
+                        $('.city').append('<option value=""> Select City</option>');
+                        $('.area').empty();
+                        $('.area').append('<option value=""> Select Area</option>');
+                    }
+                });
+            } else {
+                $('.state').empty();
+                $('.state').append('<option value=""> Select State</option>');
+                $('.city').empty();
+                $('.city').append('<option value=""> Select City</option>');
+                $('.area').empty();
+                $('.area').append('<option value=""> Select Area</option>');
+            }
+        });
+
+        // When state get changes, related city will be shown 
+        $('.state').change(function () {
+            var stateId = $(this).val();
+            if (stateId) {
+                $.ajax({
+                    url: "{% url 'get_cities' %}",
+                    data: {
+                        'state_id': stateId
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        $('.city').empty();
+                        $('.city').append('<option value="">Select City</option>');
+                        $.each(data.cities, function (index, city) {
+                            $('.city').append(
+                                $('<option>').val(city.id).text(city.city_name)
+                            );
+                        });
+
+                        // Clear area dropdowns
+                        $('.area').empty();
+                        $('.area').append('<option value=""> Select Area</option>');
+                    }
+                });
+            } else {
+                $('.city').empty();
+                $('.city').append('<option value=""> Select City</option>');
+                $('.area').empty();
+                $('.area').append('<option value=""> Select Area</option>');
+            }
+        });
+
+
+        // When city get changes, related area will be shown 
+        $('.city').change(function () {
+            var cityId = $(this).val();
+            if (cityId) {
+                $.ajax({
+                    url: "{% url 'get_areas' %}",
+                    data: {
+                        'city_id': cityId
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        $('.area').empty();
+                        $('.area').append('<option value="">Select Area</option>');
+                        $.each(data.areas, function (index, area) {
+                            $('.area').append(
+                                $('<option>').val(area.id).text(area.area_name)
+                            );
+                        });
+                    }
+                });
+            } else {
+                $('.area').empty();
+                $('.area').append('<option value=""> Select Area</option>');
+            }
+        });
+    });
+</script>
+
+{% endblock content %}

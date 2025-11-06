@@ -1,0 +1,23 @@
+{% if status_page == 'payment_page' %}
+        <td class="border-light" id="paymenttype_status_td{{p.id}}">
+              {% if p.payment_status %}
+              <span class="badge bg-success">
+                  <a href="#" hx-post="{% url 'paymentTypeStatusChange' p.id %}"
+                      hx-target="#paymenttype_status_td{{p.id}}"
+                      hx-trigger="click once"
+                      hx-swap="innerHTML"
+                      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Active</a>
+              </span>
+              {% else %}
+              <span class="badge bg-danger">
+                  <a href="#" hx-post="{% url 'paymentTypeStatusChange' p.id %}"
+                      hx-target="#paymenttype_status_td{{p.id}}"
+                      hx-trigger="click once"
+                      hx-swap="innerHTML"
+                      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Deactive</a>
+              </span>
+              {% endif %}
+          </td>
+
+
+{% endif %}

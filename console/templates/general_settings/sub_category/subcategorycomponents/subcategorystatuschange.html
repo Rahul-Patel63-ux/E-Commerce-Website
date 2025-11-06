@@ -1,0 +1,22 @@
+{% load static %}
+{% if status_page == 'subcategory_page' %}
+        <td class="border-light" id="subcategory_status_td{{subcategory.id}}">
+              {% if subcategory.sub_category_status %}
+              <span class="badge bg-success">
+                  <a href="#" hx-post="{% url 'subCategoryStatusChange' subcategory.id %}"
+                      hx-target="#subcategory_status_td{{subcategory.id}}"
+                      hx-trigger="click once"
+                      hx-swap="innerHTML"
+                      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Active</a>
+              </span>
+              {% else %}
+              <span class="badge bg-danger">
+                  <a href="#" hx-post="{% url 'subCategoryStatusChange' subcategory.id %}"
+                      hx-target="#subcategory_status_td{{subcategory.id}}"
+                      hx-trigger="click once"
+                      hx-swap="innerHTML"
+                      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Deactive</a>
+              </span>
+              {% endif %}
+          </td>
+{% endif %}

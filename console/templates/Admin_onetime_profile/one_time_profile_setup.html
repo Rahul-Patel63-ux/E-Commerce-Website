@@ -1,0 +1,349 @@
+{% extends 'mock_base/mock_base.html' %}
+{% block content %}
+<!--alert starts here-->
+{% include 'alertcomponents/alertcomponent.html' %}
+<!--alert ends here-->
+<div class="card">
+  <div class="card-header text-center" style="background-color:#405189;padding:10px 15px 10px 10px;">
+    <h3 class="text-white fs-4">One Time Profile Setup</h3>
+  </div>
+  <div class="card-body">
+    <form id="one_time_profile" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header" style="background-color:#40518995;padding:10px 15px 10px 10px;">
+              <h5>Personal Details</h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                    <label for="ecom_name" class="form-label">Full Name <span style="color:red;">*</span></label>
+                    <input type="text" id="ecom_name" class="form-control" name="ecom_name" placeholder="Ex:Mark Antony">
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                    <label for="ecom_phone_number" class="form-label">Phone Number <span style="color:red;">*</span></label>
+                    <input type="tel" id="ecom_phone_number" class="form-control" name="ecom_phone_number" placeholder="Ex:8527419513">
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                    <label for="ecom_gender" class="form-label">Gender <span style="color:red;">*</span></label>
+                    <select name="ecom_gender" id="ecom_gender" class="form-select">
+                      <option value="">Select Gender</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">others</option>
+                    </select>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                    <label for="ecom_dob" class="form-label">Date Of Birth <span class="text-light-emphasis">*</span></label>
+                    <input type="date" id="ecom_dob" class="form-control date_of_birth" name="ecom_dob" placeholder="">
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                    <label for="ecom_aadhaar" class="form-label">Aadhaar <span style="color:red;">*</span></label>
+                    <input type="number" id="ecom_aadhaar" class="form-control" name="ecom_aadhaar" placeholder="Ex:6166 3001 0823">
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header" style="background-color:#40518995;padding:10px 15px 10px 10px;">
+              <h5>Company Details</h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                  <label for="company_name" class="form-label">Name <span style="color:red;">*</span></label>
+                  <input type="text" id="company_name" name="company_name" class="form-control" placeholder="Ex: Mart">
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                  <label for="company_regno" class="form-label">Registration Number <span style="color:red;">*</span></label>
+                  <input type="text" id="company_regno" name="company_regno" class="form-control" placeholder="Ex: U51101DL2020PTC123456">
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                  <label for="company_logo" class="form-label">Logo <span style="color:red;">* <sub class="text-secondary">(.jpg/ .png/)</sub></span></label>
+                  <input type="file" id="company_logo" name="company_logo" class="form-control" >
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                  <label for="company_banner" class="form-label">Banner <span style="color:red;">* <sub class="text-secondary">(.jpg/ .png/)</sub></span></label>
+                  <input type="file" id="company_banner" name="company_banner" class="form-control" >
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+                  <label for="company_icon" class="form-label">Icon <span style="color:red;">* <sub class="text-secondary">(.jpg/ .png/)</sub></span></label>
+                  <input type="file" id="company_icon" name="company_icon" class="form-control" >
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                  <label for="admin_company_about" class="form-label">About <span style="color:red;">*</span></label>
+                  <textarea class="form-control ckeditor-classic" id="admin_company_about" name="admin_company_about" rows="3" placeholder="Ex: About Company" ></textarea>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                  <label for="admin_company_summary" class="form-label">Summary <span style="color:red;">*</span></label>
+                  <textarea class="form-control ckeditor-classic" id="admin_company_summary" name="admin_company_summary" rows="3" placeholder="Ex: Summary" ></textarea>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 mb-4 d-flex justify-content-center gap-1">
+                    <button type="submit" id=oneTimeProfileFormSubmit" class="btn text-white" style="background-color:#405189;">Submit</button>
+                    <button type="button" class="btn bg-light" data-bs-dismiss="modal">Close</button>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </form>
+
+  </div>
+</div>
+<!--base_assests js file-->
+{% include 'base_assets/base_js.html' %}
+
+<!-- Initialize CKEditor -->
+<script>
+    document.querySelectorAll(".ckeditor-classic").forEach(function(element) {
+        ClassicEditor
+            .create(element, {
+                toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'alignment', '|', 'blockQuote', 'undo', 'redo'],
+                alignment: {
+                    options: ['left', 'center', 'right', 'justify']
+                },
+                height: '200px'
+            })
+            .then(function(editor) {
+                editor.ui.view.editable.element.style.height = '200px';
+            })
+            .catch(function(error) {
+                console.error(error);
+            });
+    });
+</script>
+
+
+<!--form validaitons-->
+
+<script>
+    window.addEventListener('load', function() {
+        var today = new Date().toISOString().split('T')[0];
+        var dateInputs = document.querySelectorAll('.date_of_birth'); // Select inputs with class "date-input"
+        dateInputs.forEach(function(input) {
+            input.setAttribute('max', today); // Set max attribute to today's date
+        });
+    });
+</script>
+
+<script>
+  $(document).ready(function() {
+
+    // Function to capitalize first letter
+    function capitalizeFirstLetter(str) {
+        if (str.length > 0) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+        return str;
+    }
+
+    // Custom validation method for capitalizing first letter
+    $.validator.addMethod("capitalizeFirstLetter", function(value, element) {
+        $(element).val(capitalizeFirstLetter(value));
+        return true;
+    }, "");
+    $.validator.addMethod("letterStartNoLeadingSpace", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z][^\s].*/.test(value);
+    }, "Company name must start with a letter and have no leading space.");
+
+    // Add custom validation method to restrict double spaces
+    $.validator.addMethod("noDoubleSpace", function(value, element) {
+        return this.optional(element) || !/\s{2,}/.test(value);
+    }, "Double spaces are not allowed.");
+
+    $.validator.addMethod("twelveDigits", function(value, element) {
+        return this.optional(element) || /^\d{12}$/.test(value);
+    }, "Aadhaar number must be exactly 12 digits.");
+
+    // Method to check that the number does not start with 0 or 1
+    $.validator.addMethod("noZeroOrOneStart", function(value, element) {
+        return this.optional(element) || /^[2-9]\d{11}$/.test(value);
+    }, "Aadhaar number must not start with 0 or 1.");
+
+    // Method to check that all digits are not identical
+    $.validator.addMethod("nonIdenticalDigits", function(value, element) {
+        return this.optional(element) || !/^(\d)\1{11}$/.test(value);
+    }, "Aadhaar number digits must not all be identical.");
+
+    // Custom validation method for file size
+    $.validator.addMethod("maxFileSize", function(value, element, param) {
+        if (element.files && element.files.length > 0) {
+            return element.files[0].size <= param * 1024 * 1024; // Convert MB to bytes
+        }
+        return true;
+    }, "File size must not exceed {0}MB.");
+
+
+
+    // Custom validation method for phone number (10 digits)
+    $.validator.addMethod("validPhone", function(value, element) {
+        return this.optional(element) || /^[6-9]\d{9}$/.test(value);
+    }, "Please enter a valid 10-digit phone number starting with 6, 7, 8, or 9.");
+
+<!--    // Custom validation method for company registration number-->
+<!--    $.validator.addMethod("validCompanyRegno", function(value, element) {-->
+<!--        return this.optional(element) || /^([LUu]{1})([0-9]{5})([A-Za-z]{2})([0-9]{4})([A-Za-z]{3})([0-9]{6})$/.test(value);-->
+<!--    }, "Please enter a valid registration number (e.g., U51101DL2020PTC123456).");-->
+     $.validator.addMethod("validCompanyRegno", function(value, element) {
+        // Remove spaces and hyphens
+        var cleanedValue = value.replace(/[\s-]/g, '');
+        var isValid = /^([LUu]{1})([0-9]{5})([A-Za-z]{2})([0-9]{4})([A-Za-z]{3})([0-9]{6})$/.test(cleanedValue);
+        console.log("Company Regno Input:", value, "Cleaned:", cleanedValue, "Valid:", isValid);
+        if (isValid) {
+            $(element).val(cleanedValue); // Update input with cleaned value
+        }
+        return this.optional(element) || isValid;
+    }, "Please enter a valid registration number (e.g., U51101DL2020PTC123456).");
+
+    $.validator.addMethod("alphaOnly", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z\s]+$/.test(value);
+    }, "Please enter only alphabets and spaces.");
+    $.validator.addMethod("noFutureDate", function(value, element) {
+        if (!value) return true; // Skip if empty (handled by required rule)
+        const selectedDate = new Date(value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Normalize to midnight
+        return selectedDate <= today;
+    }, "Date of birth cannot be in the future.");
+
+    $('#one_time_profile').validate({
+        rules: {
+            ecom_name: {
+                required: true,
+                minlength: 2,
+                maxlength: 50,
+                alphaOnly:true,
+                letterStartNoLeadingSpace:true,
+                noDoubleSpace:true,
+                capitalizeFirstLetter: true
+            },
+            ecom_phone_number: {
+                required: true,
+                validPhone: true
+            },
+            ecom_gender: {
+                required: true
+            },
+            ecom_dob: {
+                required: true,
+                noFutureDate:true
+            },
+            ecom_aadhaar: {
+                required: true,
+                twelveDigits:true,
+                noZeroOrOneStart:true,
+                nonIdenticalDigits:true
+            },
+            company_name: {
+                required: true,
+                minlength: 3,
+                maxlength: 100,
+                capitalizeFirstLetter: true
+            },
+            company_regno: {
+                required: true,
+                validCompanyRegno: true
+            },
+            company_logo: {
+                required: true,
+                extension: "jpg|png",
+                maxFileSize: 2
+            },
+            company_banner: {
+                required: true,
+                extension: "jpg|png",
+                maxFileSize: 2
+            },
+            company_icon: {
+                required: true,
+                extension: "jpg|png",
+                maxFileSize: 2
+            },
+            admin_company_about: {
+                required: true,
+                minlength: 10,
+                maxlength: 500
+            },
+            admin_company_summary: {
+                required: true,
+                minlength: 10,
+                maxlength: 500
+            }
+        },
+        messages: {
+            ecom_name: {
+                required: "Please enter your full name.",
+                letterStartNoLeadingSpace: " Full name should start with a character.",
+                minlength: "Full name should be at least 2 characters.",
+                maxlength: "Full name should not exceed 50 characters."
+            },
+            ecom_phone_number: {
+                required: "Please enter your phone number.",
+                validPhone: "Please enter a valid 10-digit phone number starting with 6, 7, 8, or 9."
+            },
+            ecom_gender: {
+                required: "Please select your gender."
+            },
+            ecom_dob: {
+                required: "Please enter your date of birth."
+            },
+            ecom_aadhaar: {
+                required: "Please enter your Aadhaar number.",
+                validAadhaar: "Please enter a valid 12-digit Aadhaar number."
+            },
+            company_name: {
+                required: "Please enter the company name.",
+                minlength: "Company name should be at least 3 characters.",
+                maxlength: "Company name should not exceed 100 characters."
+            },
+            company_regno: {
+                required: "Please enter the company registration number.",
+                validCompanyRegno: "Please enter a valid registration number (e.g., U51101DL2020PTC123456)."
+            },
+            company_logo: {
+                required: "Please upload a company logo.",
+                extension: "Only .jpg or .png files are allowed.",
+                maxFileSize: "Logo size must not exceed 2MB."
+            },
+            company_banner: {
+                required: "Please upload a company banner.",
+                extension: "Only .jpg or .png files are allowed.",
+                maxFileSize: "Banner size must not exceed 2MB."
+            },
+            company_icon: {
+                required: "Please upload a company icon.",
+                extension: "Only .jpg or .png files are allowed.",
+                maxFileSize: "Icon size must not exceed 2MB."
+            },
+            admin_company_about: {
+                required: "Please enter the company about section.",
+                minlength: "About section should be at least 10 characters.",
+                maxlength: "About section should not exceed 500 characters."
+            },
+            admin_company_summary: {
+                required: "Please enter the company summary.",
+                minlength: "Summary should be at least 10 characters.",
+                maxlength: "Summary should not exceed 500 characters."
+            }
+        },
+        submitHandler: function(form) {
+            console.log("Form is valid.");
+            form.submit();
+        }
+    });
+});
+</script>
+{% endblock %}
+
+

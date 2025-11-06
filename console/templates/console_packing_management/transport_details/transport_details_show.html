@@ -1,0 +1,44 @@
+{% load static %}
+
+{% if transport_detail %}
+<div class="row">
+    <div class="col-12">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Order</th>
+                            <th>Transport Type</th>
+                            <th>Delivery Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ transport_detail.order_ref.order_item_reg_id }}</td>
+                            <td>{{ transport_detail.transport_type.transport_type }}</td>
+                            <td>{{ transport_detail.delivery_date|date:"d M, Y" }}</td>
+                        </tr>
+                    </tbody>
+                    <!--    <div class="mb-3">-->
+                    <!--        <label class="form-label">Order Reference</label>-->
+                    <!--        <p class="form-control-static">{{ transport_detail.order_ref.order_reg_id }}</p>-->
+                    <!--    </div>-->
+                    <!--    <div class="mb-3">-->
+                    <!--        <label class="form-label">Transport Type</label>-->
+                    <!--        <p class="form-control-static">{{ transport_detail.transport_type.transport_type }}</p>-->
+                    <!--    </div>-->
+                    <!--    <div class="mb-3">-->
+                    <!--        <label class="form-label">Delivery Date</label>-->
+                    <!--        <p class="form-control-static">{{ transport_detail.delivery_date }}</p>-->
+                    <!--    </div>-->
+                    {% else %}
+                        <tr>
+                            <td colspan="3" style="color:red; text-align:center;">No Transportation Details Available</td>
+                        </tr>
+                    <!--    <p style="color:red; text-align:center;">No Transportation Details Available</p>-->
+                    {% endif %}
+                </table>
+        </div>
+    </div>
+</div>

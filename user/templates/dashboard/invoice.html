@@ -1,0 +1,226 @@
+{% extends "user_base/base.html" %}
+
+{% load static %}
+{% load humanize %}
+{% block content %}
+
+{% include 'alertToast/alerttoasters.html' %}
+
+<div class="container-fluid">
+
+    <!-- start page title -->
+    <div class="row pt-5">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+                        <li class="breadcrumb-item active">Invoice</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end page title -->
+     
+    <div class="row justify-content-center">
+        <div class="col-xxl-12">
+            <div class="card p-3 pb-2 shadow-lg">
+                <div class="row  g-0 product-list">
+                    <!-- LOGO -->
+                    <div class="col-3">
+                        <div class="navbar-brand-box">
+                            <div class="logo logo-dark">
+                                <span class="logo-sm">
+                                    <img src="{% static 'assets/images/logo-sm.png' %}" alt="" height="22">
+                                </span>
+                                <span class="logo-lg">
+                                    <img src="{% static 'assets/images/logo-dark.png' %}" alt="" height="22">
+                                </span>
+                            </div>
+                            <div class="logo logo-light">
+                                <span class="logo-sm">
+                                    <img src="{% static 'assets/images/logo-sm.png' %}" alt="" height="22">
+                                </span>
+                                <span class="logo-lg">
+                                    <img src="{% static 'assets/images/logo-light.png' %}" alt="" height="22">
+                                </span>
+                            </div>
+                            <!-- <button type="button" class="btn btn-sm p-0 fs-3xl header-item float-end btn-vertical-sm-hover"
+                            id="vertical-hover">
+                            <i class="ri-record-circle-line"></i>
+                        </button> -->
+                            <!-- <div class="vertical-menu-btn-wrapper header-item vertical-icon">
+                        <button type="button"
+                            class="btn btn-sm px-0 fs-xl vertical-menu-btn topnav-hamburger shadow hamburger-icon"
+                            id="topnav-hamburger-icon">
+                            <i class='bx bx-chevrons-right'></i>
+                            <i class='bx bx-chevrons-left'></i>
+                        </button>
+                    </div> -->
+                        </div>
+                    </div>
+                    <div class="col-5">
+
+                    </div>
+                    <div class="col-4">
+                        {% if order %}
+                        <div class="address mt-4">
+                            <div class="fw-semibold">Address:</div>
+                            <p class="ms-2 mt-2">{{order.address}}, {{order.area}},</p>
+                            <p class="ms-2">{{order.city}},
+                                {{order.state}},
+                                {{order.country}}
+                            </p>
+                        </div>
+                        {% else %}
+                        <p>Nothing found</p>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <div class="btn btn-outline-dark text-dark disabled">{{ order.order_reg_id }}</div>
+                        <table class="table text-center table-striped">
+                            <thead class="table-primary">
+                                <tr class="list_cards">
+                                    <th scope="col">S.No.</th>
+                                    <th scope="col">Title</th>
+                                    {% comment %} <th scope="col">Selling Amt</th> {% endcomment %}
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Quantity</th>
+                                    <th scope="col">Qty x Price</th>
+                                    <th scope="col">Discount Percent</th> 
+                                    <th scope="col">Dis. Price</th>
+                                    <th scope="col">Total</th> 
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if items %}
+                                {% for title, price, quantity_mul_price, qty, subtotal, discounted_value, discount_percent in items %}
+                                <tr class="product">
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ title }}</td>
+                                    <td class="price">{{ price | floatformat:2 | intcomma  }}</td>
+                                    <td class="quantity">{{ qty }}</td>
+                                    <td class="line-subtotal">{{ quantity_mul_price | floatformat:2 }}</td>
+                                    <td class="discount_percent">{{ discount_percent | floatformat:2 | intcomma }}%</td>
+                                    {% comment %} <td class="qty_price"></td> {% endcomment %}
+                                    <td class="order_discount">{{ discounted_value | floatformat:2 | intcomma }}</td>
+                                    <td>{{ subtotal | floatformat:2 | intcomma }}</td>
+                                </tr>
+                                {% endfor %}
+                                {% endif %}
+                            </tbody>
+
+                        </table>
+                    </div>
+                    <div class="row">
+                        <div class="col-8">
+
+                        </div>
+                        <div class="col-4">
+                            <div class="border-start-xxl border-top-xxl-0 border-top h-100">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Order Summary</h5>
+                                </div>
+                                <div class="card-body mt-2">
+                                    <div class="table-card">
+                                        <div class="row ms-1 p-1">
+
+                                            <div class="row pt-3">
+                                                <div class="fw-semibold col-md-6" colspan="2">Total :</div>
+                                                <div class="fw-semibold col-md-6 text-end cart-total" name="total">
+                                                </div>
+                                            </div>
+                                            <div class="row pt-3">
+                                                <div colspan="2" class="col-md-6">Discount :</div>
+                                                <div class="text-end col-md-6 cart-discount" name="discount">
+                                                </div>
+                                            </div>
+                                            <div class="row pt-3">
+                                                <div class="col-md-6" colspan="2">Sub Total:</div>
+                                                <div class="text-end col-md-6 cart-subtotal" name="subtotal">
+                                                </div>
+                                            </div>
+                                            <div class="row pt-3">
+                                                <div class="col-md-6" colspan="2">Estimated Tax (18%): </div>
+                                                <div class="text-end col-md-6 cart-tax">
+                                                </div>
+                                            </div>
+                                            <div class="row pt-3">
+                                                <div class="col-md-6" colspan="2">Coupon Code: </div>
+                                                <div class="text-end col-md-6 cart-coupon-code">
+                                                    {{ order.coupon_code }}
+                                                </div>
+                                            </div>
+                                            <div class="row pt-3">
+                                                <div class="col-md-6" colspan="2">Coupon Discount: </div>
+                                                <div class="text-end col-md-6 cart-coupon-discount-percent" name="coupon">
+                                                    {{order.coupon_discount_percent}}%
+                                                </div>
+                                            </div>
+                                            <div class="row pt-3">
+                                                <div class="col-md-6 fw-semibold" colspan="2">Grand Total :</div>
+                                                <div class="text-end col-md-6 " name="grandtotal">
+                                                    <span class="fw-semibold cart-grandTotal"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        // calculation of all the prices + discounts
+        let couponDiscount = parseFloat($(this).find('.cart-coupon-discount-percent').text().replace(/[^\d.]/g, '')) || 0;
+        console.log('Coupon Discount ' + couponDiscount);
+        let grandTotal = 0
+
+        function updateSummary() {
+            //let qty_price = 0;
+            let total = 0;
+            let order_discount = 0;
+
+            $('.product').each(function () {
+                //let quantity = parseInt($(this).find('.quantity').text().replace(/[^\d.]/g, '')) || 0;
+                //let price = parseFloat($(this).find('.price').text().replace(/[^\d.]/g, '')) || 0;
+//
+                //qty_price = quality * price 
+                
+                order_discount += parseFloat($(this).find('.order_discount').text()) || 0;
+
+                let lineSubtotal = parseFloat($(this).find('.line-subtotal').text()) || 0;
+                console.log("Line total " + lineSubtotal);
+                total += lineSubtotal;
+                console.log('Total ' + total);
+            });
+            let subtotal = total - order_discount;
+            let tax = subtotal * 0.18;
+            grandTotal = (subtotal + tax);
+
+            // Apply coupon discount only if minimumPurchase condition is met
+            if (couponDiscount > 0 ) {
+                grandTotal = (grandTotal - (grandTotal * couponDiscount) / 100);
+            }
+
+            
+            console.log("Total " + total);
+            //$('.qty_price').html('<i class="bi bi-currency-rupee"></i>' + qty_price.toFixed(2));
+            $('.cart-total').html('<i class="bi bi-currency-rupee"></i>' + total.toFixed(2));
+            $('.cart-discount').html('- <i class="bi bi-currency-rupee"></i>' + order_discount.toFixed(2));
+            $('.cart-subtotal').html('<i class="bi bi-currency-rupee"></i>' + subtotal.toFixed(2));
+            $('.cart-tax').html('<i class="bi bi-currency-rupee"></i>' + tax.toFixed(2));
+            $('.cart-grandTotal').html('<i class="bi bi-currency-rupee"></i>' + grandTotal.toFixed(2));
+        }
+        updateSummary();
+    });
+</script>
+{% endblock content %}

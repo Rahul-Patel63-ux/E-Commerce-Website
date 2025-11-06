@@ -1,0 +1,125 @@
+{% include 'base_assets/base_css.html' %}
+
+<form id="edit_city_form" action="{% url 'updateCity' s.id %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+            <label for="ucountry" class="form-label">Country <span style="color:red;">*</span></label>
+            <select name="ucountry" id="ucountry" class="form-select" onchange="updateEditStateOptions()">
+                <option value="">Select country</option>
+                {% for i in country %}
+                    <option value="{{ i.id }}" {% if i.id == s.country_ref.id %}selected{% endif %}>{{ i.country_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+            <label for="ustate" class="form-label">State <span style="color:red;">*</span></label>
+            <select name="ustate" id="ustate" class="form-select">
+                <option value="">Select state</option>
+                {% for st in state %}
+                    <option value="{{ st.id }}" {% if st.id == s.state_ref.id %}selected{% endif %}>{{ st.state_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+            <label for="ucity" class="form-label">City <span style="color:red;">*</span></label>
+            <input type="text" id="ucity" class="form-control" name="ucity" value="{{ s.city_name }}" placeholder="Ex: Mumbai">
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" id="editcityFormSubmit" class="btn text-white" style="background-color:#405189;">Save</button>
+        <button type="button" class="btn bg-light" data-bs-dismiss="modal">Close</button>
+    </div>
+</form>
+
+<!--base_assets js file-->
+{% include 'base_assets/base_js.html' %}
+
+<script>
+$(document).ready(function() {
+    // Function to capitalize first letter
+    function capitalizeFirstLetter(str) {
+        if (str.length > 0) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+        return str;
+    }
+
+    // Custom validation methods
+    $.validator.addMethod("capitalizeFirstLetter", function(value, element) {
+        $(element).val(capitalizeFirstLetter(value));
+        return true;
+    }, "");
+
+    $.validator.addMethod("letterStartNoLeadingSpace", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z][^\s].*/.test(value);
+    }, "City name must start with a letter and have no leading space.");
+
+    $.validator.addMethod("atLeastOneAlpha", function(value, element) {
+        return this.optional(element) || /[a-zA-Z]/.test(value);
+    }, "Please enter at least one alphabetical character.");
+
+    $.validator.addMethod("noDoubleSpace", function(value, element) {
+        return this.optional(element) || !/\s{2,}/.test(value);
+    }, "Double spaces are not allowed.");
+
+    $.validator.addMethod("alphaSpaceOnly", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z\s]*$/.test(value);
+    }, "Only alphabetical characters and spaces are allowed.");
+
+    $('#edit_city_form').validate({
+        rules: {
+            ucountry: { required: true },
+            ustate: { required: true },
+            ucity: {
+                required: true,
+                alphaSpaceOnly: true,
+                noDoubleSpace: true,
+                letterStartNoLeadingSpace: true,
+                atLeastOneAlpha: true,
+                minlength: 2,
+                maxlength: 50,
+                capitalizeFirstLetter: true
+            }
+        },
+        messages: {
+            ucountry: { required: "Please select a country." },
+            ustate: { required: "Please select a state." },
+            ucity: {
+                required: "Please enter the city name.",
+                alphaSpaceOnly: "Only alphabetical characters and spaces are allowed.",
+                noDoubleSpace: "Double spaces are not allowed.",
+                letterStartNoLeadingSpace: "City name must start with a letter and have no leading space.",
+                atLeastOneAlpha: "Please enter at least one alphabetical character.",
+                minlength: "City name should be at least 2 characters.",
+                maxlength: "City name should not exceed 50 characters."
+            }
+        },
+        submitHandler: function(form) {
+            console.log("Form is valid.");
+            form.submit();
+        }
+    });
+
+    // Function to update state options for edit form
+    window.updateEditStateOptions = function() {
+        var countryId = $('#ucountry').val();
+        var stateSelect = $('#ustate');
+        stateSelect.empty();
+        stateSelect.append('<option value="">Select state</option>');
+
+        if (countryId) {
+            $.ajax({
+                url: "{% url 'getStatesByCountry' %}",
+                data: { country_id: countryId },
+                dataType: 'json',
+                success: function(data) {
+                    $.each(data.states, function(index, state) {
+                        stateSelect.append('<option value="' + state.id + '">' + state.state_name + '</option>');
+                    });
+                }
+            });
+        }
+    };
+});
+</script>

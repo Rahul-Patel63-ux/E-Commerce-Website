@@ -1,0 +1,176 @@
+{% extends 'console_base/base.html' %}
+
+{% block content %}
+<!--alert starts here-->
+{% include 'alertcomponents/alertcomponent.html' %}
+<!--alert ends here-->
+{% include 'base_assets/base_css.html' %}
+
+<!-- breadcrum starts here -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="{% url 'consoleGeneralSettings' %}">General Settings</a></li>
+                    <li class="breadcrumb-item active">Locations</li>
+                    <li class="breadcrumb-item active">Country</li>
+                </ol>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!--breadcrum ends here-->
+
+<!-- country start here -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                      <div class="col-6">
+                           <!-- Button trigger modal -->
+                              <button type="button" class="btn text-white" style="background-color:#405189;" data-bs-toggle="modal" data-bs-target="#countryModal">
+                                <i class="bx bx-plus-circle"></i> Country
+                              </button>
+                            <!-- country creation modal starts here-->
+                               <div class="modal fade" id="countryModal" tabindex="-1" aria-labelledby="countryModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                      <div class="modal-content">
+                                        <div class="modal-header" style="background-color:#405189;padding:10px 15px 10px 10px;">
+                                          <h1 class="modal-title text-white mb-0 fs-5" id="countryModalLabel">Add Country</h1>
+                                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: white;"></button>
+                                        </div>
+                                        <form id="country_form" method="post" enctype="multipart/form-data">
+                                          {% csrf_token %}
+                                            <div class="modal-body">
+
+                                                  <div class="row">
+                                                      <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                                                          <label for="country" class="form-label">Country <span style="color:red;">*</span></label>
+                                                          <input type="text" id="country" class="form-control" name="country" placeholder="Ex:India">
+                                                      </div>
+
+                                                  </div>
+                                                </div>
+
+
+
+                                            <div class="modal-footer">
+                                                <button type="submit" id="createcountryFormSubmit" class="btn text-white" style="background-color:#405189;">Submit</button>
+                                                <button type="button" class="btn bg-light" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </form>
+                                      </div>
+                                    </div>
+                          </div>
+<!--                          Country creation modal ends here-->
+
+
+
+<!--                              <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importModal"><i class="bx bxs-file-import"></i> Import</button>-->
+<!--                              &lt;!&ndash; Buttons with Label &ndash;&gt;-->
+<!--                              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exportModal"><i class=" bx bxs-file-export"></i> Export</button>-->
+                      </div>
+                      <div class="col-1"></div>
+                      <div class="col-5">
+                          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="query" hx-get="{% url 'countryRenderData' %}" hx-trigger="input changed delay:500ms, query" hx-swap="innerHTML" hx-target="#countryTableBodyContainer">
+                      </div>
+                </div>
+            </div>
+            <div class="card-body">
+            <!--card body starts here-->
+                <div class="table-responsive">
+                      <table class="table">
+                          <thead>
+                                <tr>
+                                  <th>S.No</th>
+                                  <th>Country </th>
+                                    <th>Created On</th>
+                                    <th>Status</th>
+                                  <th style="text-align:center;">Action</th>
+                                </tr>
+                          </thead>
+                          <tbody
+                                  hx-get="{% url 'countryRenderData' %}"
+                                  hx-swap="innerHTML"
+                                  hx-target="this"
+                                  hx-trigger="revealed once"
+                                  id="countryTableBodyContainer">
+
+                          </tbody>
+                      </table>
+                    </div>
+                <div class="d-flex justify-content-center" id="pagination_div">
+
+                </div>
+                <!--card body ends here-->
+
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- country ends here -->
+<!--base_assests js file-->
+{% include 'base_assets/base_js.html' %}
+
+<script>
+    $(document).ready(function() {
+        $.validator.addMethod("validCountry", function(value, element) {
+            return this.optional(element) || /^[A-Za-z\s\-]+$/.test(value);
+        }, "Please enter a valid country name (letters, spaces, or hyphens only)");
+        // Custom method to prevent double spaces
+        $.validator.addMethod("noDoubleSpaces", function(value, element) {
+            return this.optional(element) || !/\s\s/.test(value);
+        }, "Double spaces are not allowed in the country name");
+
+        // Custom method to prevent leading/trailing spaces
+        $.validator.addMethod("noLeadingTrailingSpaces", function(value, element) {
+            return this.optional(element) || value === value.trim();
+        }, "Country should start with a character.");
+        // Initialize jQuery validation for the country form
+        $("#country_form").validate({
+            rules: {
+                country: {
+                    required: true,
+                    minlength: 2,
+                    maxlength: 100,
+                    validCountry:true,
+                    noDoubleSpaces:true,
+                    noLeadingTrailingSpaces:true
+
+                }
+            },
+            messages: {
+                country: {
+                    required: "Please enter a country name",
+                    minlength: "Country name must be at least 2 characters long",
+                    maxlength: "Country name cannot exceed 100 characters"
+
+                }
+            },
+            errorElement: "div",
+            errorPlacement: function(error, element) {
+                error.addClass("invalid-feedback");
+                element.closest(".col-lg-12").append(error);
+            },
+            highlight: function(element) {
+                $(element).addClass("is-invalid");
+            },
+            unhighlight: function(element) {
+                $(element).removeClass("is-invalid");
+            },
+            submitHandler: function(form) {
+                // Handle form submission (you can customize this part)
+                form.submit();
+            }
+        });
+    });
+</script>
+
+{% endblock %}

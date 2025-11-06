@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Details - {{ order.order_item_reg_id }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12pt;
+            margin: 20mm;
+            color: #333;
+        }
+        h1 {
+            font-size: 16pt;
+            color: #405189;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            padding: 20px;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-weight: bold;
+            font-size: 14pt;
+            margin-bottom: 10px;
+        }
+        .section-content {
+            font-size: 12pt;
+            line-height: 1.5;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 10pt;
+            color: #666;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Order Details</h1>
+        <div class="section">
+            <div class="section-title">Order ID</div>
+            <div class="section-content">{{ order.order_item_reg_id }}</div>
+        </div>
+        <div class="section">
+            <div class="section-title">Shipping Address</div>
+            <div class="section-content">
+                {{ order.order_ref.address }}<br>
+                {{ order.order_ref.area.area_name }}, {{ order.order_ref.city.city_name }}<br>
+                {{ order.order_ref.state.state_name }}, {{ order.order_ref.country.country_name }}
+            </div>
+        </div>
+        <div class="section">
+            <div class="section-title">Customer Details</div>
+            <div class="section-content">
+                Username: {{ order.order_ref.user.username }}<br>
+                Email: {{ order.order_ref.user.email }}
+            </div>
+        </div>
+        <div class="footer">
+            Generated on {{ current_date }}<br>
+            {{admin.admin_company_name}}
+
+        </div>
+    </div>
+</body>
+</html>

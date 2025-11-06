@@ -1,0 +1,167 @@
+{% include 'base_assets/base_css.html' %}
+{% if orders %}
+
+        {% for order in orders %}
+            <tr>
+                <td class="text-nowrap">{{ forloop.counter0|add:orders.start_index }}</td>
+                <td class="text-nowrap">
+                    <a href="#"
+                       hx-get="{% url 'viewOrderDetails' order.id %}"
+                       hx-target="#orderDetailsModalBody"
+                       hx-swap="innerHTML"
+                       data-bs-toggle="modal"
+                       data-bs-target="#orderDetailsModal">
+                        <small>{{ order.order_reg_id }}</small>
+                    </a>
+                </td>
+<!--                <td>{{ order.order_reg_id }}</td>-->
+                <td class="text-nowrap">
+                    {% if order.order_items %}
+                        {{ order.order_items|truncatechars:50 }}
+                    {% else %}
+                        No products
+                    {% endif %}
+                </td>
+                <td class="text-nowrap">{{ order.user.username }}</td>
+                <td class="text-nowrap">{{ order.grandtotal }}</td>
+                <td class="text-nowrap">{{ order.created_at|date:"d M Y, H:i" }}</td>
+                <td class="text-nowrap">
+                    {% if order.order_status == 'new' %}
+                        <span class="badge bg-body-secondary border border-success text-success">New</span>
+                    {% elif order.order_status == 'accept' %}
+                        <span class="badge bg-body-secondary border border-secondary text-secondary">Accepted</span>
+                    {% elif order.order_status == 'pending' %}
+                        <span class="badge bg-body-secondary border border-warning text-warning">Pending</span>
+                    {% else %}
+                        <span class="badge bg-body-secondary border border-danger text-danger">Cancelled</span>
+                    {% endif %}
+                </td>
+                <td class="text-nowrap">
+                    <a href="#editorder_statusModal-{{order.id}}" class="btn btn-sm text-white btn-icon" style="background-color:#405189;" data-bs-toggle="modal" hx-get="{% url 'acceptedOrderViewRenderData' %}?editid={{order.id}}" hx-target="#order_status-edit-form-{{order.id}}" hx-trigger="click once" hx-swap="outerHTML">
+                        <i class="ri-pencil-fill"></i>
+                    </a>
+<!--                    {% if order.status %}-->
+<!--                        <span class="badge bg-success">Active</span>-->
+<!--                    {% else %}-->
+<!--                        <span class="badge bg-danger">Deactive</span>-->
+<!--                    {% endif %}-->
+<!--                    <select class="form-select form-select-sm"-->
+<!--                            name="order_status"-->
+<!--                            hx-post="{% url 'update_order_status' order.id %}"-->
+<!--                            hx-target="#my_orders_table_container_block"-->
+<!--                            hx-swap="innerHTML"-->
+<!--                            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'-->
+<!--                            hx-include="[name='search_query'],[name='text_query'],[name='status_filter']">-->
+<!--                        <option value="" {% if not order.order_status %}selected{% endif %}>Select Status</option>-->
+<!--                        <option value="accept" {% if order.order_status == 'accept' %}selected{% endif %}>Accept</option>-->
+<!--                        <option value="reject" {% if order.order_status == 'reject' %}selected{% endif %}>Cancel</option>-->
+<!--                        <option value="pending" {% if order.order_status == 'pending' %}selected{% endif %}>Pending</option>-->
+<!--                    </select>-->
+                </td>
+
+            </tr>
+            <!-- Edit form modal-->
+            <div class="modal fade" id="editorder_statusModal-{{order.id}}" tabindex="-1" aria-labelledby="editorder_statusModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header" style="background-color:#405189;padding:10px 15px 10px 10px;">
+                            <h5 class="modal-title text-white mb-0">Edit Order Status</h5>
+                            <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" style="background-color: white;" type="button"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            <div id="order_status-edit-form-{{order.id}}">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+{% else %}
+<tr>
+    <td colspan="8" style="color:red; text-align:center;">No orders found.</td>
+</tr>
+{% endif %}
+
+<!-- Order Details Modal (Add this once, outside the loop) -->
+<div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color:#405189;padding:10px 15px;">
+                <h5 class="modal-title text-white" id="orderDetailsModalLabel">Order Details</h5>
+                <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="orderDetailsModalBody">
+                <!-- Order details will be loaded here via HTMX -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-center" id="pagination_div" hx-swap-oob="true">
+    <ul class="pagination pagination-separated pagination-sm justify-content-center justify-content-sm-start mb-0">
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="#"
+                   hx-get="{% url 'acceptedOrderViewRenderData' %}?page={{ page_obj.previous_page_number }}&search_query={{ search_query|default:'' }}&text_query={{ text_query|default:'' }}"
+                   hx-target="#my_orders_table_container_block"
+                   hx-swap="innerHTML">Previous</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled text-muted">
+                <a class="page-link" href="#">Previous</a>
+            </li>
+        {% endif %}
+
+        {% if page_obj.number > 3 %}
+            <li class="page-item">
+                <a class="page-link" href="#"
+                   hx-get="{% url 'acceptedOrderViewRenderData' %}?page=1&search_query={{ search_query|default:'' }}&text_query={{ text_query|default:'' }}"
+                   hx-target="#my_orders_table_container_block"
+                   hx-swap="innerHTML">1</a>
+            </li>
+            {% if page_obj.number == 4 %}
+                <li class="page-item text-muted" style="display: none;"><span class="page-link">...</span></li>
+            {% else %}
+                <li class="page-item text-muted"><span class="page-link">...</span></li>
+            {% endif %}
+        {% endif %}
+
+        {% for page_num in page_obj.paginator.page_range %}
+            {% if page_num >= page_obj.number|add:-2 and page_num <= page_obj.number|add:2 %}
+                <li class="page-item {% if page_num == page_obj.number %}active{% endif %}">
+                    <a class="page-link" href="#"
+                       hx-get="{% url 'acceptedOrderViewRenderData' %}?page={{ page_num }}&search_query={{ search_query|default:'' }}&text_query={{ text_query|default:'' }}"
+                       hx-target="#my_orders_table_container_block"
+                       hx-swap="innerHTML">{{ page_num }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.number < page_obj.paginator.num_pages|add:-2 %}
+            <li class="page-item text-muted"><span class="page-link">...</span></li>
+            <li class="page-item">
+                <a class="page-link" href="#"
+                   hx-get="{% url 'acceptedOrderViewRenderData' %}?page={{ page_obj.paginator.num_pages }}&search_query={{ search_query|default:'' }}&text_query={{ text_query|default:'' }}"
+                   hx-target="#my_orders_table_container_block"
+                   hx-swap="innerHTML">{{ page_obj.paginator.num_pages }}</a>
+            </li>
+        {% endif %}
+
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="#"
+                   hx-get="{% url 'acceptedOrderViewRenderData' %}?page={{ page_obj.next_page_number }}&search_query={{ search_query|default:'' }}&text_query={{ text_query|default:'' }}"
+                   hx-target="#my_orders_table_container_block"
+                   hx-swap="innerHTML">Next</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled text-muted">
+                <a class="page-link" href="#">Next</a>
+            </li>
+        {% endif %}
+    </ul>
+</div>
+
+{% include 'base_assets/base_js.html' %}

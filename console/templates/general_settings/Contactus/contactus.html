@@ -1,0 +1,200 @@
+{% extends 'console_base/base.html' %}
+
+{% block content %}
+
+<!--alert starts here-->
+{% include 'alertcomponents/alertcomponent.html' %}
+<!--alert ends here-->
+
+
+<!-- breadcrum starts here -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="{% url 'consoleGeneralSettings' %}">General Settings</a></li>
+                    <li class="breadcrumb-item active">Contact Us</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+<!--breadcrum ends here-->
+
+<!--Contact us starts here-->
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-6">
+                        <!-- Button trigger modal -->
+                          <button type="button" class="btn text-white" style="background-color:#405189;" data-bs-toggle="modal" data-bs-target="#contactusModal">
+                            <i class="bx bx-plus-circle"></i> Contact Us
+                          </button>
+                          <!-- contactus modal starts here-->
+
+                          <div class="modal fade" id="contactusModal" tabindex="-1" aria-labelledby="contactusModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                              <div class="modal-content">
+                                <div class="modal-header" style="background-color:#405189; padding:10px 15px 10px 10px;">
+                                  <h1 class="modal-title text-white mb-0 fs-5" id="contactusModalLabel">Add Contact Details</h1>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: white;"></button>
+                                </div>
+                                <form id="contactus_form" method="post">
+                                  {% csrf_token %}
+                                    <div class="modal-body">
+
+                                          <div class="row">
+                                              <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                                                  <label for="contact_us_email" class="form-label">Email <span class="text-danger">*</span></label>
+                                                  <input type="email" class="form-control" id="contact_us_email" name="contact_us_email" placeholder="sample@gmail.com" >
+                                              </div>
+
+                                              <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                                                  <label for="contact_us_phone_number" class="form-label">Phone Number <span style="color:red;">*</span></label>
+                                                  <input type="text" id="contact_us_phone_number" class="form-control" name="contact_us_phone_number" placeholder="Ex: 9963526356">
+                                              </div>
+                                              <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                                                    <label for="contact_us_address" class="form-label">Address <span style="color:red;">*</span></label>
+                                                    <textarea class="form-control" id="contact_us_address"  name="contact_us_address" rows="3" placeholder="Ex: 123 Main Street"></textarea>
+                                              </div>
+                                          </div>
+                                        </div>
+
+
+
+                                    <div class="modal-footer">
+                                        <button type="submit" id="createContactUsFormSubmit" class="btn text-white" style="background-color:#405189;">Submit</button>
+                                        <button type="button" class="btn bg-light" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                </form>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- contact us modal starts here-->
+                    </div>
+                      <div class="col-1"></div>
+                      <div class="col-5">
+                          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="query" hx-get="{% url 'contactUsDataRender' %}" hx-trigger="input changed delay:500ms,query" hx-swap="innerHTML" hx-target="#contactusTableBodyContainer">
+
+                      </div>
+
+                </div>
+
+
+            </div>
+            <div class="card-body">
+            <!--card body starts here-->
+                <div class="table-responsive">
+                      <table class="table">
+                          <thead>
+                                <tr>
+                                  <th>S.No</th>
+                                    <th>Email</th>
+                                  <th>Phone Number</th>
+                                  <th>Address</th>
+                                    <th>Created on</th>
+                                    <th>Status</th>
+
+                                  <th style="text-align:center;">Action</th>
+                                </tr>
+                          </thead>
+                          <tbody
+                                  hx-get="{% url 'contactUsDataRender' %}"
+                                  hx-swap="innerHTML"
+                                  hx-target="this"
+                                  hx-trigger="revealed once"
+                                  id="contactusTableBodyContainer">
+
+                          </tbody>
+                      </table>
+                </div>
+                <div class="d-flex justify-content-center" id="pagination_div">
+
+                </div>
+                <!--card body ends here-->
+
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!--Contact Us ends here-->
+<!--base_assests js file-->
+{% include 'base_assets/base_js.html' %}
+
+
+<!--script starts here-->
+<script>
+
+$(document).ready(function() {
+
+
+
+    // Custom method for phone number
+    $.validator.addMethod("phoneNumber", function(value, element) {
+        const phoneRegex = /^\+?[0-9]{10,15}$/;
+        return this.optional(element) || phoneRegex.test(value);
+    }, "Phone number must be 10-15 digits, with optional + prefix.");
+
+
+    // Form validation
+    $("#contactus_form").validate({
+        rules: {
+            contact_us_email: {
+                required: true,
+                email:true
+
+            },
+            contact_us_phone_number: {
+                required: true,
+                minlength:10,
+                phoneNumber: true
+
+            },
+            contact_us_address: {
+                required: true,
+                minlength: 3,
+                maxlength: 255
+
+            }
+        },
+        messages: {
+            contact_us_email: {
+                required: "Email is required.",
+                email:"Please enter valid email."
+            },
+            contact_us_phone_number: {
+                required: "Phone number is required.",
+                minlength: "Phone number should contain at least 10 numbers",
+                phoneNumber: "Phone number must be 10-15 digits, with optional + prefix."
+            },
+            contact_us_address: {
+                required: "Address is required.",
+                minlength: "Address must contain at least 3 charecters",
+                maxlength: "Address must not exceed 255 characters."
+
+            }
+        },
+        errorPlacement: function(error, element) {
+            error.appendTo(element.parent());
+        },
+
+        submitHandler: function(form) {
+          console.log(" Form is valid.");
+          $('#createContactUsFormSubmit').prop('disabled',true);
+          form.submit();
+      }
+    });
+});
+</script>
+
+
+<!--script ends here-->
+
+{% endblock %}

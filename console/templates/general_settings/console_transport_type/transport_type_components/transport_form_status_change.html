@@ -1,0 +1,23 @@
+{% load static %}
+
+{% if status_page == 'transport_type_page' %}
+    <td class="border-light" id="transport_type_status_td{{ transport_type.id }}">
+        {% if transport_type.transport_status %}
+            <span class="badge bg-success">
+                <a href="#" hx-post="{% url 'transportTypeStatusChange' transport_type.id %}"
+                   hx-target="#transport_type_status_td{{ transport_type.id }}"
+                   hx-trigger="click once"
+                   hx-swap="innerHTML"
+                   hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Active</a>
+            </span>
+        {% else %}
+            <span class="badge bg-danger">
+                <a href="#" hx-post="{% url 'transportTypeStatusChange' transport_type.id %}"
+                   hx-target="#transport_type_status_td{{ transport_type.id }}"
+                   hx-trigger="click once"
+                   hx-swap="innerHTML"
+                   hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Deactive</a>
+            </span>
+        {% endif %}
+    </td>
+{% endif %}

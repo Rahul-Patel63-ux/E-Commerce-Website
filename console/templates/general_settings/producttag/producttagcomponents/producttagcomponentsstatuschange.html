@@ -1,0 +1,23 @@
+
+{% if status_page == 'tag_page' %}
+        <td class="border-light" id="tag_status_td{{tag_status.id}}">
+              {% if tag_status.product_tag_status %}
+              <span class="badge bg-success">
+                  <a href="#" hx-post="{% url 'tagStatusChange' tag_status.id %}"
+                      hx-target="#tag_status_td{{tag_status.id}}"
+                      hx-trigger="click once"
+                      hx-swap="innerHTML"
+                      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Active</a>
+              </span>
+              {% else %}
+              <span class="badge bg-danger">
+                  <a href="#" hx-post="{% url 'tagStatusChange' tag_status.id %}"
+                      hx-target="#tag_status_td{{tag_status.id}}"
+                      hx-trigger="click once"
+                      hx-swap="innerHTML"
+                      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Deactive</a>
+              </span>
+              {% endif %}
+          </td>
+
+{% endif %}

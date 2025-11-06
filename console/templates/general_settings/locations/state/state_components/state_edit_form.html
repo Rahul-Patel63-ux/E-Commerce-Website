@@ -1,0 +1,113 @@
+
+{% include 'base_assets/base_css.html' %}
+
+
+<form id="edit_state_form" action="{% url 'updateState' s.id %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+
+          <div class="row">
+              <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                          <label for="ucountry" class="form-label">country <span style="color:red;">*</span></label>
+                          <select name="ucountry" id="ucountry" class="form-select">
+                            <option value="">Select country</option>
+                               {% for i in country %}
+
+                                  <option value="{{ i.id }}" {% if i.id == s.country_ref.id %}selected{% endif %}>{{ i.country_name}}</option>
+                              {% endfor %}
+
+
+                          </select>
+                    </div>
+              <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                  <label for="ustate" class="form-label">state <span style="color:red;">*</span></label>
+                  <input type="text" id="ustate" class="form-control" name="ustate" value="{{s.state_name}}" placeholder="Ex:India">
+              </div>
+
+          </div>
+
+
+
+    <div class="modal-footer">
+        <button type="submit" id="editstateFormSubmit" class="btn text-white" style="background-color:#405189;">Save</button>
+        <button type="button" class="btn bg-light" data-bs-dismiss="modal">Close</button>
+    </div>
+</form>
+
+<!--base_assests js file-->
+{% include 'base_assets/base_js.html' %}
+
+
+<script>
+    $(document).ready(function() {
+    // Function to capitalize first letter
+    function capitalizeFirstLetter(str) {
+        if (str.length > 0) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+        return str;
+    }
+
+    // Custom validation method for capitalizing first letter
+    $.validator.addMethod("capitalizeFirstLetter", function(value, element) {
+        $(element).val(capitalizeFirstLetter(value));
+        return true;
+    }, "");
+
+    // Custom validation method for no leading space and starting with a letter
+    $.validator.addMethod("letterStartNoLeadingSpace", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z][^\s].*/.test(value);
+    }, "State name must start with a letter and have no leading space.");
+
+    // Custom validation method to ensure at least one alphabetical character
+    $.validator.addMethod("atLeastOneAlpha", function(value, element) {
+        return this.optional(element) || /[a-zA-Z]/.test(value);
+    }, "Please enter at least one alphabetical character.");
+
+    // Custom validation method to restrict double spaces
+    $.validator.addMethod("noDoubleSpace", function(value, element) {
+        return this.optional(element) || !/\s{2,}/.test(value);
+    }, "Double spaces are not allowed.");
+
+    // Custom validation method for alphabetical characters and spaces only
+    $.validator.addMethod("alphaSpaceOnly", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z\s]*$/.test(value);
+    }, "Only alphabetical characters and spaces are allowed.");
+
+    $('#edit_state_form').validate({
+        rules: {
+            ucountry: {
+                required: true
+            },
+            ustate: {
+                required: true,
+                alphaSpaceOnly: true,
+                noDoubleSpace: true,
+                letterStartNoLeadingSpace: true,
+                atLeastOneAlpha: true,
+                minlength: 2,
+                maxlength: 50,
+                capitalizeFirstLetter: true
+            }
+        },
+        messages: {
+            ucountry: {
+                required: "Please select a country."
+            },
+            ustate: {
+                required: "Please enter the state name.",
+                alphaSpaceOnly: "Only alphabetical characters and spaces are allowed.",
+                noDoubleSpace: "Double spaces are not allowed.",
+                letterStartNoLeadingSpace: "State name must start with a letter and have no leading space.",
+                atLeastOneAlpha: "Please enter at least one alphabetical character.",
+                minlength: "State name should be at least 2 characters.",
+                maxlength: "State name should not exceed 50 characters."
+            }
+        },
+        submitHandler: function(form) {
+            console.log("Form is valid.");
+            form.submit();
+        }
+    });
+});
+</script>

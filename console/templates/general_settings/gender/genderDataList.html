@@ -1,0 +1,263 @@
+{% extends "console_base/base.html" %}
+
+{% block content %}
+
+
+{% load static %}
+<!-- Table started -->
+
+<!--alert starts here-->
+{% include 'alertcomponents/alertcomponent.html' %}
+
+<div class="full-table">
+    <div class="card inner-card">
+        <div class="card-header">
+            <div class="row container-fluid">
+                <div class="col-md-6">
+                    <button class="btn btn-secondary me-1" type="button" data-bs-toggle="modal"
+                        data-bs-target="#createGender" style="background-color:#405189;">Create Gender</button>
+                    <!-- <button class="btn btn-success me-1" type="button" data-bs-toggle="modal"
+                        data-bs-target="#importFile">Import</button>
+                    <button class="btn btn-primary me-1" type="button" data-bs-toggle="modal"
+                        data-bs-target="#exportFile">Export</button> -->
+                </div>
+                <div class="col-md-6 searchbar">
+                    <input class="form-control mr-sm-2" type="text" placeholder="Search by Gender"
+                        hx-get="{% url 'gender_data_table' %}" hx-trigger="input changed delay:500ms, query"
+                        hx-swap="innerHTML" hx-target="#render_table" id="query" name='query'>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <table class="table">
+                <thead class="table-primary">
+                    <tr class="list_cards">
+                        <th scope="col">S.No.</th>
+                        <th scope="col">Gender</th>
+                        <th scope="col">Created Date</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody hx-get="{% url 'gender_data_table' %}" hx-trigger="revealed once" hx-swap="innerHTML"
+                    hx-target="this" id='render_table'>
+
+                </tbody>
+
+            </table>
+        </div>
+        <!--  -->
+        <div class="d-flex justify-content-center" id="paginatin_div">
+
+        </div>
+        <!--  -->
+    </div>
+</div>
+
+
+<!-- Adding New User -->
+<div class="modal fade" id="createGender">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content">
+
+            <!-- Creating popup window Header start-->
+            <div class="modal-header pb-3" style="background-color:#405189;">
+                <h4 class="modal-title text-white">Create Gender</h4>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" style="background-color: white;" type="button"></button>
+            </div>
+            <!-- Creating Popup window Header Ends -->
+
+            <!-- Creating Fields for the popup window starts here-->
+            <form id="genderForm" action="" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="inputField">
+                        <div class="row">
+                            <div class="col-md-4 col-sm-12">
+                                <label for="name">Gender <span class="text-danger">*</span></label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12">
+                                <input type="text" name="gender" id="gender" class="form-control"
+                                    placeholder="Ex- Male/Female">
+                                <div id="check-gender-input"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Creating Fields for the popup window ends here -->
+
+                <!-- Creating Buttons starts Here -->
+                <div class="modal-footer">
+                    <button type="submit" id="submitBtn" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal"
+                        aria-lable="close">Close</button>
+                </div>
+            </form>
+            <!-- Creating Buttons Ends Here -->
+        </div>
+    </div>
+</div>
+<!-- Creating Model Form POP UP END Here -->
+
+
+<!-- Creating IMPORT FILE POP UP Start Here -->
+<!-- Adding New User -->
+<div class="modal fade" id="importFile">
+    <div class="row">
+        <div class="col-md-12 col-sm-4">
+            <div class="modal-dialog modal-dialog-centered modal-sm">
+                <div class="modal-content">
+
+                    <!-- Creating popup window Header start-->
+                    <div class="modal-header">
+                        <h4 class="modal-title">Import File</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-lable="close"></button>
+                    </div>
+                    <!-- Creating Popup window Header Ends -->
+
+                    <!-- Creating Fields for the popup window starts here-->
+                    <form id="import">
+                        <div class="modal-body ">
+                            <div class="card imgholder " id="importStructure">
+                                <label for="formFile" class="upload">
+                                    <i class="bi bi-plus-circle-dotted  fs-1" id="manIcon"></i>
+                                </label>
+                            </div>
+                            <div class="mb-3">
+                                <input class="form-control" type="file" name="importFile" id="formFile">
+                            </div>
+                        </div>
+                        <!-- Creating Fields for the popup window ends here -->
+
+                        <!-- Creating Buttons starts Here -->
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                    <!-- Creating Buttons Ends Here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Creating Model Form POP UP END Here -->
+
+
+
+
+<!-- Exporting The Date -->
+<div class="modal fade" id="exportFile">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content">
+
+            <!-- Creating popup window Header start-->
+            <div class="modal-header">
+                <h4 class="modal-title">Export</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-lable="close"></button>
+            </div>
+            <!-- Creating Popup window Header Ends -->
+
+
+            <!-- Creating Fields for the popup window starts here-->
+            <form id="export">
+                <div class="modal-body">
+                    <div id="exportItem">
+                        <div class="row">
+                            <div class="col-3">
+                                <label for="">From *</label>
+                            </div>
+                            <div class="col-9"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12"><input type="date" name="exportDateFrom" class="form-control"
+                                    id="datepickerFrom"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-3">
+                                <label for="">To *</label>
+                            </div>
+                            <div class="col-9"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12"><input type="date" class="form-control" name="exportDateTo"
+                                    id="datepickerTo"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Creating Fields for the popup window ends here -->
+
+
+                <!-- Creating Buttons starts Here -->
+                <div class="modal-footer">
+                    <button type="submit" form="export" class="btn btn-primary">Submit</button>
+                    <button type="reset" form="export" class="btn btn-danger">Reset</button>
+                </div>
+            </form>
+            <!-- Creating Buttons Ends Here -->
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // For Create and Update Elements
+    $(document).ready(function () {
+
+        $.validator.addMethod("noSpace", function (value, element) {
+            return value.indexOf(" ") < 0;
+        }, "Spaces are not allowed");
+
+
+        $.validator.addMethod("noNumbers", function (value, element) {
+            return this.optional(element) || /^[^0-9]+$/.test(value);
+        }, "Numbers are not allowed");
+
+
+        $.validator.addMethod("noSpecialChars", function (value, element) {
+            return this.optional(element) || /^[A-Za-z0-9]+$/.test(value);
+        }, "Special characters are not allowed");
+
+        $('#genderForm').validate({
+            rules: {
+                gender: {
+                    required: true,
+                    minlength: 2,
+                    maxlength: 8,
+                    noSpace: true,
+                    noSpecialChars: true,
+                    noNumbers: true
+                }
+            },
+            messages: {
+                gender : {
+                    required: 'Please Enter Gender',
+                    minlength: 'Minimum 2 characters required',
+                    maxlength: 'Maximum 8 characters allowed',
+                    noSpace: "Spaces are not allowed",
+                    noSpecialChars: "Special Characters are not allowed",
+                    noNumbers: "Numbers are not allowed"
+                }
+            },
+            submitHandler: function (form) {
+                $('#submitBtn').prop("disabled", true);
+                form.submit();
+            }
+        });
+
+
+        // Preventing from  multiple submissions
+        // $("#genderForm").submit(function (e) {
+        //     $("#submitBtn").prop('disabled', true);
+        // });
+    });
+
+
+
+</script> 
+
+{% endblock content %}

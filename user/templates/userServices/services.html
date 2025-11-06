@@ -1,0 +1,102 @@
+{% extends "user_base/base.html" %}
+
+{% load static %}
+{% block content %}
+{% include 'alertToast/alerttoasters.html' %}
+
+
+
+<div class="container-fluid">
+    <div class="row pt-5">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+                        <li class="breadcrumb-item active">Services</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="p-3">
+                <div class="card shadow-lg mb-3">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <img src="{% static 'assets\images\doctor\img-01.png' %}"
+                                class="img-fluid rounded-start" alt="img">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">Book Recive</h5>
+                                <p class="card-text">Returning books on time helps ensure everyone has fair access to
+                                    library resources. It keeps the system running smoothly, allowing others to borrow
+                                    and enjoy the books too. Late returns can result in fees and inconvenience for
+                                    others waiting for the same book. Be considerate—return on time! </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-lg mb-3">
+                    <div class="row g-0">
+                        <div class="col-md-8 order-sm-2 order-md-1">
+                            <div class="card-body">
+                                <h5 class="card-title">Food</h5>
+                                <p class="card-text">Please refrain from bringing food or drinks into the library to
+                                    maintain a clean and comfortable space for everyone. Spills and crumbs can damage
+                                    books and equipment and may attract pests. Let's all work together to keep our
+                                    library environment welcoming and in great condition!</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 order-sm-1 order-md-2">
+                            <img src="{% static 'assets\images\doctor\img-02.png' %}" class="img-fluid rounded-start"
+                                alt="img">
+                        </div>
+                    </div>
+                </div>
+                <div class="card shadow-lg mb-3">
+                    <div class="row g-0">
+                        <div class="col-md-4 h-50">
+                            <img src="{% static 'assets\images\doctor\img-03.png' %}" class="img-fluid rounded-start"
+                                alt="img">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">Silance</h5>
+                                <p class="card-text">Please use a quiet voice in the library to respect others who are
+                                    reading, studying, or working. Keeping noise to a minimum helps everyone stay
+                                    focused and enjoy a peaceful environment. Let’s work together to create a calm space
+                                    for all!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card shadow-lg mb-3">
+                    <div class="row g-0">
+                        <div class="col-md-8 order-sm-2 order-md-1">
+                            <div class="card-body">
+                                <h5 class="card-title">Return books to their proper place</h5>
+                                <p class="card-text">Please return books to their proper place after use to help
+                                    maintain an organized and efficient library. When items are left out of place, it
+                                    makes it harder for others to find what they need. Let’s all play a part in keeping
+                                    our library tidy and accessible!</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 order-sm-1 order-md-2">
+                            <img src="{% static 'assets\images\doctor\img-04.png' %}" class="img-fluid rounded-start"
+                                alt="img">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock content %}

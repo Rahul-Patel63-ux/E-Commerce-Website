@@ -1,0 +1,27 @@
+{% extends 'console_base/base.html' %}
+
+{% block content %}
+<!--alert starts here-->
+{% include 'alertcomponents/alertcomponent.html' %}
+<!--alert ends here-->
+
+{% include 'base_assets/base_css.html' %}
+
+<!-- breadcrum starts here -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="">Finance & Accounts</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'profitAndLose' %}">Profit & Lose</a></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+<!--breadcrum ends here-->
+
+{% include 'base_assets/base_js.html' %}
+
+{% endblock %}

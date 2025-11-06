@@ -1,0 +1,1936 @@
+{% extends 'console_base/base.html' %}
+
+{% block content %}
+<!--base_css include-->
+{% include 'base_assets/base_css.html' %}
+<!--alert starts here-->
+{% include 'alertcomponents/alertcomponent.html' %}
+<!--alert ends here-->
+<!-- custom css -->
+        {% block style %}
+            <style>
+                #purchase_vendor{
+                    min-height: 38px;
+                    border: 1px solid #ced4da;
+                    border-radius: 0.25rem;
+                }
+                .payment-fields {
+                    display: none;
+                }
+                .item-actions {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+                .add-item-btn, .remove-item-btn {
+                    cursor: pointer;
+                    font-size: 1.2rem;
+                    padding: 0;
+                    background: none;
+                    border: none;
+                }
+                .card-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+                .invalid-feedback {
+                    color: red !important;
+                }
+                .ts-wrapper {
+                    width: 100%;
+                    height:55%;
+                    position: relative;
+                }
+
+                .ts-control {
+                    height: 30px; /* Match Bootstrap form-control/form-select height */
+                    min-height: 30px;
+                    border: 1px solid #ced4da;
+                    border-radius: 0.25rem;
+                    padding: 0.375rem 0.75rem; /* Match Bootstrap padding */
+                    font-size: 1rem; /* Match Bootstrap font size */
+                    line-height: 1.5; /* Match Bootstrap line height */
+                    background-color: #fff;
+                    box-sizing: border-box; /* Ensure padding/border are included in height */
+                    display: flex;
+                    align-items: center;
+                    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+                }
+
+                .ts-control:focus-within {
+                    border-color: #80bdff;
+                    outline: 0;
+                    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+                }
+
+                .ts-control > .items {
+                    display: flex;
+                    align-items: center;
+                    height: 100%; /* Ensure items fill the control height */
+                    line-height: 1.5;
+                }
+
+                .ts-control input {
+                    font-size: 1rem;
+<!--                    line-height: 1.5;-->
+                    color: #495057;
+                    height: 100%; /* Ensure input matches control height */
+                    border: none; /* Remove any internal borders */
+                    background: transparent;
+                }
+
+                .ts-dropdown {
+                    border: 1px solid #ced4da;
+                    border-radius: 0.25rem;
+                    background-color: #fff;
+                    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+                    z-index: 1000;
+                    max-height: 200px;
+                    overflow-y: auto;
+                    margin-top: 0.25rem;
+                }
+
+                .ts-dropdown .option {
+                    padding: 0.375rem 0.75rem;
+                    font-size: 1rem;
+                    color: #495057;
+                    cursor: pointer;
+                }
+
+                .ts-dropdown .option:hover,
+                .ts-dropdown .option.active {
+                    background-color: #f8f9fa;
+                    color: #212529;
+                }
+
+                .ts-dropdown .option.selected {
+                    background-color: #007bff;
+                    color: #fff;
+                }
+
+                .ts-wrapper.has-items .ts-control {
+                    background-color: #fff;
+                }
+
+                .ts-wrapper.form-invalid .ts-control {
+                    border-color: #dc3545;
+                    background-color: #fff5f5;
+                }
+
+                .ts-wrapper.form-invalid .ts-control:focus-within {
+                    border-color: #dc3545;
+                    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+                }
+
+                /* Ensure error messages align properly */
+                .invalid-feedback {
+                    display: none;
+                }
+
+                .ts-wrapper.form-invalid ~ .invalid-feedback {
+                    display: block;
+                    margin-top: 5px;
+                    font-size: 0.875rem;
+                }
+
+
+            </style>
+        {% endblock %}
+        <!-- custom css end here -->
+
+<!-- breadcrum starts here -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="{% url 'viewAllPurchasesTable' %}">Purchase Management</a></li>
+                    <li class="breadcrumb-item active">Add purchase</li>
+                </ol>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!--breadcrum ends here-->
+
+<!-- Bootstrap Modal for Credit Prompt -->
+<div class="modal fade" id="creditModal" tabindex="-1" aria-labelledby="creditModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="creditModalLabel">Vendor Credit Available</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="creditMessage">Credit amount: <span id="creditAmountDisplay">0.00</span>. Do you want to use it?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="creditNoBtn">No</button>
+                <button type="button" class="btn btn-primary" id="creditYesBtn">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<form id="purchaseForm" method="post">
+        {% csrf_token %}
+            <input type="hidden" name="use_credit" id="use_credit" value="false">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0 fs-5">Vendor Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-12 mb-4">
+                                <label for="purchase_vendor" class="form-label">Vendor <span style="color:red;">*</span></label>
+                                <select name="purchase_vendor" id="purchase_vendor" class="form-select purchase_vendor tom-select">
+                                  <option value="">Select Vendor</option>
+                                     {% for v in vendor %}
+
+                                        <option value="{{ v.id }}">{{ v.vendor_company_name}}</option>
+                                    {% endfor %}
+
+
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-12 mb-4">
+                              <label for="purchase_vendor_name" class="form-label">Name <span style="color:red;">*</span></label>
+                              <input type="text" id="purchase_vendor_name" class="form-control text-dark" name="purchase_vendor_name" placeholder="Ex: Arun" disabled>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-12 mb-4">
+                                <label for="purchase_vendor_phone" class="form-label">Mobile Number <span style="color:red;">*</span></label>
+                                <input type="tel" id="purchase_vendor_phone" class="form-control text-dark" name="purchase_vendor_phone" placeholder="Ex: 9347897976" disabled>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-12 mb-4">
+                                <label for="purchase_vendor_email" class="form-label">Email <span style="color:red;">*</span></label>
+                                <input type="email" id="purchase_vendor_email" class="form-control text-dark" name="purchase_vendor_email" placeholder="Ex: email@gmail.com" disabled>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-12 mb-4">
+                                <label for="purchase_vendor_aadhar" class="form-label">Aadhaar <span style="color:red;">*</span></label>
+                                <input type="number" id="purchase_vendor_aadhar" class="form-control text-dark" name="purchase_vendor_aadhar" placeholder="Ex: 6161 3001 0823" disabled>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-12 mb-4">
+                                <label for="purchase_vendor_url" class="form-label">URL <span style="color:red;">*</span></label>
+                                <input type="url" id="purchase_vendor_url" class="form-control text-dark" name="purchase_vendor_url" placeholder="Ex: https://www.google.com/" disabled>
+        <!--                        <a id="purchase_vendor_url_link" href="#" target="_blank" class="url-link text-primary" style="text-decoration: underline;">Visit Company Website</a>-->
+                            </div>
+
+                            <div class="col-lg-3 col-md-3 col-sm-12 mb-4">
+                                <label for="purchase_vendor_type" class="form-label">Vendor Type <span style="color:red;">*</span></label>
+                                <input type="text" id="purchase_vendor_type" class="form-control text-dark" name="purchase_vendor_type" placeholder="Ex: Retailers" disabled>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+
+                    <div class="card-header">
+                        <h5 class="mb-0 fs-5">Purchase Items</h5>
+                        <div class="item-actions">
+                            <button type="button" class="btn text-success add-item-btn" id="addItem" title="Add Item" aria-label="Add Item">
+                                <i class="bx bx-plus-circle"></i>
+                            </button>
+                            <button type="button" class="btn text-danger remove-item-btn" id="removeItem" title="Remove Last Item" aria-label="Remove Last Item">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+
+
+                            <div id="itemContainer">
+                                <div class="item-row mb-4">
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-3 col-sm-12">
+                                            <label class="form-label">Item <span style="color:red;">*</span></label>
+                                            <select class="form-select product tom-select" name="product[]" required>
+                                                <option value="">Select Product</option>
+                                                {% for product in products %}
+                                                    <option value="{{ product.id }}">{{ product.product_title }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-3 col-md-3 col-sm-12">
+                                            <label class="form-label">Quantity <span style="color:red;">*</span></label>
+                                            <input type="number" class="form-control quantity" name="quantity[]" min="1" placeholder="Ex: 20">
+                                        </div>
+                                        <div class="col-lg-3 col-md-3 col-sm-12">
+                                            <label class="form-label">MRP (Rs.) <span style="color:red;">*</span></label>
+                                            <input type="number" step="0.01" class="form-control mrp" name="mrp[]"  placeholder="Ex: 99.99">
+                                        </div>
+                                        <div class="col-lg-3 col-md-3 col-sm-12">
+                                            <label class="form-label">Purchase Price <span style="color:red;">*</span></label>
+                                            <input type="number" step="0.01" class="form-control purchase_price" name="purchase_price[]" placeholder="Ex: 85.00">
+                                        </div>
+                                        <div class="col-lg-3 col-md-3 col-sm-12">
+                                            <label class="form-label">CGST (%) <span style="color:red;">*</span></label>
+                                            <input type="number" step="0.01" class="form-control cgst" name="cgst[]" placeholder="Ex: 2.5">
+                                        </div>
+                                        <div class="col-lg-3 col-md-3 col-sm-12">
+                                            <label class="form-label">SGST (%) <span style="color:red;">*</span></label>
+                                            <input type="number" step="0.01" class="form-control sgst" name="sgst[]" readonly placeholder="Ex: 2.5">
+                                        </div>
+                                        <div class="col-lg-3 col-md-3 col-sm-12">
+                                            <label class="form-label">Total <span style="color:red;">*</span></label>
+                                            <input type="number" step="0.01" class="form-control total" name="total[]" readonly placeholder="Ex: 999.85">
+                                        </div>
+                                        <div class="col-lg-3 col-md-3 col-sm-12">
+                                            <label class="form-label">Total<sub class="text-secondary-emphasis" > inc GST</sub> <span style="color:red;">*</span></label>
+                                            <input type="number" step="0.01" class="form-control total_with_gst" name="total_with_gst[]" readonly placeholder="Ex:1050.85">
+                                        </div>
+<!--                                        <div class="col-lg-1 col-md-1 col-sm-12">-->
+<!--                                            <span class="remove-item-btn" title="Remove Item"><i class="fas fa-trash-alt"></i></span>-->
+<!--                                        </div>-->
+                                    </div>
+                                </div>
+                            </div>
+<!--                            <button type="button" class="btn btn-secondary" id="addItem">Add Item</button>-->
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0 fs-5">Payment Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-12">
+                                    <label class="form-label" for="grand_total">Grand Total <span style="color:red;">*</span></label>
+                                    <input type="number" id="grand_total" step="0.01" class="form-control grand_total" name="grand_total" readonly placeholder="Ex:1050.85">
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-12">
+                                    <label class="form-label" for="advance_amount">Advance Amount <span style="color:red;">*</span></label>
+                                    <input type="number" id="advance_amount" step="0.01" class="form-control advance_amount" name="advance_amount"  placeholder="Ex:1050.85">
+<!--                                    <a href="#" class="use-credit-link" id="useCreditLink">Use credit</a>-->
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-12">
+                                    <label class="form-label" for="pending_amount">Pending Amount <span style="color:red;">*</span></label>
+                                    <input type="number" step="0.01" id="pending_amount" class="form-control pending_amount" name="pending_amount" readonly placeholder="Ex:1050.85">
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-12 credit-fields">
+                                    <label class="form-label" for="credit_amount">Credit Amount</label>
+                                    <input type="number" step="0.01" id="credit_amount" class="form-control credit_amount" name="credit_amount" readonly placeholder="Ex: 100.00">
+                                </div>
+
+                                <div class="col-lg-3 col-md-3 col-sm-12 mb-4">
+                                    <label for="payment_type" class="form-label">Payment Type <span style="color:red;">*</span></label>
+                                    <select name="payment_type" id="payment_type" class="form-select" required>
+                                        <option value="">Select Payment Type</option>
+                                        {% for payment_type in payment_types %}
+                                            <option value="{{ payment_type.id }}">{{ payment_type.payment_type }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="payment-fields cash-fields col-lg-3 col-md-3 col-sm-12 mb-4">
+                                    <label for="cash_amount" class="form-label">Amount</label>
+                                    <input type="number" step="0.01" class="form-control" name="cash_amount" id="cash_amount" placeholder="Ex: 1000.00">
+                                </div>
+                                <div class="payment-fields upi-fields col-lg-3 col-md-3 col-sm-12 mb-4">
+                                    <label for="upi_id" class="form-label">UPI ID</label>
+                                    <input type="text" class="form-control" name="upi_id" id="upi_id" placeholder="Ex: user@upi">
+                                </div>
+                                <div class="payment-fields upi-fields col-lg-3 col-md-3 col-sm-12 mb-4">
+                                    <label for="upi_transaction_id" class="form-label">Transaction ID</label>
+                                    <input type="text" class="form-control" name="upi_transaction_id" id="upi_transaction_id" placeholder="Ex: TXN123456789">
+                                </div>
+                                <div class="payment-fields upi-cash-fields col-lg-3 col-md-3 col-sm-12 mb-4">
+                                    <label for="upi_cash_amount" class="form-label">Cash Amount</label>
+                                    <input type="number" step="0.01" class="form-control" name="upi_cash_amount" id="upi_cash_amount" placeholder="Ex: 500.00">
+                                </div>
+                                <div class="payment-fields upi-cash-fields col-lg-3 col-md-3 col-sm-12 mb-4">
+                                    <label for="upi_amount" class="form-label">UPI Amount</label>
+                                    <input type="number" step="0.01" class="form-control" name="upi_amount" id="upi_amount" placeholder="Ex: 500.00">
+                                </div>
+                                <div class="payment-fields upi-cash-fields col-lg-3 col-md-3 col-sm-12 mb-4">
+                                    <label for="upi_cash_transaction_id" class="form-label">Transaction ID</label>
+                                    <input type="text" class="form-control" name="upi_cash_transaction_id" id="upi_cash_transaction_id" placeholder="Ex: TXN123456789">
+                                </div>
+                                <div class="payment-fields netbanking-fields col-lg-3 col-md-3 col-sm-12 mb-4">
+                                    <label for="account_type" class="form-label">Account Type</label>
+                                    <select name="account_type" id="account_type" class="form-select">
+                                        <option value="">Select Account Type</option>
+                                        {%for account_type in account_types %}
+                                            <option value="{{account_type.id}}">{{ account_type.account_type }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="payment-fields netbanking-fields col-lg-3 col-md-3 col-sm-12 mb-4">
+                                    <label for="bank_name" class="form-label">Bank Name</label>
+                                    <input type="text" class="form-control" name="bank_name" id="bank_name" placeholder="Ex: HDFC Bank">
+                                </div>
+                                <div class="payment-fields netbanking-fields col-lg-3 col-md-3 col-sm-12 mb-4">
+                                    <label for="account_number" class="form-label">Account Number</label>
+                                    <input type="text" class="form-control" name="account_number" id="account_number" placeholder="Ex: 123456789012">
+                                </div>
+                                <div class="payment-fields netbanking-fields col-lg-3 col-md-3 col-sm-12 mb-4">
+                                    <label for="netbanking_transaction_id" class="form-label">Transaction ID</label>
+                                    <input type="text" class="form-control" name="netbanking_transaction_id" id="netbanking_transaction_id" placeholder="Ex: TXN123456789">
+                                </div>
+                                <div class="payment-fields cheque-fields col-lg-3 col-md-3 col-sm-12 mb-4">
+                                    <label for="cheque_number" class="form-label">Cheque Number</label>
+                                    <input type="text" class="form-control" name="cheque_number" id="cheque_number" placeholder="Ex: 123456">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    <div class="d-flex justify-content-center mb-4">
+
+        <button type="submit" class="btn btn-primary mt-3">Submit</button>
+    </div>
+
+</form>
+<!--base_js include-->
+{% include 'base_assets/base_js.html' %}
+
+
+<script>
+    $(document).ready(function() {
+    // Initialize Tom Select for a single element
+    function initializeTomSelect($element) {
+        if ($element.is('select') && !$element[0].tomselect) {
+            new TomSelect($element[0], {
+                create: false,
+                maxItems: 1,
+                placeholder: $element.find('option:first').text(),
+                render: {
+                    option: function(data, escape) {
+                        return '<div>' + escape(data.text) + '</div>';
+                    },
+                    item: function(data, escape) {
+                        return '<div>' + escape(data.text) + '</div>';
+                    }
+                }
+            });
+            console.log('Tom Select initialized for:', $element[0]);
+        } else {
+            console.log('Tom Select skipped for:', $element[0]);
+        }
+    }
+
+    // Initialize Tom Select only for purchase_vendor and product[] selects
+    function initializeAllTomSelects() {
+        initializeTomSelect($('#purchase_vendor'));
+        $('.product.tom-select').each(function() {
+            initializeTomSelect($(this));
+        });
+    }
+
+    // Call initialization on page load
+    initializeAllTomSelects();
+
+    // Custom validation methods
+    $.validator.addMethod("positiveNumber", function(value, element) {
+        return this.optional(element) || (parseFloat(value) > 0);
+    }, "Please enter a positive number.");
+
+    $.validator.addMethod("validUPI", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/.test(value);
+    }, "Please enter a valid UPI ID (e.g., user@upi).");
+
+    $.validator.addMethod("validTransactionID", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z0-9]{6,20}$/.test(value);
+    }, "Please enter a valid transaction ID (6-20 alphanumeric characters).");
+
+    $.validator.addMethod("validChequeNumber", function(value, element) {
+        return this.optional(element) || /^\d{6}$/.test(value);
+    }, "Please enter a valid 6-digit cheque number.");
+
+    $.validator.addMethod("validAccountNumber", function(value, element) {
+        return this.optional(element) || /^\d{9,18}$/.test(value);
+    }, "Please enter a valid account number (9-18 digits).");
+
+    $.validator.addMethod("purchasePriceLessThanMRP", function(value, element) {
+        let row = $(element).closest('.item-row');
+        let mrp = parseFloat(row.find('.mrp').val()) || 0;
+        let purchasePrice = parseFloat(value) || 0;
+        return this.optional(element) || purchasePrice <= mrp;
+    }, "Purchase price cannot be greater than MRP.");
+
+    // jQuery Validate setup
+    $('#purchaseForm').validate({
+        rules: {
+            purchase_vendor: {
+                required: true
+            },
+            'product[]': {
+                required: true
+            },
+            'quantity[]': {
+                required: true,
+                digits: true,
+                positiveNumber: true,
+                min: 1
+            },
+            'mrp[]': {
+                required: true,
+                number: true,
+                positiveNumber: true,
+                min: 0.01
+            },
+            'purchase_price[]': {
+                required: true,
+                number: true,
+                positiveNumber: true,
+                min: 0.01,
+                purchasePriceLessThanMRP: true
+            },
+            'cgst[]': {
+                required: true,
+                number: true,
+                positiveNumber: true,
+                min: 0
+            },
+            'sgst[]': {
+                required: true,
+                number: true,
+                positiveNumber: true,
+                min: 0
+            },
+            grand_total: {
+                required: true,
+                number: true,
+                positiveNumber: true,
+                min: 0.01
+            },
+            advance_amount: {
+                required: true,
+                number: true,
+                positiveNumber: true,
+                min: 0.01
+            },
+            pending_amount: {
+                required: true,
+                number: true,
+                min: 0
+            },
+            payment_type: {
+                required: true
+            },
+            cash_amount: {
+                required: function() {
+                    return $('#payment_type').val() === 'cash';
+                },
+                number: true,
+                positiveNumber: true,
+                min: 0.01
+            },
+            upi_id: {
+                required: function() {
+                    return $('#payment_type').val() === 'upi';
+                },
+                validUPI: true
+            },
+            upi_transaction_id: {
+                required: function() {
+                    return $('#payment_type').val() === 'upi';
+                },
+                validTransactionID: true
+            },
+            upi_cash_amount: {
+                required: function() {
+                    return $('#payment_type').val() === 'upi_cash';
+                },
+                number: true,
+                positiveNumber: true,
+                min: 0.01
+            },
+            upi_amount: {
+                required: function() {
+                    return $('#payment_type').val() === 'upi_cash';
+                },
+                number: true,
+                positiveNumber: true,
+                min: 0.01
+            },
+            upi_cash_transaction_id: {
+                required: function() {
+                    return $('#payment_type').val() === 'upi_cash';
+                },
+                validTransactionID: true
+            },
+            account_type: {
+                required: function() {
+                    return $('#payment_type').val() === 'net_banking';
+                }
+            },
+            bank_name: {
+                required: function() {
+                    return $('#payment_type').val() === 'net_banking';
+            },
+                alphaSpaceOnly: true,
+                noDoubleSpace: true,
+                letterStartNoLeadingSpace: true,
+                minlength: 3,
+                maxlength: 100
+            },
+            account_number: {
+                required: function() {
+                    return $('#payment_type').val() === 'net_banking';
+                },
+                validAccountNumber: true
+            },
+            netbanking_transaction_id: {
+                required: function() {
+                    return $('#payment_type').val() === 'net_banking';
+                },
+                validTransactionID: true
+            },
+            cheque_number: {
+                required: function() {
+                    return $('#payment_type').val() === 'cheque';
+                },
+                validChequeNumber: true
+            }
+        },
+        messages: {
+            purchase_vendor: {
+                required: "Please select a vendor."
+            },
+            'product[]': {
+                required: "Please select a product."
+            },
+            'quantity[]': {
+                required: "Please enter the quantity.",
+                digits: "Quantity must be a whole number.",
+                min: "Quantity must be at least 1."
+            },
+            'mrp[]': {
+                required: "Please enter the MRP.",
+                number: "MRP must be a valid number.",
+                min: "MRP must be at least 0.01."
+            },
+            'purchase_price[]': {
+                required: "Please enter the purchase price.",
+                number: "Purchase price must be a valid number.",
+                min: "Purchase price must be at least 0.01."
+            },
+            'cgst[]': {
+                required: "Please enter the CGST percentage.",
+                number: "CGST must be a valid number.",
+                min: "CGST must be greater than or equal to 0."
+            },
+            'sgst[]': {
+                required: "Please enter the SGST percentage.",
+                number: "SGST must be a valid number.",
+                min: "SGST must be at least 0."
+            },
+            grand_total: {
+                required: "Please enter the grand total.",
+                number: "Grand total must be a valid number.",
+                min: "Grand total must be at least 0.01."
+            },
+            advance_amount: {
+                required: "Please enter the advance amount.",
+                number: "Advance amount must be a valid number.",
+                min: "Advance amount must be at least 0.01."
+            },
+            pending_amount: {
+                required: "Please enter the pending amount.",
+                number: "Pending amount must be a valid number.",
+                min: "Pending amount must be at least 0."
+            },
+            payment_type: {
+                required: "Please select a payment type."
+            },
+            cash_amount: {
+                required: "Please enter the cash amount.",
+                number: "Cash amount must be a valid number.",
+                min: "Cash amount must be at least 0.01."
+            },
+            upi_id: {
+                required: "Please enter the UPI ID.",
+                validUPI: "Please enter a valid UPI ID."
+            },
+            upi_transaction_id: {
+                required: "Please enter the UPI transaction ID.",
+                validTransactionID: "Please enter a valid transaction ID."
+            },
+            upi_cash_amount: {
+                required: "Please enter the cash amount.",
+                number: "Cash amount must be a valid number.",
+                min: "Cash amount must be at least 0.01."
+            },
+            upi_amount: {
+                required: "Please enter the UPI amount.",
+                number: "UPI amount must be a valid number.",
+                min: "UPI amount must be at least 0.01."
+            },
+            upi_cash_transaction_id: {
+                required: "Please enter the UPI transaction ID.",
+                validTransactionID: "Please enter a valid transaction ID."
+            },
+            account_type: {
+                required: "Please select an account type."
+            },
+            bank_name: {
+                required: "Please enter the bank name.",
+                minlength: "Bank name should be at least 3 characters.",
+                maxlength: "Bank name should not exceed 100 characters."
+            },
+            account_number: {
+                required: "Please enter the account number.",
+                validAccountNumber: "Account number must be 9-18 digits."
+            },
+            netbanking_transaction_id: {
+                required: "Please enter the transaction ID.",
+                validTransactionID: "Please enter a valid transaction ID."
+            },
+            cheque_number: {
+                required: "Please enter the cheque number.",
+                validChequeNumber: "Cheque number must be 6 digits."
+            }
+        },
+        errorPlacement: function(error, element) {
+            error.addClass('invalid-feedback');
+            if (element.is('select')) {
+                let $wrapper = element.next('.ts-wrapper');
+                if ($wrapper.length) {
+                    error.insertAfter($wrapper);
+                } else {
+                    error.insertAfter(element);
+                }
+            } else {
+                error.insertAfter(element);
+            }
+            if (element.is(':disabled')) {
+                error.addClass('text-muted');
+            }
+        },
+        submitHandler: function(form) {
+            console.log('Form is valid, submitting...');
+            form.submit();
+        }
+    });
+
+    // Dynamic validation for added items
+    $('#addItem').on('click', function() {
+        $('.item-row:last').find('select, input').each(function() {
+            if ($(this).hasClass('purchase_price')) {
+                $(this).rules('add', {
+                    required: true,
+                    number: true,
+                    positiveNumber: true,
+                    min: 0.01,
+                    purchasePriceLessThanMRP: true,
+                    messages: {
+                        required: "Please enter the purchase price.",
+                        number: "Purchase price must be a valid number.",
+                        min: "Purchase price must be at least 0.01.",
+                        purchasePriceLessThanMRP: "Purchase price cannot be greater than MRP."
+                    }
+                });
+            } else {
+                $(this).rules('add', {
+                    required: true,
+                    messages: {
+                        required: "This field is required."
+                    }
+                });
+            }
+        });
+    });
+
+    // Re-validate purchase_price when mrp changes
+    $(document).on('input', '.mrp', function() {
+        let row = $(this).closest('.item-row');
+        let purchasePriceInput = row.find('.purchase_price');
+        purchasePriceInput.valid();
+    });
+
+    // CGST to SGST copy and total calculation
+    $(document).on('input', '.cgst, .quantity, .purchase_price', function() {
+        let row = $(this).closest('.item-row');
+        row.find('.sgst').val(row.find('.cgst').val());
+        calculateTotals(row);
+    });
+
+    // Calculate totals for a row
+    function calculateTotals(row) {
+        let quantity = parseFloat(row.find('.quantity').val()) || 0;
+        let purchasePrice = parseFloat(row.find('.purchase_price').val()) || 0;
+        let cgst = parseFloat(row.find('.cgst').val()) || 0;
+        let sgst = parseFloat(row.find('.sgst').val()) || 0;
+
+        let total = quantity * purchasePrice;
+        let gstAmount = total * ((cgst + sgst) / 100);
+        let totalWithGst = total + gstAmount;
+
+        row.find('.total').val(total.toFixed(2));
+        row.find('.total_with_gst').val(totalWithGst.toFixed(2));
+        updateGrandTotal();
+    }
+
+    // Update grand total
+    function updateGrandTotal() {
+        let grandTotal = 0;
+        $('.total_with_gst').each(function() {
+            grandTotal += parseFloat($(this).val()) || 0;
+        });
+        $('#grand_total').val(grandTotal.toFixed(2));
+        updatePendingAmount();
+    }
+
+    // Update pending and credit amount
+    function updatePendingAmount() {
+        let grandTotal = parseFloat($('#grand_total').val()) || 0;
+        let advanceAmount = parseFloat($('#advance_amount').val()) || 0;
+        let pendingAmount = grandTotal - advanceAmount;
+        let creditAmount = advanceAmount - grandTotal;
+
+        if (pendingAmount >= 0) {
+            $('#pending_amount').val(pendingAmount.toFixed(2));
+            $('#credit_amount').val('0.00');
+            $('.credit-fields').hide();
+        } else {
+            $('#pending_amount').val('0.00');
+            $('#credit_amount').val(creditAmount.toFixed(2));
+            $('.credit-fields').show();
+        }
+    }
+
+    // Trigger update on advance amount change
+    $(document).on('input', '#advance_amount', function() {
+        updatePendingAmount();
+    });
+
+    // Add new item row
+    $('#addItem').click(function() {
+        let newRow = $('.item-row:first').clone(true, true);
+        newRow.find('input').val('');
+
+        let $productSelect = newRow.find('select.product');
+        $productSelect
+            .removeClass('tomselected ts-hidden-accessible')
+            .removeAttr('id')
+            .val('');
+
+        // Remove existing Tom Select wrapper
+        $productSelect.siblings('.ts-wrapper').remove();
+
+        // Destroy existing Tom Select instance if present
+        if ($productSelect[0].tomselect) {
+            $productSelect[0].tomselect.destroy();
+            console.log('Destroyed Tom Select instance for:', $productSelect[0]);
+        }
+
+        // Append the new row
+        $('#itemContainer').append(newRow);
+
+        // Initialize Tom Select on the new product select
+        initializeTomSelect($productSelect);
+
+        // Add validation rules for new inputs
+        newRow.find('select, input').each(function() {
+            $(this).rules('add', {
+                required: true,
+                messages: {
+                    required: "This field is required."
+                }
+            });
+        });
+
+        toggleRemoveButton();
+        updateGrandTotal();
+    });
+
+    // Remove last item row
+    $('#removeItem').click(function() {
+        let rows = $('.item-row');
+        if (rows.length > 1) {
+            let lastRow = rows.last();
+            let $productSelect = lastRow.find('.product');
+            if ($productSelect[0].tomselect) {
+                $productSelect[0].tomselect.destroy();
+                console.log('Destroyed Tom Select instance for removed row:', $productSelect[0]);
+            }
+            lastRow.remove();
+            toggleRemoveButton();
+            updateGrandTotal();
+        }
+    });
+
+    // Toggle remove button visibility
+    function toggleRemoveButton() {
+        if ($('.item-row').length === 1) {
+            $('#removeItem').hide();
+        } else {
+            $('#removeItem').show();
+        }
+    }
+
+    // Initial toggle of remove button
+    toggleRemoveButton();
+
+    // Form submission validation
+    $('#purchaseForm').submit(function(e) {
+        e.preventDefault(); // Temporarily for debugging
+        if (!$('#purchase_vendor').val()) {
+            //alert('Please select a vendor.');
+            return;
+        }
+        if (!$('#payment_type').val()) {
+            //alert('Please select a payment type.');
+            return;
+        }
+        // Ensure no reinitialization of Tom Select
+        if (!$('#purchase_vendor')[0].tomselect) {
+            initializeTomSelect($('#purchase_vendor'));
+        }
+        $('.product.tom-select').each(function() {
+            if (!$(this)[0].tomselect) {
+                initializeTomSelect($(this));
+            }
+        });
+        console.log('Form submitted');
+        // Uncomment to allow actual submission
+        this.submit();
+    });
+
+    // Vendor details fetch
+    let currentCreditAmount = 0;
+    let creditApplied = false;
+    $('#purchase_vendor').on('change', function() {
+        var vendorId = $(this).val();
+        creditApplied = false;
+        if (vendorId) {
+            $.ajax({
+                url: '{% url "get_vendor_details" %}',
+                type: 'GET',
+                data: { vendor_id: vendorId },
+                success: function(response) {
+                    if (response.success) {
+                        $('#purchase_vendor_name').val(response.vendor_name || '');
+                        $('#purchase_vendor_phone').val(response.vendor_phone_number || '');
+                        $('#purchase_vendor_email').val(response.vendor_email || '');
+                        $('#purchase_vendor_aadhar').val(response.vendor_aadhaar || '');
+                        $('#purchase_vendor_url').val(response.vendor_company_url || '');
+                        $('#purchase_vendor_type').val(response.vendor_type || '');
+                        currentCreditAmount = response.credit_amount ? parseFloat(response.credit_amount) : 0;
+                        if (currentCreditAmount > 0) {
+                            $('#useCreditLink').show();
+                        } else {
+                            $('#useCreditLink').hide();
+                        }
+                    } else {
+                        $('#purchase_vendor_name').val('');
+                        $('#purchase_vendor_phone').val('');
+                        $('#purchase_vendor_email').val('');
+                        $('#purchase_vendor_aadhar').val('');
+                        $('#purchase_vendor_url').val('');
+                        $('#purchase_vendor_type').val('');
+                        currentCreditAmount = 0;
+                        $('#useCreditLink').hide();
+                    }
+                    updatePendingAmount();
+                },
+                error: function() {
+                    $('#purchase_vendor_name').val('');
+                    $('#purchase_vendor_phone').val('');
+                    $('#purchase_vendor_email').val('');
+                    $('#purchase_vendor_aadhar').val('');
+                    $('#purchase_vendor_url').val('');
+                    $('#purchase_vendor_type').val('');
+                    currentCreditAmount = 0;
+                    $('#useCreditLink').hide();
+                    updatePendingAmount();
+                }
+            });
+        } else {
+            $('#purchase_vendor_name').val('');
+            $('#purchase_vendor_phone').val('');
+            $('#purchase_vendor_email').val('');
+            $('#purchase_vendor_aadhar').val('');
+            $('#purchase_vendor_url').val('');
+            $('#purchase_vendor_type').val('');
+            currentCreditAmount = 0;
+            $('#useCreditLink').hide();
+            updatePendingAmount();
+        }
+    });
+
+    // Show credit modal when clicking the "Use available credit" link
+    $('#useCreditLink').on('click', function(e) {
+        e.preventDefault();
+        if (currentCreditAmount > 0 && !creditApplied) {
+            $('#creditAmountDisplay').text(currentCreditAmount.toFixed(2));
+            $('#creditModal').modal('show');
+        }
+    });
+
+    // Handle modal "Yes" button
+    $('#creditYesBtn').on('click', function() {
+        if (!creditApplied) {
+            let grandTotal = parseFloat($('#grand_total').val()) || 0;
+            let creditToUse = Math.min(currentCreditAmount, grandTotal);
+            let currentAdvance = parseFloat($('#advance_amount').val()) || 0;
+            $('#advance_amount').val((currentAdvance + creditToUse).toFixed(2));
+            $('#use_credit').val('true');
+            creditApplied = true;
+            $('#useCreditLink').addClass('disabled').css('pointer-events', 'none');
+            $('#creditYesBtn').prop('disabled', true);
+            updatePendingAmount();
+        }
+        $('#creditModal').modal('hide');
+    });
+
+    // Handle modal "No" button or close
+    $('#creditNoBtn, .modal .btn-close').on('click', function() {
+        $('#use_credit').val('false');
+        $('#creditModal').modal('hide');
+    });
+
+    // Payment type handling
+    $('#payment_type').on('change', function() {
+        $('.payment-fields').hide().find('input, select').prop('disabled', true);
+        let selectedOption = $(this).find('option:selected').text().toLowerCase().replace(' ', '_');
+
+        if (selectedOption === 'cash') {
+            $('.cash-fields').show().find('input').prop('disabled', false);
+        } else if (selectedOption === 'upi') {
+            $('.upi-fields').show().find('input').prop('disabled', false);
+        } else if (selectedOption === 'upi_cash') {
+            $('.upi-cash-fields').show().find('input').prop('disabled', false);
+        } else if (selectedOption === 'net_banking') {
+            $('.netbanking-fields').show().find('input, select').prop('disabled', false);
+        } else if (selectedOption === 'cheque') {
+            $('.cheque-fields').show().find('input').prop('disabled', false);
+        }
+    });
+});
+</script>
+
+<!--&lt;!&ndash;validations&ndash;&gt;-->
+<!--<script>-->
+<!--    $(document).ready(function() {-->
+
+<!--        // Custom method for positive numbers-->
+<!--        $.validator.addMethod("positiveNumber", function(value, element) {-->
+<!--            return this.optional(element) || (parseFloat(value) > 0);-->
+<!--        }, "Please enter a positive number.");-->
+
+<!--        // Custom method for UPI ID format-->
+<!--        $.validator.addMethod("validUPI", function(value, element) {-->
+<!--            return this.optional(element) || /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/.test(value);-->
+<!--        }, "Please enter a valid UPI ID (e.g., user@upi).");-->
+
+<!--        // Custom method for transaction ID-->
+<!--        $.validator.addMethod("validTransactionID", function(value, element) {-->
+<!--            return this.optional(element) || /^[a-zA-Z0-9]{6,20}$/.test(value);-->
+<!--        }, "Please enter a valid transaction ID (6-20 alphanumeric characters).");-->
+
+<!--        // Custom method for cheque number-->
+<!--        $.validator.addMethod("validChequeNumber", function(value, element) {-->
+<!--            return this.optional(element) || /^\d{6}$/.test(value);-->
+<!--        }, "Please enter a valid 6-digit cheque number.");-->
+
+<!--        // Custom method for account number-->
+<!--        $.validator.addMethod("validAccountNumber", function(value, element) {-->
+<!--            return this.optional(element) || /^\d{9,18}$/.test(value);-->
+<!--        }, "Please enter a valid account number (9-18 digits).");-->
+
+<!--        $.validator.addMethod("purchasePriceLessThanMRP", function(value, element) {-->
+<!--            let row = $(element).closest('.item-row');-->
+<!--            let mrp = parseFloat(row.find('.mrp').val()) || 0;-->
+<!--            let purchasePrice = parseFloat(value) || 0;-->
+<!--            return this.optional(element) || purchasePrice <= mrp;-->
+<!--        }, "Purchase price cannot be greater than MRP.");-->
+
+<!--        $('#purchaseForm').validate({-->
+<!--            rules: {-->
+<!--                purchase_vendor: {-->
+<!--                    required: true-->
+<!--                },-->
+
+<!--                'product[]': {-->
+<!--                    required: true-->
+<!--                },-->
+<!--                'quantity[]': {-->
+<!--                    required: true,-->
+<!--                    digits: true,-->
+<!--                    positiveNumber: true,-->
+<!--                    min: 1-->
+<!--                },-->
+<!--                'mrp[]': {-->
+<!--                    required: true,-->
+<!--                    number: true,-->
+<!--                    positiveNumber: true,-->
+<!--                    min: 0.01-->
+<!--                },-->
+<!--                'purchase_price[]': {-->
+<!--                    required: true,-->
+<!--                    number: true,-->
+<!--                    positiveNumber: true,-->
+<!--                    min: 0.01,-->
+<!--                    purchasePriceLessThanMRP: true-->
+<!--                },-->
+<!--                'cgst[]': {-->
+<!--                    required: true,-->
+<!--                    number: true,-->
+<!--                    positiveNumber: true,-->
+<!--                    min: 0-->
+<!--                },-->
+<!--                'sgst[]': {-->
+<!--                    required: true,-->
+<!--                    number: true,-->
+<!--                    positiveNumber: true,-->
+<!--                    min: 0-->
+<!--                },-->
+<!--                grand_total: {-->
+<!--                    required: true,-->
+<!--                    number: true,-->
+<!--                    positiveNumber: true,-->
+<!--                    min: 0.01-->
+<!--                },-->
+<!--                advance_amount: {-->
+<!--                    required: true,-->
+<!--                    number: true,-->
+<!--                    positiveNumber: true,-->
+<!--                    min: 0.01-->
+<!--                },-->
+<!--                pending_amount: {-->
+<!--                    required: true,-->
+<!--                    number: true,-->
+<!--                    min: 0-->
+<!--                },-->
+<!--                payment_type: {-->
+<!--                    required: true-->
+<!--                },-->
+<!--                cash_amount: {-->
+<!--                    required: function() {-->
+<!--                        return $('#payment_type').val() === 'cash';-->
+<!--                    },-->
+<!--                    number: true,-->
+<!--                    positiveNumber: true,-->
+<!--                    min: 0.01-->
+<!--                },-->
+<!--                upi_id: {-->
+<!--                    required: function() {-->
+<!--                        return $('#payment_type').val() === 'upi';-->
+<!--                    },-->
+<!--                    validUPI: true-->
+<!--                },-->
+<!--                upi_transaction_id: {-->
+<!--                    required: function() {-->
+<!--                        return $('#payment_type').val() === 'upi';-->
+<!--                    },-->
+<!--                    validTransactionID: true-->
+<!--                },-->
+<!--                upi_cash_amount: {-->
+<!--                    required: function() {-->
+<!--                        return $('#payment_type').val() === 'upi_cash';-->
+<!--                    },-->
+<!--                    number: true,-->
+<!--                    positiveNumber: true,-->
+<!--                    min: 0.01-->
+<!--                },-->
+<!--                upi_amount: {-->
+<!--                    required: function() {-->
+<!--                        return $('#payment_type').val() === 'upi_cash';-->
+<!--                    },-->
+<!--                    number: true,-->
+<!--                    positiveNumber: true,-->
+<!--                    min: 0.01-->
+<!--                },-->
+<!--                upi_cash_transaction_id: {-->
+<!--                    required: function() {-->
+<!--                        return $('#payment_type').val() === 'upi_cash';-->
+<!--                    },-->
+<!--                    validTransactionID: true-->
+<!--                },-->
+<!--                account_type: {-->
+<!--                    required: function() {-->
+<!--                        return $('#payment_type').val() === 'net_banking';-->
+<!--                    }-->
+<!--                },-->
+<!--                bank_name: {-->
+<!--                    required: function() {-->
+<!--                        return $('#payment_type').val() === 'net_banking';-->
+<!--                    },-->
+<!--                    alphaSpaceOnly: true,-->
+<!--                    noDoubleSpace: true,-->
+<!--                    letterStartNoLeadingSpace: true,-->
+<!--                    minlength: 3,-->
+<!--                    maxlength: 100-->
+<!--                },-->
+<!--                account_number: {-->
+<!--                    required: function() {-->
+<!--                        return $('#payment_type').val() === 'net_banking';-->
+<!--                    },-->
+<!--                    validAccountNumber: true-->
+<!--                },-->
+<!--                netbanking_transaction_id: {-->
+<!--                    required: function() {-->
+<!--                        return $('#payment_type').val() === 'net_banking';-->
+<!--                    },-->
+<!--                    validTransactionID: true-->
+<!--                },-->
+<!--                cheque_number: {-->
+<!--                    required: function() {-->
+<!--                        return $('#payment_type').val() === 'cheque';-->
+<!--                    },-->
+<!--                    validChequeNumber: true-->
+<!--                }-->
+<!--            },-->
+<!--            messages: {-->
+<!--                purchase_vendor: {-->
+<!--                    required: "Please select a vendor."-->
+<!--                },-->
+<!--                purchase_vendor_name: {-->
+<!--                    required: "Please enter the vendor name.",-->
+<!--                    minlength: "Vendor name should be at least 2 characters.",-->
+<!--                    maxlength: "Vendor name should not exceed 50 characters."-->
+<!--                },-->
+<!--                purchase_vendor_phone: {-->
+<!--                    required: "Please enter the phone number.",-->
+<!--                    validPhone: "Please enter a valid 10-digit phone number."-->
+<!--                },-->
+<!--                purchase_vendor_email: {-->
+<!--                    required: "Please enter the email address.",-->
+<!--                    email: "Please enter a valid email address."-->
+<!--                },-->
+<!--                purchase_vendor_aadhar: {-->
+<!--                    required: "Please enter the Aadhaar number.",-->
+<!--                    twelveDigits: "Aadhaar number must be exactly 12 digits."-->
+<!--                },-->
+<!--                purchase_vendor_url: {-->
+<!--                    required: "Please enter the company website.",-->
+<!--                    url: "Please enter a valid URL (e.g., https://www.example.com)."-->
+<!--                },-->
+<!--                purchase_vendor_type: {-->
+<!--                    required: "Please enter the vendor type.",-->
+<!--                    minlength: "Vendor type should be at least 2 characters.",-->
+<!--                    maxlength: "Vendor type should not exceed 50 characters."-->
+<!--                },-->
+<!--                'product[]': {-->
+<!--                    required: "Please select a product."-->
+<!--                },-->
+<!--                'quantity[]': {-->
+<!--                    required: "Please enter the quantity.",-->
+<!--                    digits: "Quantity must be a whole number.",-->
+<!--                    min: "Quantity must be at least 1."-->
+<!--                },-->
+<!--                'mrp[]': {-->
+<!--                    required: "Please enter the MRP.",-->
+<!--                    number: "MRP must be a valid number.",-->
+<!--                    min: "MRP must be at least 0.01."-->
+<!--                },-->
+<!--                'purchase_price[]': {-->
+<!--                    required: "Please enter the purchase price.",-->
+<!--                    number: "Purchase price must be a valid number.",-->
+<!--                    min: "Purchase price must be at least 0.01."-->
+<!--                },-->
+<!--                'cgst[]': {-->
+<!--                    required: "Please enter the CGST percentage.",-->
+<!--                    number: "CGST must be a valid number.",-->
+<!--                    min: "CGST must be at least 0."-->
+<!--                },-->
+<!--                'sgst[]': {-->
+<!--                    required: "Please enter the SGST percentage.",-->
+<!--                    number: "SGST must be a valid number.",-->
+<!--                    min: "SGST must be at least 0."-->
+<!--                },-->
+<!--                grand_total: {-->
+<!--                    required: "Please enter the grand total.",-->
+<!--                    number: "Grand total must be a valid number.",-->
+<!--                    min: "Grand total must be at least 0.01."-->
+<!--                },-->
+<!--                advance_amount: {-->
+<!--                    required: "Please enter the advance amount.",-->
+<!--                    number: "Advance amount must be a valid number.",-->
+<!--                    min: "Advance amount must be at least 0.01."-->
+<!--                },-->
+<!--                pending_amount: {-->
+<!--                    required: "Please enter the pending amount.",-->
+<!--                    number: "Pending amount must be a valid number.",-->
+<!--                    min: "Pending amount must be at least 0."-->
+<!--                },-->
+<!--                payment_type: {-->
+<!--                    required: "Please select a payment type."-->
+<!--                },-->
+<!--                cash_amount: {-->
+<!--                    required: "Please enter the cash amount.",-->
+<!--                    number: "Cash amount must be a valid number.",-->
+<!--                    min: "Cash amount must be at least 0.01."-->
+<!--                },-->
+<!--                upi_id: {-->
+<!--                    required: "Please enter the UPI ID.",-->
+<!--                    validUPI: "Please enter a valid UPI ID."-->
+<!--                },-->
+<!--                upi_transaction_id: {-->
+<!--                    required: "Please enter the UPI transaction ID.",-->
+<!--                    validTransactionID: "Please enter a valid transaction ID."-->
+<!--                },-->
+<!--                upi_cash_amount: {-->
+<!--                    required: "Please enter the cash amount.",-->
+<!--                    number: "Cash amount must be a valid number.",-->
+<!--                    min: "Cash amount must be at least 0.01."-->
+<!--                },-->
+<!--                upi_amount: {-->
+<!--                    required: "Please enter the UPI amount.",-->
+<!--                    number: "UPI amount must be a valid number.",-->
+<!--                    min: "UPI amount must be at least 0.01."-->
+<!--                },-->
+<!--                upi_cash_transaction_id: {-->
+<!--                    required: "Please enter the UPI transaction ID.",-->
+<!--                    validTransactionID: "Please enter a valid transaction ID."-->
+<!--                },-->
+<!--                account_type: {-->
+<!--                    required: "Please select an account type."-->
+<!--                },-->
+<!--                bank_name: {-->
+<!--                    required: "Please enter the bank name.",-->
+<!--                    minlength: "Bank name should be at least 3 characters.",-->
+<!--                    maxlength: "Bank name should not exceed 100 characters."-->
+<!--                },-->
+<!--                account_number: {-->
+<!--                    required: "Please enter the account number.",-->
+<!--                    validAccountNumber: "Account number must be 9-18 digits."-->
+<!--                },-->
+<!--                netbanking_transaction_id: {-->
+<!--                    required: "Please enter the transaction ID.",-->
+<!--                    validTransactionID: "Please enter a valid transaction ID."-->
+<!--                },-->
+<!--                cheque_number: {-->
+<!--                    required: "Please enter the cheque number.",-->
+<!--                    validChequeNumber: "Cheque number must be 6 digits."-->
+<!--                }-->
+<!--            },-->
+
+
+<!--            errorPlacement: function(error, element) {-->
+<!--                error.addClass('invalid-feedback');-->
+<!--                if (element.is('select')) {-->
+<!--                    // For Tom Select, place error after the Tom Select wrapper-->
+<!--                    if (element[0].tomselect) {-->
+<!--                        error.insertAfter(element.next('.ts-wrapper'));-->
+<!--                    } else {-->
+<!--                        error.insertAfter(element);-->
+<!--                    }-->
+<!--                } else {-->
+<!--                    error.insertAfter(element);-->
+<!--                }-->
+<!--                if (element.is(':disabled')) {-->
+<!--                    error.addClass('text-muted');-->
+<!--                }-->
+<!--            },-->
+
+<!--            submitHandler: function(form) {-->
+<!--                console.log("Form is valid.");-->
+<!--                form.submit();-->
+<!--            }-->
+<!--        });-->
+
+<!--        // Dynamic validation for added items-->
+<!--        $('#addItem').on('click', function() {-->
+<!--            $('.item-row:last').find('select, input').each(function() {-->
+<!--                if ($(this).hasClass('purchase_price')) {-->
+<!--                    $(this).rules('add', {-->
+<!--                        required: true,-->
+<!--                        number: true,-->
+<!--                        positiveNumber: true,-->
+<!--                        min: 0.01,-->
+<!--                        purchasePriceLessThanMRP: true,-->
+<!--                        messages: {-->
+<!--                            required: "Please enter the purchase price.",-->
+<!--                            number: "Purchase price must be a valid number.",-->
+<!--                            min: "Purchase price must be at least 0.01.",-->
+<!--                            purchasePriceLessThanMRP: "Purchase price cannot be greater than MRP."-->
+<!--                        }-->
+<!--                    });-->
+<!--                } else {-->
+<!--                    $(this).rules('add', {-->
+<!--                        required: true,-->
+<!--                        messages: {-->
+<!--                            required: "This field is required."-->
+<!--                        }-->
+<!--                    });-->
+<!--                }-->
+<!--            });-->
+<!--        });-->
+
+<!--        // Re-validate purchase_price when mrp changes-->
+<!--        $(document).on('input', '.mrp', function() {-->
+<!--            let row = $(this).closest('.item-row');-->
+<!--            let purchasePriceInput = row.find('.purchase_price');-->
+<!--            purchasePriceInput.valid(); // Trigger validation for purchase_price-->
+<!--        });-->
+<!--    });-->
+<!--</script>-->
+
+<!--&lt;!&ndash; Replace the Select2 JavaScript with Tom Select &ndash;&gt;-->
+<!--<script>-->
+<!--$(document).ready(function() {-->
+<!--    // Initialize Tom Select for existing dropdowns-->
+<!--    function initializeTomSelect($element) {-->
+<!--        if (!$element[0].tomselect) {-->
+<!--            new TomSelect($element[0], {-->
+<!--                create: false,-->
+<!--                maxItems: 1,-->
+<!--                placeholder: $element.find('option:first').text(),-->
+<!--                render: {-->
+<!--                    option: function(data, escape) {-->
+<!--                        return '<div>' + escape(data.text) + '</div>';-->
+<!--                    },-->
+<!--                    item: function(data, escape) {-->
+<!--                        return '<div>' + escape(data.text) + '</div>';-->
+<!--                    }-->
+<!--                }-->
+<!--            });-->
+<!--            console.log('Tom Select initialized for:', $element[0]);-->
+<!--        } else if ($element[0].tomselect) {-->
+<!--            console.log('Tom Select already initialized for:', $element[0]);-->
+<!--        } else {-->
+<!--            console.log('Element is not a select or invalid:', $element[0]);-->
+<!--        }-->
+<!--    }-->
+
+
+<!--    // Initialize Tom Select for existing elements-->
+<!--    $('.tom-select').each(function() {-->
+
+<!--        initializeTomSelect($(this));-->
+
+<!--    });-->
+
+<!--    // CGST to SGST copy and total calculation-->
+<!--    $(document).on('input', '.cgst, .quantity, .purchase_price', function() {-->
+<!--        let row = $(this).closest('.item-row');-->
+<!--        row.find('.sgst').val(row.find('.cgst').val());-->
+<!--        calculateTotals(row);-->
+<!--    });-->
+
+<!--    // Calculate totals for a row-->
+<!--    function calculateTotals(row) {-->
+<!--        let quantity = parseFloat(row.find('.quantity').val()) || 0;-->
+<!--        let purchasePrice = parseFloat(row.find('.purchase_price').val()) || 0;-->
+<!--        let cgst = parseFloat(row.find('.cgst').val()) || 0;-->
+<!--        let sgst = parseFloat(row.find('.sgst').val()) || 0;-->
+
+<!--        let total = quantity * purchasePrice;-->
+<!--        let gstAmount = total * ((cgst + sgst) / 100);-->
+<!--        let totalWithGst = total + gstAmount;-->
+
+<!--        row.find('.total').val(total.toFixed(2));-->
+<!--        row.find('.total_with_gst').val(totalWithGst.toFixed(2));-->
+<!--        updateGrandTotal();-->
+<!--    }-->
+
+<!--    // Update grand total-->
+<!--    function updateGrandTotal() {-->
+<!--        let grandTotal = 0;-->
+<!--        $('.total_with_gst').each(function() {-->
+<!--            grandTotal += parseFloat($(this).val()) || 0;-->
+<!--        });-->
+<!--        $('#grand_total').val(grandTotal.toFixed(2));-->
+<!--        updatePendingAmount();-->
+<!--    }-->
+
+<!--    // Update pending and credit amount-->
+<!--    function updatePendingAmount() {-->
+<!--        let grandTotal = parseFloat($('#grand_total').val()) || 0;-->
+<!--        let advanceAmount = parseFloat($('#advance_amount').val()) || 0;-->
+<!--        let pendingAmount = grandTotal - advanceAmount;-->
+<!--        let creditAmount = advanceAmount - grandTotal;-->
+
+<!--        if (pendingAmount >= 0) {-->
+<!--            $('#pending_amount').val(pendingAmount.toFixed(2));-->
+<!--            $('#credit_amount').val('0.00');-->
+<!--            $('.credit-fields').hide();-->
+<!--        } else {-->
+<!--            $('#pending_amount').val('0.00');-->
+<!--            $('#credit_amount').val(creditAmount.toFixed(2));-->
+<!--            $('.credit-fields').show();-->
+<!--        }-->
+<!--    }-->
+
+<!--    // Trigger update on advance amount change-->
+<!--    $(document).on('input', '#advance_amount', function() {-->
+<!--        updatePendingAmount();-->
+<!--    });-->
+
+<!--    // Add new item row-->
+<!--    $('#addItem').click(function() {-->
+
+<!--        let newRow = $('.item-row:first').clone(true, true);-->
+
+<!--        newRow.find('input').val('');-->
+
+<!--        let $productSelect = newRow.find('select.product');-->
+<!--        // Ensure the tom-select class is present and remove any conflicting classes-->
+<!--        $productSelect-->
+<!--            .removeClass('tomselected ts-hidden-accessible')-->
+<!--            .addClass('tom-select')-->
+<!--            .removeAttr('id') // Remove any cloned ID to avoid duplicates-->
+<!--            .val(''); // Clear the select value-->
+
+<!--        // Ensure the tom-select class is present-->
+<!--        //$productSelect.addClass('tom-select');-->
+
+<!--        // Remove any existing Tom Select wrapper-->
+<!--        $productSelect.siblings('.ts-wrapper').remove();-->
+
+
+<!--        // Destroy existing Tom Select instance if present-->
+
+<!--        if ($productSelect[0].tomselect) {-->
+<!--            //console.log('Destroying Tom Select instance for:', $productSelect)-->
+<!--            $productSelect[0].tomselect.destroy();-->
+<!--        }else {-->
+<!--            console.log('No Tom Select instance found for:', $productSelect);-->
+<!--        }-->
+
+
+<!--        //$productSelect.val('');-->
+
+<!--        // Remove any existing Tom Select wrapper to avoid duplicates-->
+<!--        //$productSelect.siblings('.ts-wrapper').remove();-->
+
+<!--        // Append the new row to the container-->
+<!--        $('#itemContainer').append(newRow);-->
+
+<!--        // Initialize Tom Select on the new product select-->
+<!--        initializeTomSelect($productSelect);-->
+
+
+
+
+<!--        newRow.find('select, input').each(function() {-->
+<!--            $(this).rules('add', {-->
+<!--                required: true,-->
+<!--                messages: {-->
+<!--                    required: "This field is required."-->
+<!--                }-->
+<!--            });-->
+<!--        });-->
+<!--        toggleRemoveButton();-->
+<!--        updateGrandTotal();-->
+<!--    });-->
+
+<!--    // Remove last item row-->
+<!--    $('#removeItem').click(function() {-->
+<!--        let rows = $('.item-row');-->
+<!--        if (rows.length > 1) {-->
+<!--            let lastRow = rows.last();-->
+<!--            // Destroy Tom Select instance in the removed row-->
+<!--            let $productSelect = lastRow.find('.product');-->
+<!--            if ($productSelect[0].tomselect) {-->
+<!--                console.log('Destroying Tom Select instance for removed row:', $productSelect);-->
+<!--                $productSelect[0].tomselect.destroy();-->
+<!--            }-->
+<!--            lastRow.remove();-->
+<!--            toggleRemoveButton();-->
+<!--            updateGrandTotal();-->
+<!--        }-->
+<!--    });-->
+
+<!--    // Toggle remove button visibility-->
+<!--    function toggleRemoveButton() {-->
+<!--        if ($('.item-row').length === 1) {-->
+<!--            $('#removeItem').hide();-->
+<!--        } else {-->
+<!--            $('#removeItem').show();-->
+<!--        }-->
+<!--    }-->
+
+<!--    // Initial toggle of remove button-->
+<!--    toggleRemoveButton();-->
+
+<!--    // Form submission validation-->
+<!--    $('#purchaseForm').submit(function(e) {-->
+<!--        if (!$('#purchase_vendor').val()) {-->
+<!--            e.preventDefault();-->
+<!--            return;-->
+<!--        }-->
+<!--        if (!$('#payment_type').val()) {-->
+<!--            e.preventDefault();-->
+<!--            return;-->
+<!--        }-->
+<!--    });-->
+
+<!--    // Vendor details fetch-->
+<!--    let currentCreditAmount = 0;-->
+<!--    let creditApplied = false;-->
+<!--    $('#purchase_vendor').on('change', function() {-->
+<!--        var vendorId = $(this).val();-->
+<!--        creditApplied = false;-->
+<!--        if (vendorId) {-->
+<!--            $.ajax({-->
+<!--                url: '{% url "get_vendor_details" %}',-->
+<!--                type: 'GET',-->
+<!--                data: { vendor_id: vendorId },-->
+<!--                success: function(response) {-->
+<!--                    if (response.success) {-->
+<!--                        $('#purchase_vendor_name').val(response.vendor_name || '');-->
+<!--                        $('#purchase_vendor_phone').val(response.vendor_phone_number || '');-->
+<!--                        $('#purchase_vendor_email').val(response.vendor_email || '');-->
+<!--                        $('#purchase_vendor_aadhar').val(response.vendor_aadhaar || '');-->
+<!--                        $('#purchase_vendor_url').val(response.vendor_company_url || '');-->
+<!--                        $('#purchase_vendor_type').val(response.vendor_type || '');-->
+<!--                        currentCreditAmount = response.credit_amount ? parseFloat(response.credit_amount) : 0;-->
+<!--                        if (currentCreditAmount > 0) {-->
+<!--                            $('#useCreditLink').show();-->
+<!--                        } else {-->
+<!--                            $('#useCreditLink').hide();-->
+<!--                        }-->
+<!--                    } else {-->
+<!--                        $('#purchase_vendor_name').val('');-->
+<!--                        $('#purchase_vendor_phone').val('');-->
+<!--                        $('#purchase_vendor_email').val('');-->
+<!--                        $('#purchase_vendor_aadhar').val('');-->
+<!--                        $('#purchase_vendor_url').val('');-->
+<!--                        $('#purchase_vendor_type').val('');-->
+<!--                        currentCreditAmount = 0;-->
+<!--                        $('#useCreditLink').hide();-->
+<!--                    }-->
+<!--                    updatePendingAmount();-->
+<!--                },-->
+<!--                error: function() {-->
+<!--                    $('#purchase_vendor_name').val('');-->
+<!--                    $('#purchase_vendor_phone').val('');-->
+<!--                    $('#purchase_vendor_email').val('');-->
+<!--                    $('#purchase_vendor_aadhar').val('');-->
+<!--                    $('#purchase_vendor_url').val('');-->
+<!--                    $('#purchase_vendor_type').val('');-->
+<!--                    currentCreditAmount = 0;-->
+<!--                    $('#useCreditLink').hide();-->
+<!--                    updatePendingAmount();-->
+<!--                }-->
+<!--            });-->
+<!--        } else {-->
+<!--            $('#purchase_vendor_name').val('');-->
+<!--            $('#purchase_vendor_phone').val('');-->
+<!--            $('#purchase_vendor_email').val('');-->
+<!--            $('#purchase_vendor_aadhar').val('');-->
+<!--            $('#purchase_vendor_url').val('');-->
+<!--            $('#purchase_vendor_type').val('');-->
+<!--            currentCreditAmount = 0;-->
+<!--            $('#useCreditLink').hide();-->
+<!--            updatePendingAmount();-->
+<!--        }-->
+<!--    });-->
+
+<!--    // Show credit modal when clicking the "Use available credit" link-->
+<!--    $('#useCreditLink').on('click', function(e) {-->
+<!--        e.preventDefault();-->
+<!--        if (currentCreditAmount > 0 && !creditApplied) {-->
+<!--            $('#creditAmountDisplay').text(currentCreditAmount.toFixed(2));-->
+<!--            $('#creditModal').modal('show');-->
+<!--        }-->
+<!--    });-->
+
+<!--    // Handle modal "Yes" button-->
+<!--    $('#creditYesBtn').on('click', function() {-->
+<!--        if (!creditApplied) {-->
+<!--            let grandTotal = parseFloat($('#grand_total').val()) || 0;-->
+<!--            let creditToUse = Math.min(currentCreditAmount, grandTotal);-->
+<!--            let currentAdvance = parseFloat($('#advance_amount').val()) || 0;-->
+<!--            $('#advance_amount').val((currentAdvance + creditToUse).toFixed(2));-->
+<!--            $('#use_credit').val('true');-->
+<!--            creditApplied = true;-->
+<!--            $('#useCreditLink').addClass('disabled').css('pointer-events', 'none');-->
+<!--            $('#creditYesBtn').prop('disabled', true);-->
+<!--            updatePendingAmount();-->
+<!--        }-->
+<!--        $('#creditModal').modal('hide');-->
+<!--    });-->
+
+<!--    // Handle modal "No" button or close-->
+<!--    $('#creditNoBtn, .modal .btn-close').on('click', function() {-->
+<!--        $('#use_credit').val('false');-->
+<!--        $('#creditModal').modal('hide');-->
+<!--    });-->
+
+<!--    // Payment type handling-->
+<!--    $('#payment_type').on('change', function() {-->
+<!--        $('.payment-fields').hide().find('input, select').prop('disabled', true);-->
+<!--        let selectedOption = $(this).find('option:selected').text().toLowerCase().replace(' ', '_');-->
+
+<!--        if (selectedOption === 'cash') {-->
+<!--            $('.cash-fields').show().find('input').prop('disabled', false);-->
+<!--        } else if (selectedOption === 'upi') {-->
+<!--            $('.upi-fields').show().find('input').prop('disabled', false);-->
+<!--        } else if (selectedOption === 'upi_cash') {-->
+<!--            $('.upi-cash-fields').show().find('input').prop('disabled', false);-->
+<!--        } else if (selectedOption === 'net_banking') {-->
+<!--            $('.netbanking-fields').show().find('input, select').prop('disabled', false);-->
+<!--            // Initialize Tom Select for account_type if not already initialized-->
+<!--            let $accountType = $('#account_type');-->
+<!--            if (!$accountType[0].tomselect) {-->
+<!--                initializeTomSelect($accountType);-->
+<!--            }-->
+<!--        } else if (selectedOption === 'cheque') {-->
+<!--            $('.cheque-fields').show().find('input').prop('disabled', false);-->
+<!--        }-->
+<!--    });-->
+<!--});-->
+<!--</script>-->
+
+<!--<script>-->
+<!--$(document).ready(function() {-->
+<!--    // CGST to SGST copy and total calculation-->
+<!--    $(document).on('input', '.cgst, .quantity, .purchase_price', function() {-->
+<!--        let row = $(this).closest('.item-row');-->
+<!--        row.find('.sgst').val(row.find('.cgst').val());-->
+<!--        calculateTotals(row);-->
+<!--    });-->
+
+<!--    // Calculate totals for a row-->
+<!--    function calculateTotals(row) {-->
+<!--        let quantity = parseFloat(row.find('.quantity').val()) || 0;-->
+<!--        let purchasePrice = parseFloat(row.find('.purchase_price').val()) || 0;-->
+<!--        let cgst = parseFloat(row.find('.cgst').val()) || 0;-->
+<!--        let sgst = parseFloat(row.find('.sgst').val()) || 0;-->
+
+<!--        let total = quantity * purchasePrice;-->
+<!--        let gstAmount = total * ((cgst + sgst) / 100);-->
+<!--        let totalWithGst = total + gstAmount;-->
+
+<!--        row.find('.total').val(total.toFixed(2));-->
+<!--        row.find('.total_with_gst').val(totalWithGst.toFixed(2));-->
+<!--        updateGrandTotal();-->
+<!--    }-->
+
+<!--    // Update grand total-->
+<!--    function updateGrandTotal() {-->
+<!--        let grandTotal = 0;-->
+<!--        $('.total_with_gst').each(function() {-->
+<!--            grandTotal += parseFloat($(this).val()) || 0;-->
+<!--        });-->
+<!--        $('#grand_total').val(grandTotal.toFixed(2));-->
+<!--        updatePendingAmount();-->
+<!--    }-->
+
+<!--    // Update pending and credit amount-->
+<!--    function updatePendingAmount() {-->
+<!--        let grandTotal = parseFloat($('#grand_total').val()) || 0;-->
+<!--        let advanceAmount = parseFloat($('#advance_amount').val()) || 0;-->
+<!--        let pendingAmount = grandTotal - advanceAmount;-->
+<!--        let creditAmount = advanceAmount - grandTotal;-->
+
+<!--        if (pendingAmount >= 0) {-->
+<!--            $('#pending_amount').val(pendingAmount.toFixed(2));-->
+<!--            $('#credit_amount').val('0.00');-->
+<!--            $('.credit-fields').hide();-->
+<!--        } else {-->
+<!--            $('#pending_amount').val('0.00');-->
+<!--            $('#credit_amount').val(creditAmount.toFixed(2));-->
+<!--            $('.credit-fields').show();-->
+<!--        }-->
+<!--    }-->
+
+<!--    // Trigger update on advance amount change-->
+<!--    $(document).on('input', '#advance_amount', function() {-->
+<!--        updatePendingAmount();-->
+<!--    });-->
+
+<!--    // Initialize Select2 for existing product dropdowns on page load-->
+<!--    $('.product').select2({-->
+<!--        width: '100%',-->
+<!--        height: '100%'-->
+<!--    });-->
+
+<!--    // Add new item row-->
+<!--    $('#addItem').click(function() {-->
+<!--        let newRow = $('.item-row:first').clone();-->
+<!--        newRow.find('input').val('');-->
+<!--        let $productSelect = newRow.find('.product');-->
+<!--        $productSelect.val('').trigger('change.select2');-->
+
+<!--        if ($productSelect.hasClass('select2-hidden-accessible')) {-->
+<!--            $productSelect.select2('destroy');-->
+<!--        }-->
+
+<!--        $('#itemContainer').append(newRow);-->
+
+<!--        $productSelect.select2({-->
+<!--            width: '100%',-->
+<!--            height: '100%'-->
+<!--        });-->
+
+<!--        toggleRemoveButton();-->
+<!--    });-->
+
+<!--    // Remove last item row-->
+<!--    $('#removeItem').click(function() {-->
+<!--        let rows = $('.item-row');-->
+<!--        if (rows.length > 1) {-->
+<!--            rows.last().remove();-->
+<!--            toggleRemoveButton();-->
+<!--            updateGrandTotal();-->
+<!--        }-->
+<!--    });-->
+
+<!--    // Toggle remove button visibility-->
+<!--    function toggleRemoveButton() {-->
+<!--        if ($('.item-row').length === 1) {-->
+<!--            $('#removeItem').hide();-->
+<!--        } else {-->
+<!--            $('#removeItem').show();-->
+<!--        }-->
+<!--    }-->
+
+<!--    // Initial toggle of remove button-->
+<!--    toggleRemoveButton();-->
+
+<!--    // Form submission validation-->
+<!--    $('#purchaseForm').submit(function(e) {-->
+<!--        if (!$('#purchase_vendor').val()) {-->
+<!--&lt;!&ndash;            alert('Please select a vendor.');&ndash;&gt;-->
+<!--            e.preventDefault();-->
+<!--            return;-->
+<!--        }-->
+<!--        if (!$('#payment_type').val()) {-->
+<!--&lt;!&ndash;            alert('Please select a payment type.');&ndash;&gt;-->
+<!--            e.preventDefault();-->
+<!--            return;-->
+<!--        }-->
+<!--    });-->
+
+<!--    // Initialize Select2 for vendor-->
+<!--    $('#purchase_vendor').select2({-->
+<!--        width: '100%',-->
+<!--        height: '100%'-->
+<!--    });-->
+
+<!--    // Vendor details fetch-->
+<!--    let currentCreditAmount = 0;-->
+<!--    let creditApplied = false;-->
+<!--    $('#purchase_vendor').on('change', function() {-->
+<!--        var vendorId = $(this).val();-->
+<!--        creditApplied = false;-->
+<!--        if (vendorId) {-->
+<!--            $.ajax({-->
+<!--                url: '{% url "get_vendor_details" %}',-->
+<!--                type: 'GET',-->
+<!--                data: { vendor_id: vendorId },-->
+<!--                success: function(response) {-->
+<!--                    if (response.success) {-->
+<!--                        $('#purchase_vendor_name').val(response.vendor_name || '');-->
+<!--                        $('#purchase_vendor_phone').val(response.vendor_phone_number || '');-->
+<!--                        $('#purchase_vendor_email').val(response.vendor_email || '');-->
+<!--                        $('#purchase_vendor_aadhar').val(response.vendor_aadhaar || '');-->
+<!--                        $('#purchase_vendor_url').val(response.vendor_company_url || '');-->
+<!--                        $('#purchase_vendor_type').val(response.vendor_type || '');-->
+<!--                        currentCreditAmount = response.credit_amount ? parseFloat(response.credit_amount) : 0;-->
+<!--                        if (currentCreditAmount > 0) {-->
+<!--                            $('#useCreditLink').show();-->
+<!--                        } else {-->
+<!--                            $('#useCreditLink').hide();-->
+<!--                        }-->
+<!--                    } else {-->
+<!--                        //alert('Vendor details not found.');-->
+<!--                        $('#purchase_vendor_name').val('');-->
+<!--                        $('#purchase_vendor_phone').val('');-->
+<!--                        $('#purchase_vendor_email').val('');-->
+<!--                        $('#purchase_vendor_aadhar').val('');-->
+<!--                        $('#purchase_vendor_url').val('');-->
+<!--                        $('#purchase_vendor_type').val('');-->
+<!--                        currentCreditAmount = 0;-->
+<!--                        $('#useCreditLink').hide();-->
+<!--                    }-->
+<!--                    updatePendingAmount();-->
+
+<!--                },-->
+<!--                error: function() {-->
+<!--                    $('#purchase_vendor_name').val('');-->
+<!--                    $('#purchase_vendor_phone').val('');-->
+<!--                    $('#purchase_vendor_email').val('');-->
+<!--                    $('#purchase_vendor_aadhar').val('');-->
+<!--                    $('#purchase_vendor_url').val('');-->
+<!--                    $('#purchase_vendor_type').val('');-->
+<!--                    currentCreditAmount = 0;-->
+<!--                    $('#useCreditLink').hide();-->
+<!--                    updatePendingAmount();-->
+<!--                }-->
+<!--            });-->
+<!--        } else {-->
+<!--            $('#purchase_vendor_name').val('');-->
+<!--            $('#purchase_vendor_phone').val('');-->
+<!--            $('#purchase_vendor_email').val('');-->
+<!--            $('#purchase_vendor_aadhar').val('');-->
+<!--            $('#purchase_vendor_url').val('');-->
+<!--            $('#purchase_vendor_type').val('');-->
+<!--            currentCreditAmount = 0;-->
+<!--            $('#useCreditLink').hide();-->
+<!--            updatePendingAmount();-->
+<!--        }-->
+<!--    });-->
+<!--     // Show credit modal when clicking the "Use available credit" link-->
+<!--    $('#useCreditLink').on('click', function(e) {-->
+<!--        e.preventDefault();-->
+<!--        if (currentCreditAmount > 0 && !creditApplied) {-->
+<!--            $('#creditAmountDisplay').text(currentCreditAmount.toFixed(2));-->
+<!--            $('#creditModal').modal('show');-->
+<!--        }-->
+<!--    });-->
+
+<!--    // Handle modal "Yes" button-->
+<!--    $('#creditYesBtn').on('click', function() {-->
+<!--        if (!creditApplied) {-->
+<!--            let grandTotal = parseFloat($('#grand_total').val()) || 0;-->
+<!--            let creditToUse = Math.min(currentCreditAmount, grandTotal);-->
+<!--            let currentAdvance = parseFloat($('#advance_amount').val()) || 0;-->
+<!--            $('#advance_amount').val((currentAdvance + creditToUse).toFixed(2));-->
+<!--            $('#use_credit').val('true');-->
+<!--            creditApplied = true; // Mark credit as applied-->
+<!--            $('#useCreditLink').addClass('disabled').css('pointer-events', 'none');-->
+<!--            $('#creditYesBtn').prop('disabled', true); // Disable the Yes button-->
+<!--            updatePendingAmount();-->
+<!--        }-->
+<!--        $('#creditModal').modal('hide');-->
+<!--    });-->
+
+<!--    // Handle modal "No" button or close-->
+<!--    $('#creditNoBtn, .modal .btn-close').on('click', function() {-->
+<!--        $('#use_credit').val('false');-->
+<!--        $('#creditModal').modal('hide');-->
+<!--    });-->
+
+<!--    // Payment type handling-->
+<!--&lt;!&ndash;    $('#payment_type').select2({&ndash;&gt;-->
+<!--&lt;!&ndash;        width: '100%',&ndash;&gt;-->
+<!--&lt;!&ndash;        height: '100%'&ndash;&gt;-->
+<!--&lt;!&ndash;    });&ndash;&gt;-->
+
+<!--    $('#payment_type').on('change', function() {-->
+<!--        $('.payment-fields').hide().find('input, select').prop('disabled', true);-->
+<!--        let selectedOption = $(this).find('option:selected').text().toLowerCase().replace(' ', '_');-->
+
+<!--        if (selectedOption === 'cash') {-->
+<!--            $('.cash-fields').show().find('input').prop('disabled', false);-->
+<!--        } else if (selectedOption === 'upi') {-->
+<!--            $('.upi-fields').show().find('input').prop('disabled', false);-->
+<!--        } else if (selectedOption === 'upi_cash') {-->
+<!--            $('.upi-cash-fields').show().find('input').prop('disabled', false);-->
+<!--        } else if (selectedOption === 'net_banking') {-->
+<!--            $('.netbanking-fields').show().find('input, select').prop('disabled', false);-->
+<!--        } else if (selectedOption === 'cheque') {-->
+<!--            $('.cheque-fields').show().find('input').prop('disabled', false);-->
+<!--        }-->
+<!--    });-->
+<!--});-->
+<!--</script>-->
+
+{% endblock %}
+
+

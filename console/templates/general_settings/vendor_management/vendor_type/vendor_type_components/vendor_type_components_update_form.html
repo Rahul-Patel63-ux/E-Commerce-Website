@@ -1,0 +1,75 @@
+<form id="edit_vendortype_form" action="{% url 'updateVendorType' v.id %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+      <div class="modal-body">
+
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                    <label for="uvendortype" class="form-label">Vendor Type <span style="color:red;">*</span></label>
+                    <input type="text" id="uvendortype" class="form-control" name="uvendortype" placeholder="Ex:Manufacturers" value="{{v.vendor_type}}">
+                </div>
+            </div>
+          </div>
+
+
+
+      <div class="modal-footer">
+          <button type="submit" id="edit_vendortypeFormSubmit" class="btn text-white" style="background-color:#405189;">Save</button>
+          <button type="button" class="btn bg-light" data-bs-dismiss="modal">Close</button>
+      </div>
+  </form>
+<!--base_assests js file-->
+{% include 'base_assets/base_js.html' %}
+
+<!--Script starts here-->
+<script>
+$(document).ready(function() {
+   console.log('hello');
+
+    function capitalizeFirstLetter(str) {
+        if (str.length > 0) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+        return str;
+    }
+
+    // Adding custom validation method for capitalizing first letter
+    $.validator.addMethod("capitalizeFirstLetter", function(value, element) {
+        // Capitalize the input value
+        $(element).val(capitalizeFirstLetter(value));
+        return true;
+    }, "");
+    $.validator.addMethod("letterStartNoLeadingSpace", function(value, element) {
+        return this.optional(element) ||/^[a-zA-Z][a-zA-Z ]*$/.test(value);
+    }, "Please start with a letter and use only letters and spaces.");
+
+   $('#edit_vendortype_form').validate({
+       rules: {
+           uvendortype:{
+               required:true,
+               minlength: 3,
+                maxlength: 100,
+               capitalizeFirstLetter: true,
+               letterStartNoLeadingSpace:true
+           }
+
+       },
+       messages:{
+
+           uvendortype:{
+               required:" Please enter vendor type.",
+               minlength: "Vendor type should consists at least 3 characters.",
+                maxlength: "Vendor type should not be exceeded 100 characters."
+           }
+
+       },
+       submitHandler: function(form) {
+          console.log(" Form is valid.");
+          $('#edit_vendortypeFormSubmit').prop('disabled',true);
+          form.submit();
+      }
+   });
+});
+
+
+</script>
+<!--Script ends here-->

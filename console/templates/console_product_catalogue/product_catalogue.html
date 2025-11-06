@@ -1,0 +1,548 @@
+{% extends 'console_base/base.html' %}
+
+{% block content %}
+<!--alert starts here-->
+{% include 'alertcomponents/alertcomponent.html' %}
+<!--alert ends here-->
+<!-- custom css -->
+        {% block style %}
+                <!-- Custom CSS for Select2 -->
+                    <style>
+                    .select2-container .select2-selection--multiple {
+                        min-height: 38px;
+                        border: 1px solid #ced4da;
+                        border-radius: 0.25rem;
+                    }
+                    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+                        background-color: #405189;
+                        color: white;
+
+                    }
+
+                    </style>
+
+        {% endblock %}
+        <!-- custom css end here -->
+
+<!-- breadcrum starts here -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="{% url 'productCatalogue' %}">Product Catalogue</a></li>
+                </ol>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!--breadcrum ends here-->
+
+<!-- productcatalogue start here -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                      <div class="col-6">
+                           <!-- Button trigger modal -->
+                              <button type="button" class="btn text-white" style="background-color:#405189;" data-bs-toggle="modal" data-bs-target="#productcatalogueModal">
+                                <i class="bx bx-plus-circle"></i> Product Catalogue
+                              </button>
+                            <!-- productcatalogue creation modal starts here-->
+                               <div class="modal fade" id="productcatalogueModal" tabindex="-1" aria-labelledby="productcatalogueModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                                      <div class="modal-content">
+                                        <div class="modal-header" style="background-color:#405189;padding:10px 15px 10px 10px;">
+                                          <h1 class="modal-title text-white mb-0 fs-5" id="productcatalogueModalLabel">Add Product</h1>
+                                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: white;"></button>
+                                        </div>
+                                        <form id="productcatalogue_form" method="post" enctype="multipart/form-data">
+                                          {% csrf_token %}
+                                            <div class="modal-body">
+
+                                                  <div class="row">
+                                                      <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                                                          <label for="product_catalogue_title" class="form-label">Product Title <span style="color:red;">*</span></label>
+                                                          <input type="text" id="product_catalogue_title" class="form-control" name="product_catalogue_title" placeholder="Shirts">
+                                                      </div>
+                                                      <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                                                            <label for="product_brand" class="form-label">Brand <span style="color:red;">*</span></label>
+                                                            <select name="product_brand" id="product_brand" class="form-select product_brand">
+                                                              <option value="">Select Brand</option>
+                                                                 {% for b in brand %}
+
+                                                                    <option value="{{ b.id }}">{{ b.brand_name}}</option>
+                                                                {% endfor %}
+
+
+                                                            </select>
+                                                      </div>
+                                                      <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                                                            <label for="product_category" class="form-label">Main Category <span style="color:red;">*</span></label>
+                                                            <select name="product_category" id="product_category" class="form-select product_category">
+                                                              <option value="">Select Main Category</option>
+                                                                 {% for i in main_category %}
+
+                                                                    <option value="{{ i.id }}">{{ i.main_category}}</option>
+                                                                {% endfor %}
+
+
+                                                            </select>
+                                                      </div>
+                                                      <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                                                            <label for="product_subcategory" class="form-label">Sub Category <span style="color:red;">*</span></label>
+                                                            <select name="product_subcategory" id="product_subcategory" class="form-select product_subcategory">
+                                                              <option value="">Select Sub Category</option>
+                                                                 {% for j in sub_category %}
+
+                                                                    <option value="{{ j.id }}">{{ j.sub_category}}</option>
+                                                                {% endfor %}
+
+
+                                                            </select>
+                                                      </div>
+                                                      <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                                                            <label for="product_color" class="form-label">Color <span style="color:red;">*</span></label>
+                                                            <select name="product_color" id="product_color" class="form-select product_color">
+                                                              <option value="">Select Color</option>
+                                                                 {% for c in color %}
+                                                                        <option value="{{ c.id }}" style="color: {{ c.product_color_code }};">
+                                                                            {{ c.product_color_name }}
+                                                                        </option>
+                                                                                                        <!-- &#9632;-->
+                                                                {% endfor %}
+
+
+                                                            </select>
+                                                      </div>
+                                                      <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                                                            <label for="product_size" class="form-label">Size <span style="color:red;">*</span></label>
+                                                            <select name="product_size[]" id="product_size" class="form-select product_size" multiple>
+<!--                                                              <option value="">Select Size</option>-->
+                                                                 {% for s in size %}
+
+                                                                    <option value="{{ s.id }}">{{ s.product_size_name}}</option>
+                                                                {% endfor %}
+
+
+                                                            </select>
+                                                      </div>
+                                                      <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                                                            <label for="product_material" class="form-label">Material <span style="color:red;">*</span></label>
+                                                            <select name="product_material" id="product_material" class="form-select product_material">
+                                                              <option value="">Select Material</option>
+                                                                 {% for mat in material %}
+
+                                                                    <option value="{{ mat.id }}">{{ mat.product_material}}</option>
+                                                                {% endfor %}
+
+
+                                                            </select>
+                                                      </div>
+<!--                                                      <div class="col-lg-6 col-md-6 col-sm-12 mb-4">-->
+<!--                                                            <label for="product_catalogue_mrp" class="form-label">MRP <span style="color:red;">*</span></label>-->
+<!--                                                            <input type="number" id="product_catalogue_mrp" class="form-control" name="product_catalogue_mrp" placeholder="Ex: 100.99" step="0.01" min="0.01">-->
+<!--                                                      </div>-->
+<!--                                                      <div class="col-lg-6 col-md-6 col-sm-12 mb-4">-->
+<!--                                                            <label for="product_discount_percent" class="form-label">Discount Percent</label>-->
+<!--                                                            <input type="number" id="product_discount_percent" class="form-control" name="product_discount_percent" placeholder="Ex: 10.00" step="0.01" min="0" max="100">-->
+<!--                                                        </div>-->
+
+
+
+                                                      <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                                                           <label for="product_images" class="form-label" >Image <span style="color:red;">* <sub class="text-primary">(.png, .jpg, min-3,max-5)</sub></span></label>
+                                                           <input type="file" id="product_images" name="product_images" class="form-control" multiple>
+<!--                                                          <div id="image-error" class="text-danger" style="display:none;"></div>-->
+
+                                                      </div>
+<!--                                                      <div class="col-lg-6 col-md-6 col-sm-12 mb-4">-->
+<!--                                                          <label for="product_catalogue_stock_quantity" class="form-label">Stock Quantity <span style="color:red;">*</span></label>-->
+<!--                                                          <input type="number" id="product_catalogue_stock_quantity" class="form-control" name="product_catalogue_stock_quantity" placeholder="Ex: 100">-->
+<!--                                                      </div>-->
+<!--                                                      <div class="col-lg-6 col-md-6 col-sm-12 mb-4">-->
+<!--                                                          <label for="product_catalogue_mrp" class="form-label">MRP <span style="color:red;">*</span></label>-->
+<!--                                                          <input type="number" id="product_catalogue_mrp" class="form-control" name="product_catalogue_mrp" placeholder="Ex: 100.99">-->
+<!--                                                      </div>-->
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                                                            <label for="product_description" class="form-label">Description <span class="text-light-emphasis">* </span></label>
+                                                            <textarea class="form-control ckeditor-classic" id="product_description" name="product_description" rows="5"></textarea>
+                                                        </div>
+
+                                                  </div>
+                                                </div>
+
+
+
+                                            <div class="modal-footer">
+                                                <button type="submit" id="createproductcatalogueFormSubmit" class="btn text-white" style="background-color:#405189;">Submit</button>
+                                                <button type="button" class="btn bg-light" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </form>
+                                      </div>
+                                    </div>
+                          </div>
+<!--                          Product Catalogue creation modal ends here-->
+
+
+
+<!--                              <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importModal"><i class="bx bxs-file-import"></i> Import</button>-->
+<!--                              &lt;!&ndash; Buttons with Label &ndash;&gt;-->
+<!--                              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exportModal"><i class=" bx bxs-file-export"></i> Export</button>-->
+                      </div>
+                      <div class="col-1"></div>
+                      <div class="col-5">
+                          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="query" hx-get="{% url 'productcatalogueRenderData' %}" hx-trigger="input changed delay:500ms, query" hx-swap="innerHTML" hx-target="#productcatalogueTableBodyContainer">
+                      </div>
+                </div>
+            </div>
+            <div class="card-body">
+            <!--card body starts here-->
+                <div class="table-responsive">
+                      <table class="table border">
+                          <thead>
+                                <tr>
+                                  <th>S.No</th>
+<!--                                    <th>Image</th>-->
+                                  <th>Product </th>
+                                    <th>Main Category</th>
+                                    <th>Sub Category</th>
+                                    <th>Created On</th>
+                                    <th>Status</th>
+                                  <th style="text-align:center;">Action</th>
+                                </tr>
+                          </thead>
+                          <tbody
+                                  hx-get="{% url 'productcatalogueRenderData' %}"
+                                  hx-swap="innerHTML"
+                                  hx-target="this"
+                                  hx-trigger="revealed once"
+                                  id="productcatalogueTableBodyContainer">
+
+                          </tbody>
+                      </table>
+                    </div>
+                <div class="d-flex justify-content-center" id="pagination_div">
+
+                </div>
+                <!--card body ends here-->
+
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!--base_assests js file-->
+{% include 'base_assets/base_js.html' %}
+<!-- Initialize Select2 for product_size -->
+<script>
+$(document).ready(function() {
+    var sizeSelect = $('#product_size');
+    sizeSelect.select2({
+        placeholder: "Select Sizes",
+        allowClear: true,
+        width: '100%',
+        closeOnSelect: false,
+        minimumResultsForSearch: Infinity, // Disable search feature
+        dropdownParent: $('#productcatalogueModal') // Attach dropdown to modal
+    });
+});
+</script>
+
+
+<!-- Initialize CKEditor -->
+<script>
+    document.querySelectorAll(".ckeditor-classic").forEach(function(element) {
+        ClassicEditor
+            .create(element, {
+                toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'alignment', '|', 'blockQuote', 'undo', 'redo'],
+                alignment: {
+                    options: ['left', 'center', 'right', 'justify']
+                },
+                height: '200px'
+            })
+            .then(function(editor) {
+                editor.ui.view.editable.element.style.height = '200px';
+            })
+            .catch(function(error) {
+                console.error(error);
+            });
+    });
+</script>
+
+<!--dependency script using ajax-->
+<script>
+$(document).ready(function() {
+    // When main category changes, fetch subcategories
+    $('.product_category').change(function() {
+        var mainCategoryId = $(this).val();
+        if (mainCategoryId) {
+            $.ajax({
+                url: "{% url 'get_subcategories' %}",
+                data: {
+                    'main_category_id': mainCategoryId
+                },
+                dataType: 'json',
+                success: function(data) {
+                    $('.product_subcategory').empty();
+                    $('.product_subcategory').append('<option value="">Select Sub Category</option>');
+                    $.each(data.subcategories, function(index, subcategory) {
+                        $('.product_subcategory').append(
+                            $('<option>').val(subcategory.id).text(subcategory.sub_category)
+                        );
+                    });
+                }
+            });
+        } else {
+            $('.product_subcategory').empty();
+            $('.product_subcategory').append('<option value="">Select Sub Category</option>');
+        }
+    });
+});
+</script>
+
+<!--validations-->
+<script>
+$(document).ready(function() {
+    // Function to capitalize first letter
+    function capitalizeFirstLetter(str) {
+        if (str.length > 0) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+        return str;
+    }
+
+    // Custom validation method for capitalizing first letter
+    $.validator.addMethod("capitalizeFirstLetter", function(value, element) {
+        $(element).val(capitalizeFirstLetter(value));
+        return true;
+    }, "");
+
+    // Custom validation method to restrict double spaces
+    $.validator.addMethod("noDoubleSpace", function(value, element) {
+        return this.optional(element) || !/\s{2,}/.test(value);
+    }, "Double spaces are not allowed.");
+
+    // Custom validation method for letters and spaces only
+    $.validator.addMethod("alphaSpaceOnly", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z\s]*$/.test(value);
+    }, "Only alphabetical characters and spaces are allowed.");
+    $.validator.addMethod("letterStartNoLeadingSpace", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z][^\s].*/.test(value);
+    }, "Product Name must start with a letter and have no leading space.");
+
+    // Custom validation method for file extensions and size
+    $.validator.addMethod("validImageFiles", function(value, element) {
+        if (element.files && element.files.length > 0) {
+            const validExtensions = ['jpg', 'png'];
+            const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+
+            for (let i = 0; i < element.files.length; i++) {
+                const file = element.files[i];
+                const fileExtension = file.name.split('.').pop().toLowerCase();
+
+                // Check file extension
+                if (!validExtensions.includes(fileExtension)) {
+                    return false;
+                }
+
+                // Check file size
+                if (file.size > maxSize) {
+                    return false;
+                }
+            }
+
+            // Check file count (3-5 images)
+            if (element.files.length < 3 || element.files.length > 5) {
+                return false;
+            }
+
+            return true;
+        }
+        return false;
+    }, "Please upload 3-5 images in JPG or PNG format, each not exceeding 5MB.");
+    $.validator.addMethod("multiSelectRequired", function(value, element) {
+        return $(element).val() && $(element).val().length > 0;
+    }, "Please select at least one size.");
+
+
+
+    // Custom validation method for ckeditor
+    $.validator.addMethod("ckeditorRequired", function(value, element) {
+        var editor = CKEDITOR.instances[element.id];
+        if (editor) {
+            var content = editor.getData().trim();
+            return content.length > 0;
+        }
+        return false;
+    }, "Please enter a description in the editor.");
+    // Custom validation method for positive numbers
+    $.validator.addMethod("positiveNumber", function(value, element) {
+        return this.optional(element) || (Number(value) > 0);
+    }, "Please enter a positive number.");
+    $.validator.addMethod("validDiscountPercent", function(value, element) {
+        return this.optional(element) || (Number(value) >= 0 && Number(value) <= 100);
+    }, "Discount percent must be between 0 and 100.");
+
+    $('#productcatalogue_form').validate({
+        rules: {
+            product_category: {
+                required: true
+            },
+            product_subcategory: {
+                required: true
+            },
+            product_catalogue_title: {
+                required: true,
+                alphaSpaceOnly: true,
+                noDoubleSpace: true,
+                letterStartNoLeadingSpace:true,
+                minlength: 3,
+                maxlength: 100,
+                capitalizeFirstLetter: true
+            },
+//<!--            product_image: {-->
+//<!--                required: true,-->
+//<!--                extension: "jpg|png",-->
+//<!--                maxFileSize: 5-->
+//<!--            },-->
+            product_brand: {
+                required: true
+            },
+            product_color: {
+                required: true
+            },
+            'product_size[]': {
+                multiSelectRequired: true
+            },
+            product_material: {
+                required: true
+            },
+            product_images: {
+                required: true,
+                validImageFiles:true
+            },
+            // product_catalogue_mrp: {
+            //     required: true,
+            //     number: true,
+            //     positiveNumber: true,
+            //     min: 0.01
+            // },
+            // product_discount_percent: {
+            //     number: true,
+            //     validDiscountPercent: true
+            // },
+// <!--            product_catalogue_stock_quantity: {-->
+// <!--                required: true,-->
+// <!--                number: true,-->
+// <!--                positiveNumber: true,-->
+// <!--                min: 1,-->
+// <!--                max: 999999-->
+// <!--            },-->
+            product_description: {
+                ckeditorRequired: true,
+                minlength: 10,
+                maxlength: 1000
+            }
+        },
+        messages: {
+            product_category: {
+                required: "Please select a main category."
+            },
+            product_subcategory: {
+                required: "Please select a sub category."
+            },
+            product_catalogue_title: {
+                required: "Please enter the product title.",
+                alphaSpaceOnly: "Product title must contain only letters and spaces.",
+                noDoubleSpace: "Product title cannot contain double spaces.",
+                minlength: "Product title must be at least 3 characters.",
+                maxlength: "Product title must not exceed 100 characters."
+            },
+            product_brand: {
+                required: "Please select a brand."
+            },
+//<!--            product_image: {-->
+//<!--                required: "Please upload a product image.",-->
+//<!--                extension: "Only .jpg or .png files are allowed.",-->
+//<!--                maxFileSize: "Image size must not exceed 5MB."-->
+//<!--            },-->
+            product_color: {
+                required: "Please select a color."
+            },
+            'product_size[]': {
+                multiSelectRequired: "Please select at least one size."
+            },
+            product_material: {
+                required: "Please select a material."
+            },
+            // product_catalogue_mrp: {
+            //     required: "Please enter MRP.",
+            //     number: "Please enter a valid number.",
+            //     positiveNumber: "MRP must be a positive number.",
+            //     min: "MRP must be at least 0.01."
+            // },
+            // product_discount_percent: {
+            //     number: "Please enter a valid number.",
+            //     validDiscountPercent: "Discount percent must be between 0 and 100."
+            // },
+            product_images: {
+                required: "Please upload product images.",
+            },
+//<!--            product_catalogue_stock_quantity: {-->
+//<!--                required: "Please enter stock quantity.",-->
+//<!--                number: "Please enter a valid number.",-->
+//<!--                positiveNumber: "Stock quantity must be a positive number.",-->
+//<!--                min: "Stock quantity must be at least 1.",-->
+//<!--                max: "Stock quantity must not exceed 999999."-->
+//<!--            },-->
+            product_description: {
+                ckeditorRequired: "Please enter a product description.",
+                minlength: "Description must be at least 10 characters.",
+                maxlength: "Description must not exceed 1000 characters."
+            }
+        },
+        errorPlacement: function(error, element) {
+            if (element.attr("name") === "product_description") {
+                error.insertAfter(element.next(".cke"));
+            } else if (element.attr("name") === "product_size[]") {
+                error.insertAfter(element.next(".select2-container"));
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        submitHandler: function(form) {
+            console.log("Form is valid.");
+            form.submit();
+        }
+    });
+});
+</script>
+
+<!--&lt;!&ndash;Images script &ndash;&gt;-->
+<!--<script>-->
+<!--document.getElementById('productcatalogue_form').addEventListener('submit', function(event) {-->
+<!--    const imageInput = document.getElementById('product_images');-->
+<!--    const files = imageInput.files;-->
+<!--    const errorDiv = document.getElementById('image-error');-->
+
+<!--    if (files.length < 3) {-->
+<!--        event.preventDefault();-->
+<!--        errorDiv.style.display = 'block';-->
+<!--        errorDiv.textContent = 'Please upload at least 3 images.';-->
+<!--        return;-->
+<!--    }-->
+<!--    if (files.length > 5) {-->
+<!--        event.preventDefault();-->
+<!--        errorDiv.style.display = 'block';-->
+<!--        errorDiv.textContent = 'You can upload a maximum of 5 images.';-->
+<!--        return;-->
+<!--    }-->
+<!--    errorDiv.style.display = 'none';-->
+<!--});-->
+<!--</script>-->
+{% endblock %}

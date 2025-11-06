@@ -1,0 +1,21 @@
+{% if status_page == 'area_page' %}
+<td class="border-light" id="area_status_td{{ area.id }}">
+    {% if area.area_status %}
+        <span class="badge bg-success">
+            <a href="#" hx-post="{% url 'areaStatusChange' area.id %}"
+               hx-target="#area_status_td{{ area.id }}"
+               hx-trigger="click once"
+               hx-swap="innerHTML"
+               hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Active</a>
+        </span>
+    {% else %}
+        <span class="badge bg-danger">
+            <a href="#" hx-post="{% url 'areaStatusChange' area.id %}"
+               hx-target="#area_status_td{{ area.id }}"
+               hx-trigger="click once"
+               hx-swap="innerHTML"
+               hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Deactive</a>
+        </span>
+    {% endif %}
+</td>
+{% endif %}

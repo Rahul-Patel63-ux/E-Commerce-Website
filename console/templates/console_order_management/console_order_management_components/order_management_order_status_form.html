@@ -1,0 +1,148 @@
+{% include 'base_assets/base_css.html' %}
+{% block style %}
+<style>
+    .rejection_field{
+        display:none;
+    }
+</style>
+{% endblock %}
+
+
+<form id="order_status_form" method="post" action="{% url 'update_order_status' orders.id %}">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-12">
+            <label for="order_status" class="form-label fs-5">Order Item Status <span class="text-danger">*</span></label>
+            <select name="order_status" id="order_status" class="form-select fs-5">
+                <option value="new" {% if orders.order_item_status == 'new' %}selected {% endif %}>New</option>
+                <option value="accept" {% if orders.order_item_status == 'accept' %}selected {% endif %}>Accept</option>
+                <option value="pending" {% if orders.order_item_status == 'pending' %}selected {% endif %}>Pending</option>
+                <option value="reject" {% if orders.order_item_status == 'reject' %}selected{% endif %}>Cancel</option>
+            </select>
+        </div>
+        <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-12 mt-4 mb-4">
+            <div class="form-group rejection_field" id="rejection_reason_group">
+                <label for="rejection_reason" class="form-label fs-4">Rejection Reason <span class="text-danger">*</span></label>
+                <textarea class="form-control" id="rejection_reason" name="rejection_reason" rows="4" placeholder="Enter a valid reason for canceling the order."></textarea>
+            </div>
+
+        </div>
+        <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center">
+            <button type="submit" class="btn btn-primary">Update Status</button>
+        </div>
+    </div>
+</form>
+
+{% include 'base_assets/base_js.html' %}
+
+<script>
+    $(document).ready(function() {
+        // Custom method for rejection reason
+        $.validator.addMethod("requiredIfReject", function(value, element) {
+            return $('#order_status').val() !== 'reject' || (value && value.trim().length > 0);
+        }, "Please provide a valid reason for rejecting the order.");
+        // Custom method to prevent double spaces
+        $.validator.addMethod("noDoubleSpace", function(value, element) {
+            return this.optional(element) || !/\s{2,}/.test(value);
+        }, "Double spaces are not allowed.");
+        // Custom method to ensure starts with a letter and no leading space
+        $.validator.addMethod("letterStartNoLeadingSpace", function(value, element) {
+            return this.optional(element) || /^[a-zA-Z]/.test(value);
+        }, "Must start with a letter and cannot start with a space.");
+
+        // New custom method to ensure at least one letter and no numbers
+        $.validator.addMethod("atLeastOneAlphaNoNumbers", function(value, element) {
+            return this.optional(element) || /^(?=.*[a-zA-Z])[^\d]*$/.test(value);
+        }, "Must contain at least one letter and no numbers.");
+        $('#order_status_form').validate({
+            rules: {
+                order_status: {
+                    required: true
+                },
+                rejection_reason: {
+                    requiredIfReject: true,
+                    minlength: 5,
+                    maxlength: 500,
+                    noDoubleSpace: true,
+                    letterStartNoLeadingSpace: true,
+                    atLeastOneAlphaNoNumbers: true
+                }
+            },
+            messages: {
+                order_status: {
+                    required: "Please select an order status."
+                },
+                rejection_reason: {
+                    requiredIfReject: "Please provide a valid reason for rejecting the order.",
+                    minlength: "Rejection reason must be at least 5 characters long.",
+                    maxlength: "Rejection reason cannot exceed 500 characters.",
+                    noDoubleSpace: "Double spaces are not allowed.",
+                    letterStartNoLeadingSpace: "Must start with a letter and cannot start with a space.",
+                    atLeastOneAlphaNoNumbers: "Must contain at least one letter and no numbers."
+                }
+            },
+
+            submitHandler: function(form) {
+                console.log("Order status form is valid.");
+                form.submit();
+            }
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        // Initialize rejection reason visibility and disabled state
+        var $select = $('#order_status');
+        var $rejectionReasonGroup = $('.rejection_field');
+        var $rejectionReasonInput = $('#rejection_reason');
+
+        if ($select.val() === 'reject') {
+            $rejectionReasonGroup.show().find('textarea').prop('disabled', false);
+        } else {
+            $rejectionReasonGroup.hide().find('textarea').prop('disabled', true);
+        }
+
+        // Handle change event for order_status dropdown
+        $select.on('change', function() {
+            if ($(this).val() === 'reject') {
+                $rejectionReasonGroup.show().find('textarea').prop('disabled', false);
+            } else {
+                $rejectionReasonGroup.hide().find('textarea').prop('disabled', true);
+            }
+        });
+    });
+
+
+<!--    $(document).ready(function() {-->
+<!--        // Initialize rejection reason visibility and disabled state for each form-->
+<!--        $('select[name="order_status"]').each(function() {-->
+<!--            var $select = $(this);-->
+<!--            var orderId = $select.attr('id').split('_')[2];-->
+<!--            var $rejectionReasonGroup = $('#rejection_reason_group_' + orderId);-->
+<!--            var $rejectionReasonInput = $('#rejection_reason_' + orderId);-->
+
+<!--            if ($select.val() === 'reject') {-->
+<!--                $rejectionReasonGroup.show().find('textarea').prop('disabled', false);-->
+<!--            } else {-->
+<!--                $rejectionReasonGroup.hide().find('textarea').prop('disabled', true);-->
+<!--            }-->
+<!--        });-->
+
+<!--        // Handle change event for order_status dropdown-->
+<!--        $('select[name="order_status"]').on('change', function() {-->
+<!--            var $select = $(this);-->
+<!--            var orderId = $select.attr('id').split('_')[2];-->
+<!--            var $rejectionReasonGroup = $('#rejection_reason_group_' + orderId);-->
+<!--            var $rejectionReasonInput = $('#rejection_reason_' + orderId);-->
+
+<!--            if ($select.val() === 'reject') {-->
+<!--                $rejectionReasonGroup.show().find('textarea').prop('disabled', false);-->
+<!--            } else {-->
+<!--                $rejectionReasonGroup.hide().find('textarea').prop('disabled', true);-->
+<!--            }-->
+<!--        });-->
+<!--    });-->
+
+
+</script>

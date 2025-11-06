@@ -1,0 +1,93 @@
+{% load static %}
+{% include 'base_assets/base_css.html' %}
+<!--alert starts here-->
+{% include 'alertcomponents/alertcomponent.html' %}
+<!--alert ends here-->
+
+<div class="accordion custom-accordionwithicon custom-accordion-border accordion-border-box accordion-success" id="accordionBordered">
+                    {% for product, data in product_purchases.items %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="accordionborderedExample{{ forloop.counter }}">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#accor_borderedExamplecollapse{{ forloop.counter }}" aria-expanded="false" aria-controls="accor_borderedExamplecollapse{{ forloop.counter }}">
+                                {{ product.product_title }} (Total Items: {{ data.items|length }},Total Remaining: {{ data.total_remaining }})
+                            </button>
+                        </h2>
+                        <div id="accor_borderedExamplecollapse{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="accordionborderedExample{{ forloop.counter }}" data-bs-parent="#accordionBordered">
+                            <div class="accordion-body">
+                                <table class="table table-bordered table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Product Name</th>
+                                            <th>MRP</th>
+                                            <th>Purchase Price</th>
+                                            <th>Date</th>
+                                            <th>Quantity</th>
+                                            <th>Remaining</th>
+                                            <th>Action</th>
+
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in data.items %}
+                                        <tr>
+                                            <td>{{ item.product.product_title }}</td>
+                                            <td>{{ item.mrp }}</td>
+                                            <td>{{ item.purchase_price }}</td>
+                                            <td>{{ item.purchase_item_created_at| date:"d M, Y" }}</td>
+                                            <td>{{ item.quantity }}</td>
+                                            <td>{{ item.remaining_quantity }}</td> <!-- Assuming remaining quantity is same as purchased quantity -->
+                                            <td>
+                                                <div class="d-flex justify-content-center">
+                                                    <a href="#" class="btn btn-sm text-white btn-icon " style="background-color:#405189;" data-bs-toggle="modal" data-bs-target="#inventoryModal{{ item.id }}" hx-get="{% url 'stockManagementRenderData' %}?showid={{ item.id }}" hx-trigger="click" hx-swap="innerHTML" hx-target="#inventory_container{{item.id}}">
+                                                        <i class="ri-home-5-fill"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+<!--                                        inventory modal-->
+                                        <div class="modal fade" id="inventoryModal{{ item.id }}" tabindex="-1" aria-labelledby="inventoryModalLabel{{ item.id }}" aria-hidden="true">
+                                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header" style="background-color:#405189;padding:10px 15px 10px 10px;">
+                                                        <h5 class="modal-title text-white mb-0" id="inventoryModalLabel{{ item.id }}">Move to Inventory: {{ item.product.product_title }}</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" style="background-color: white;" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body" id="inventory_container{{item.id}}">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <tr>
+                                        {% empty %}
+                                            <td colspan="6" class="text-center text-danger">No purchase items found for this product.</td>
+                                        </tr>
+
+                                        {% endfor %}
+                                        <tr>
+                                            <th colspan="4">Total</th>
+                                            <td>{{ data.total_quantity }}</td>
+                                            <td>{{ data.total_remaining }}</td>
+                                        </tr>
+
+
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                    {% empty %}
+                    <div class="alert alert-info" role="alert">
+                        No products or purchase items found.
+                    </div>
+                    {% endfor %}
+                </div>
+
+<!--validation and calculation script-->
+{% include 'base_assets/base_js.html' %}
+

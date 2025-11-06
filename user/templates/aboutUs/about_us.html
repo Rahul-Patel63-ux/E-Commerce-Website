@@ -1,0 +1,148 @@
+{% extends "user_base/base.html" %}
+
+{% load static %}
+{% block content %}
+
+{% include "alertToast/alerttoasters.html" %}
+
+<div class="main-content">
+    <div class="container mt-5"></div>
+    <!--Profile start here-->
+
+    <div class="row">
+        <div class="col-xl-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex mb-3">
+                        <div class="dropdown flex-shrink-0 ms-auto">
+                            <button class="btn btn-outline-dark btn-icon btn-sm" type="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                <i class="bi bi-share"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="https://api.whatsapp.com/send/?phone=918919889057" target="_blank"><i
+                                            class="bi bi-whatsapp me-1 text-success align-baseline"></i> Whatsapp</a></li>
+                                <li><a class="dropdown-item" href="https://www.instagram.com/peramsonsacademy/" target="_blank"><i
+                                            class="bi bi-instagram me-1 text-danger align-baseline"></i> Instagram</a></li>
+                                <li><a class="dropdown-item" href="https://www.facebook.com/peramsonsacademy/" target="_blank"><i
+                                            class="bi bi-facebook me-1 text-primary align-baseline"></i> Facebook</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="text-center border-bottom border-dashed pb-4">
+                        <img src="{{ profile.admin_company_logo.url }}" alt=""
+                            class="avatar-lg rounded-circle p-1 img-thumbnail">
+                        <div class="mt-3">
+                            <h5>{{ profile.admin_company_name }} <i
+                                    class="bi bi-patch-check-fill align-baseline text-info ms-1"></i></h5>
+                            <p class="text-muted">{{ profile.admin_company_regno }}</p>
+                        </div>
+
+
+                    </div>
+
+                    <div class="border-bottom border-dashed py-4">
+                        <h5 class="card-title mb-3">Owner Information</h5>
+                        <div class="table-responsive">
+                            <table class="table table-borderless table-sm align-middle mb-0">
+                                <tbody>
+                                    <tr>
+                                        <th class="ps-0" scope="row">Name</th>
+                                        <td class="text-muted text-end">{{ profile.admin_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="ps-0" scope="row">Birth of Date</th>
+                                        <td class="text-muted text-end">{{ profile.admin_dob }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="ps-0" scope="row">Gender</th>
+                                        <td class="text-muted text-end">{{ profile.admin_gender }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="ps-0" scope="row">Phone No</th>
+                                        <td class="text-muted text-end">{{ profile.admin_phone }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="ps-0" scope="row">Email</th>
+                                        <td class="text-muted text-end">{{ email.admin_email }}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th class="ps-0" scope="row">Aadhar</th>
+                                        <td class="text-muted text-end">{{profile.admin_aadhar }}</td>
+                                    </tr>
+
+
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
+
+                </div>
+            </div><!--end card-->
+        </div><!--end col-->
+
+        <div class="col-xl-9">
+            <div class="row align-items-center g-3 mb-3">
+                <div class="col-md order-1">
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-pills arrow-navtabs nav-secondary gap-2 flex-grow-1" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#overview-tab" role="tab"
+                                aria-selected="true">
+                                Overview
+                            </a>
+                        </li>
+
+                    </ul>
+                </div><!--end col-->
+                <!--end col-->
+            </div><!--end row-->
+            <!-- Edit Profile Modal -->
+
+
+            <div class="tab-content">
+                <div class="tab-pane active" id="overview-tab" role="tabpanel">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <h5 class="card-title mb-3">Banner</h5>
+                                <div class="row profile-media g-3">
+                                    <div class="col-lg-3">
+                                        <img src="{{ profile.admin_company_banner.url }}" alt=""
+                                            class="img-fluid h-100 rounded object-fit-cover">
+                                    </div><!--end col-->
+
+                                </div><!--end row-->
+                            </div>
+
+
+                            <div class="mb-4">
+                                <h5 class="card-title mb-3">About Us</h5>
+                                <p class="text-muted mb-2">{{ profile.admin_company_about|safe }}</p>
+                            </div>
+                            <div class="mb-4">
+                                <h5 class="card-title mb-3">Summary</h5>
+                                <p class="text-muted mb-2">{{ profile.admin_company_summary|safe }}</p>
+                            </div>
+
+                        </div>
+                        <!--end card-body-->
+                    </div><!-- end card -->
+                </div>
+                <!--end tab-pane-->
+
+
+            </div>
+
+        </div><!--end col-->
+    </div>
+
+    <!--Profile ends here-->
+
+</div>
+
+{% endblock content %}

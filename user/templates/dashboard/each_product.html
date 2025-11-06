@@ -1,0 +1,507 @@
+{% extends "user_base/base.html" %}
+
+{% load static %}
+{% load humanize %}
+{% block content %}
+
+
+{% include 'alertToast/alerttoasters.html' %}
+
+<!-- start page title bar -->
+<div class="row pt-5">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+                    <li class="breadcrumb-item active">Product Overview</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end page title bar -->
+
+<!-- main content -->
+<div class="row">
+    <div class="col-xxl-4 col-4">
+        <div class="card p-3 sticky-side-div">
+            <div class="product-img-slider">
+                <div class="swiper-container product-thumbnail-slider p-2 rounded bg-light">
+                    <div class="swiper-wrapper">
+                        {% for img in images %}
+                        {% if img %}
+                        <div class="swiper-slide">
+                            <div class="">
+                                <img src="{{ img.image.url }}" alt="" class="img-fluid d-block">
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    <!-- <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div> -->
+                    <!-- <div class="swiper-pagination"></div> -->
+                </div>
+                <!-- end swiper thumbnail slide -->
+                <div class="swiper product-nav-slider mt-2">
+                    <div class="swiper-wrapper">
+                        {% for img in images %}
+                        {% if img %}
+                        <div class="swiper-slide">
+                            <div class="nav-slide-item">
+                                <img src="{{ img.image.url }}" alt="" class="img-fluid d-block">
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <!-- end swiper nav slide -->
+            </div>
+        </div>
+    </div>
+    {% if pro %}
+    <div class="col-xxl-8 col-8">
+        <form action="{% url 'cart' inventory_items.product.id %}" method="post" id="productForm">
+            {% csrf_token %}
+            <div class="row g-0">
+                <div class="col-xxl-8">
+                    <div class="card rounded-end-0 card-height-100">
+                        <div class="card-body p-4">
+                            <h5 class="text-capitalize mb-3">{{ pro.product_title }}</h5>
+                            <div class="hstack gap-3 flex-wrap mb-4">
+
+                                <div class="text-muted">Published : <span
+                                        class="text-body fw-medium me-4">{{ pro.product_created_at | date:'d M, Y' }} | </span>
+                                        <span>Discount : <span class="text-dark">{{inventory_items.discount_percent }}%</span> </span>
+                                </div>
+                            </div>
+
+                            <h6 class="fs-md mb-3">Choose Size:</h6>
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for size_info in available_sizes %}
+                                <div data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="bottom"
+                                     data-bs-original-title="{% if size_info.available %}{{ size_info.quantity }} Items Available{% else %}Out of Stock{% endif %}">
+                                    <input type="radio" class="btn-check" name="size"
+                                           value="{{ size_info.size.product_size_short_name }}"
+                                           id="size-{{ size_info.size.id }}"
+                                           {% if size_info.available %}checked{% else %}disabled{% endif %}>
+                                    <label
+                                        class="btn btn-subtle-primary avatar-xs rounded-circle p-0 d-flex justify-content-center align-items-center"
+                                        for="size-{{ size_info.size.id }}">{{ size_info.size.product_size_short_name | upper }}
+                                    </label>
+                                </div>
+                                {% empty %}
+                                <div data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
+                                     data-bs-original-title="No Size Available">
+                                    <input type="radio" class="btn-check" name="size" id="size-none" disabled />
+                                    <label
+                                        class="btn btn-subtle-primary avatar-xs rounded-circle p-0 d-flex justify-content-center align-items-center"
+                                        for="size-none">N/A
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+
+
+                            <div class="mt-4">
+                                <h5 class="fs-md mb-3">Colors :</h5>
+                                <div class="d-flex flex-wrap gap-2">
+                                    {% if pro.product_color_ref %}
+                                    <!-- <div data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
+                                        data-bs-original-title="{{ pro.product_stock_quantity }} Items Available"> -->
+                                    <div class="avatar-xs p-0 d-flex align-items-center justify-content-center border rounded-circle fs-5xl "
+                                        style="color: {{ pro.product_color_ref.product_color_code }}">
+                                        <i class="ri-checkbox-blank-circle-fill"></i>
+                                    </div>
+                                    <!-- </div> -->
+                                    {% else %}
+                                    <!-- <div data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
+                                        data-bs-original-title="Out of Stalk"> -->
+                                    <div class="avatar-xs p-0 d-flex align-items-center justify-content-center border rounded-circle fs-5xl "
+                                        style="color: {{ pro.product_color_ref.product_color_code }}" disabled>
+                                        <i class="ri-checkbox-blank-circle-fill"></i>
+                                    </div>
+                                    <!-- </div> -->
+                                    {% endif %}
+                                </div>
+
+                                <div>
+                                    <h5 class="fs-md mb-3 mt-2">Description:</h5>
+                                    <p class="text-muted mb-2">A <b>{{ pro.product_title }}</b>
+                                        {{ pro.product_description|safe }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!--end card-->
+                </div><!--end col-->
+                <div class="col-xxl-4">
+                    <div class="card card-height-100 border-start rounded-start-0">
+                        <div class="card-body p-4">
+                            <div class="row">
+                                <!-- <div class="col-lg-12">
+                                <div class="card bg-secondary-subtle shadow">
+                                    <div class="card-body d-flex align-items-center flex-wrap gap-2">
+                                        <div class="flex-grow-1">
+                                            <h5 class="card-title text-secondary fs-xl">
+                                                {{ purchase | floatformat:"-2" }}% Off
+                                            </h5>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <button type="button" class="btn btn-secondary disabled">Until 10 Aug,
+                                                2025</button>
+                                        </div>
+                                    </div>
+                                </div> 
+                            </div>-->
+                                <!--end col-->
+                                <div class="col-lg-12">
+                                    <div class="row g-3">
+                                        {% if inventory_items %}
+                                        <div class="col-6">
+                                            <div class="card border shadow-none mb-0">
+                                                <div class="card-body p-2">
+                                                    <div class="text-center">
+                                                        <p class="text-muted text-truncate mb-2">PRICE</p>
+                                                        <h6 class="fs-lg"><i
+                                                                class="bi bi-currency-rupee"></i>{{ inventory_items.sale_price | floatformat:2 | intcomma }}
+                                                        </h6>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><!--end col-->
+                                        <div class="col-6">
+                                            <div class="card border shadow-none mb-0">
+                                                <div class="card-body p-2">
+                                                    <div class="text-center">
+                                                        <p class="text-muted text-truncate mb-2">MRP
+                                                        </p>
+                                                        <del class="fs-6 fw-bold text-muted"><i
+                                                                class="bi bi-currency-rupee"></i>{{ purchase.mrp | floatformat:2 | intcomma }}</del>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><!--end col-->
+                                        {% if product.id == cart.product.id %}
+                                            <button type="submit" class="btn btn-secondary text-light"><i
+                                                    class='bx bx-shopping-bag fs-3xl me-2'></i><b>ADD TO CART</b>
+                                            </button>
+                                        {% else %}
+                                            <button type="submit" class="btn btn-outline-secondary "><i
+                                                    class='bx bx-shopping-bag fs-3xl me-2'></i><b>GO TO CART</b>
+                                            </button>
+                                        {% endif %}
+                                        {% else %}
+                                        <div class="col-12">
+                                            <p class="text-muted">Price information not available.</p>
+                                        </div>
+                                        {% endif %}
+                                    </div><!--end row-->
+                                </div><!--end col-->    
+                            </div><!--end row-->
+                        </div>
+                    </div><!--end col-->
+                </div><!--end col-->
+            </div><!--end row-->
+
+            <div class="card">
+                <div class="card-body p-4">
+                    <div class="mt-4">
+                        <h5 class="fs-5 fw-semibold mb-3">Product Details :</h5>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-borderless align-middle description-table mb-0">
+                                <tbody>
+                                    <tr>
+                                        <th class="text-muted">Status</th>
+                                        {% if inventory_items.inventory_status %}
+                                        <td class="text-dark-50">Available</td>
+                                        {% else %}
+                                        <td class="text-dark-50">Not Available</td>
+                                        {% endif %}
+                                    </tr>
+                                    <tr>
+                                        <th class="text-muted" >Ideal For</th>
+                                        <td class="text-dark-50" >{{ pro.main_category_ref | capfirst }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-muted" >Category Type</th>
+                                        <td class="text-dark-50" >{{ pro.sub_category_ref | capfirst }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-muted" >Suitable For</th>
+                                        <td class="text-dark-50" >{{ pro.product_tag_ref | capfirst }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-muted">Fabric</th>
+                                        <td class="text-dark-50">{{ pro.product_material | capfirst }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-muted">Seller</th>
+                                        <td class="text-dark-50">{{ admin_profile.admin_company_name }}</td>
+                                    </tr>
+                                    <tr class="mt-5">
+                                        {% if pro.product_brand_ref.brand_logo %}
+                                        <th><img src="{{ pro.product_brand_ref.brand_logo.url }}" style="height: 50px; width: 120px;" alt=""></th>
+                                        {% else %}
+                                        <th>{{pro.product_brand_ref.brand_name}}</th>
+                                        {% endif %} 
+                                        <td class="text-dark-50">6 months Warranty from the date of purchase, <br> 
+                                        10 days Return or Exchange</td>
+                                    </tr>
+                                    <!-- <tr>
+                                        <th>Size</th>
+                                        <td>{{ inventory_item.purchase_item.size_ref.product_size_short_name | upper }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Available Quantity</th>
+                                        <td>{{ inventory_item.allocated_quantity }}</td>
+                                    </tr> -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div><!--end col-->
+    {% endif %}     
+</div><!--end row-->
+<!-- end main content -->
+
+<!-- Static Reviews for each product -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="position-relative">
+            <div class="card-header d-flex flex-wrap align-items-center gap-3 mb-3">
+                <h6 class="card-title flex-grow-1 mb-0">Ratings & Reviews</h6>
+                <div class="flex-shrink-0">
+                    <div class="dropdown card-header-dropdown">
+                        <a class="text-muted dropdown-btn" href="#" data-bs-toggle="dropdown" aria-haspopup="true"
+                            aria-expanded="false">
+                            This Month <i class="mdi mdi-chevron-down ms-1"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <a class="dropdown-item" href="#">Today</a>
+                            <a class="dropdown-item" href="#">Yesterday</a>
+                            <a class="dropdown-item" href="#">Last 7 Days</a>
+                            <a class="dropdown-item" href="#">Last 30 Days</a>
+                            <a class="dropdown-item" href="#">This Month</a>
+                            <a class="dropdown-item" href="#">Last Month</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-shrink-0">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addReview"><i
+                            class="ph-plus-circle align-middle me-1"></i> Add
+                        Review</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row gy-3">
+                    <div class="col-lg-2">
+                        <div class="text-center rounded bg-body-secondary p-3">
+                            <h1 class="mb-3">4.9 <small class="fs-sm text-muted fw-normal">/ 5.0</small>
+                            </h1>
+                            <div class="text-warning hstack gap-2 justify-content-center mb-2">
+                                <i class="bi bi-star-fill align-baseline"></i>
+                                <i class="bi bi-star-fill align-baseline"></i>
+                                <i class="bi bi-star-fill align-baseline"></i>
+                                <i class="bi bi-star-fill align-baseline"></i>
+                                <i class="bi bi-star-fill align-baseline"></i>
+                            </div>
+                            <p class="mb-0"><b>3.5k</b> Reviews</p>
+                        </div>
+                    </div><!--end col-->
+                    <div class="col-lg-10">
+                        <div>
+                            <div class="me-lg-n3 pe-lg-4" data-simplebar style="max-height: 500px;">
+                                <ul class="list-unstyled mb-0" id="review-list">
+                                    <li class="review-list" id="review-1">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="hstack flex-wrap gap-3 mb-4">
+                                                    <div class="badge rounded-pill bg-danger-subtle text-danger mb-0">
+                                                        <i class="mdi mdi-star"></i> <span class="rate-num">4.5</span>
+                                                    </div>
+                                                    <div class="vr"></div>
+                                                    <div class="flex-grow-1">
+                                                        <p class="mb-0"><a href="#!">Jansh Brown</a></p>
+                                                    </div>
+                                                    <div class="flex-shrink-0">
+                                                        <span class="text-muted fs-13 mb-0">08 Mar,
+                                                            2023</span>
+                                                    </div>
+                                                    <div class="flex-shrink-0">
+                                                        <a href="#addReview"
+                                                            class="badge bg-secondary-subtle text-secondary edit-item-list"
+                                                            data-bs-toggle="modal"><i
+                                                                class="ph-pencil align-baseline me-1"></i>
+                                                            Edit</a>
+                                                        <a href="#removeItemModal"
+                                                            class="badge bg-danger-subtle text-danger"
+                                                            data-bs-toggle="modal"><i
+                                                                class="ph-trash align-baseline"></i></a>
+                                                    </div>
+                                                </div>
+
+                                                <h6 class="review-title fs-md">Product Quality</h6>
+                                                <p class="review-desc mb-0">" This is an incredible
+                                                    framework worth so much in the right hands! Nowhere else
+                                                    are you going to get so much flexibility and great code
+                                                    for a few dollars. Highly recommend purchasing today!
+                                                    Like right now! "</p>
+
+                                                <div class="d-flex flex-grow-1 gap-2 review-gallery-img">
+                                                    <a href="#" class="avatar-md mt-3">
+                                                        <div class="avatar-title bg-light rounded">
+                                                            <img src="{% static 'assets/images/products/img-1.png' %}" alt="img-1.png"
+                                                                class="product-img avatar-sm">
+                                                        </div>
+                                                    </a>
+                                                    <a href="#" class="avatar-md mt-3">
+                                                        <div class="avatar-title bg-light rounded">
+                                                            <img src="{% static 'assets/images/products/img-6.png' %}" alt="img-6.png"
+                                                                class="product-img avatar-sm">
+                                                        </div>
+                                                    </a>
+                                                    <a href="#" class="avatar-md mt-3">
+                                                        <div class="avatar-title bg-light rounded">
+                                                            <img src="{% static 'assets/images/products/img-7.png' %}" alt="img-7.png"
+                                                                class="product-img avatar-sm">
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="review-list" id="review-2">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="hstack flex-wrap gap-3 mb-4">
+                                                    <div class="badge rounded-pill bg-danger-subtle text-danger mb-0">
+                                                        <i class="mdi mdi-star"></i> <span class="rate-num">4.0</span>
+                                                    </div>
+                                                    <div class="vr"></div>
+                                                    <div class="flex-grow-1">
+                                                        <p class="mb-0"><a href="#!">Camilla Harber</a></p>
+                                                    </div>
+                                                    <div class="flex-shrink-0">
+                                                        <p class="text-muted fs-13 mb-0">03 Mar, 2023</p>
+                                                    </div>
+                                                    <div class="flex-shrink-0">
+                                                        <a href="#addReview"
+                                                            class="badge bg-secondary-subtle text-secondary edit-item-list"
+                                                            data-bs-toggle="modal"><i
+                                                                class="ph-pencil align-baseline me-1"></i>
+                                                            Edit</a>
+                                                        <a href="#removeItemModal"
+                                                            class="badge bg-danger-subtle text-danger"
+                                                            data-bs-toggle="modal"><i
+                                                                class="ph-trash align-baseline"></i></a>
+                                                    </div>
+                                                </div>
+
+                                                <h6 class="review-title fs-md">Product Quality</h6>
+                                                <p class="review-desc mb-0">" We have used your other
+                                                    templates as well and seems it's amazing with the design
+                                                    and code quality. Wish you best for the future updates.
+                                                    Keep updated you will be #1 in near future. "</p>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li class="review-list" id="review-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="hstack flex-wrap gap-3 mb-4">
+                                                    <div class="badge rounded-pill bg-danger-subtle text-danger mb-0">
+                                                        <i class="mdi mdi-star"></i> <span class="rate-num">5.0</span>
+                                                    </div>
+                                                    <div class="vr"></div>
+                                                    <div class="flex-grow-1">
+                                                        <p class="mb-0"><a href="#!">Kaylin Bechtelar</a>
+                                                        </p>
+                                                    </div>
+                                                    <div class="flex-shrink-0">
+                                                        <p class="text-muted fs-13 mb-0">28 Feb, 2023</p>
+                                                    </div>
+                                                    <div class="flex-shrink-0">
+                                                        <a href="#addReview"
+                                                            class="badge bg-secondary-subtle text-secondary edit-item-list"
+                                                            data-bs-toggle="modal"><i
+                                                                class="ph-pencil align-baseline me-1"></i>
+                                                            Edit</a>
+                                                        <a href="#removeItemModal"
+                                                            class="badge bg-danger-subtle text-danger"
+                                                            data-bs-toggle="modal"><i
+                                                                class="ph-trash align-baseline"></i></a>
+                                                    </div>
+                                                </div>
+
+                                                <h6 class="review-title fs-md">Design Quality</h6>
+                                                <p class="review-desc mb-0">" This template is incredibly
+                                                    comprehensive considering how new and modern it is! I
+                                                    bought 8 different admin templates recently and all of
+                                                    them had some good features, but were always missing
+                                                    stuff that you only realise after purchase. I've
+                                                    migrated my site to this template and have yet to find
+                                                    anything missing or lacking! Plus, the online
+                                                    documentation is really easy to use and access and very
+                                                    comprehensive! Well done guys and thank you! "</p>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li class="review-list" id="review-4">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="hstack flex-wrap gap-3 mb-4">
+                                                    <div class="badge rounded-pill bg-danger-subtle text-danger mb-0">
+                                                        <i class="mdi mdi-star"></i> <span class="rate-num">3.5</span>
+                                                    </div>
+                                                    <div class="vr"></div>
+                                                    <div class="flex-grow-1">
+                                                        <p class="mb-0"><a href="#!">Dedrick Shields</a></p>
+                                                    </div>
+                                                    <div class="flex-shrink-0">
+                                                        <p class="text-muted fs-13 mb-0">24 Feb, 2023</p>
+                                                    </div>
+                                                    <div class="flex-shrink-0">
+                                                        <a href="#addReview"
+                                                            class="badge bg-secondary-subtle text-secondary edit-item-list"
+                                                            data-bs-toggle="modal"><i
+                                                                class="ph-pencil align-baseline me-1"></i>
+                                                            Edit</a>
+                                                        <a href="#removeItemModal"
+                                                            class="badge bg-danger-subtle text-danger"
+                                                            data-bs-toggle="modal"><i
+                                                                class="ph-trash align-baseline"></i></a>
+                                                    </div>
+                                                </div>
+
+                                                <h6 class="review-title fs-md">Feature Availability</h6>
+                                                <p class="review-desc mb-0">" Hello everyone, I would like
+                                                    to suggest here two contents that you could create.
+                                                    Course pages and blog pages. In them you could insert
+                                                    the listing and management of courses and listing and
+                                                    management of blog. The theme is perfect, one of the
+                                                    best purchases I've ever made. "</p>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end col -->
+                </div><!--end row-->
+            </div>
+        </div>
+    </div><!--end col-->
+</div><!--end row-->
+
+
+{% endblock content %}

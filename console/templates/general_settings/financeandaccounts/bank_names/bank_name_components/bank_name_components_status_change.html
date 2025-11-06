@@ -1,0 +1,22 @@
+{% if status_page == 'bank_page' %}
+      <td class="border-light" id="bank_status_td{{bank.id}}">
+            {% if bank.bank_status %}
+            <span class="badge bg-success">
+                <a href="#" hx-post="{% url 'bankStatusChange' bank.id %}"
+                    hx-target="#bank_status_td{{bank.id}}"
+                    hx-trigger="click once"
+                    hx-swap="innerHTML"
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Active</a>
+            </span>
+            {% else %}
+            <span class="badge bg-danger">
+                <a href="#" hx-post="{% url 'bankStatusChange' bank.id %}"
+                    hx-target="#bank_status_td{{bank.id}}"
+                    hx-trigger="click once"
+                    hx-swap="innerHTML"
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Deactive</a>
+            </span>
+            {% endif %}
+        </td>
+
+{% endif %}

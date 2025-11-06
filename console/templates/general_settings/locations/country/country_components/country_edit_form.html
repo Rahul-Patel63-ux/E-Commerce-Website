@@ -1,0 +1,77 @@
+<form id="edit_country_form" action="{% url 'updateCountry' c.id %}" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+
+
+                  <div class="row">
+                      <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                          <label for="ucountry" class="form-label">Country <span style="color:red;">*</span></label>
+                          <input type="text" id="ucountry" class="form-control" name="ucountry" value="{{ c.country_name }}" placeholder="Ex:India">
+                      </div>
+
+                  </div>
+
+
+
+
+            <div class="modal-footer">
+                <button type="submit" id="editcountryFormSubmit" class="btn text-white" style="background-color:#405189;">Save</button>
+                <button type="button" class="btn bg-light" data-bs-dismiss="modal">Close</button>
+            </div>
+        </form>
+
+<!--base_assests js file-->
+{% include 'base_assets/base_js.html' %}
+
+<script>
+    $(document).ready(function() {
+        $.validator.addMethod("validCountry", function(value, element) {
+            return this.optional(element) || /^[A-Za-z\s\-]+$/.test(value);
+        }, "Please enter a valid country name (letters, spaces, or hyphens only)");
+        // Custom method to prevent double spaces
+        $.validator.addMethod("noDoubleSpaces", function(value, element) {
+            return this.optional(element) || !/\s\s/.test(value);
+        }, "Double spaces are not allowed in the country name");
+
+        // Custom method to prevent leading/trailing spaces
+        $.validator.addMethod("noLeadingTrailingSpaces", function(value, element) {
+            return this.optional(element) || value === value.trim();
+        }, "Country should start with a character.");
+        // Initialize jQuery validation for the country form
+        $("#edit_country_form").validate({
+            rules: {
+                ucountry: {
+                    required: true,
+                    minlength: 2,
+                    maxlength: 100,
+                    validCountry:true,
+                    noDoubleSpaces:true,
+                    noLeadingTrailingSpaces:true
+
+                }
+            },
+            messages: {
+                ucountry: {
+                    required: "Please enter a country name",
+                    minlength: "Country name must be at least 2 characters long",
+                    maxlength: "Country name cannot exceed 100 characters"
+
+                }
+            },
+            errorElement: "div",
+            errorPlacement: function(error, element) {
+                error.addClass("invalid-feedback");
+                element.closest(".col-lg-12").append(error);
+            },
+            highlight: function(element) {
+                $(element).addClass("is-invalid");
+            },
+            unhighlight: function(element) {
+                $(element).removeClass("is-invalid");
+            },
+            submitHandler: function(form) {
+                // Handle form submission (you can customize this part)
+                form.submit();
+            }
+        });
+    });
+</script>

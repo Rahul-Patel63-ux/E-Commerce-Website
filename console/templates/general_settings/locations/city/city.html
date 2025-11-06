@@ -1,0 +1,209 @@
+{% extends 'console_base/base.html' %}
+
+{% block content %}
+<!--alert starts here-->
+{% include 'alertcomponents/alertcomponent.html' %}
+<!--alert ends here-->
+
+{% include 'base_assets/base_css.html' %}
+
+<!-- breadcrumb starts here -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="{% url 'consoleGeneralSettings' %}">General Settings</a></li>
+                    <li class="breadcrumb-item active">Locations</li>
+                    <li class="breadcrumb-item active">City</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+<!--breadcrumb ends here-->
+
+<!-- city start here -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-6">
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn text-white" style="background-color:#405189;" data-bs-toggle="modal" data-bs-target="#cityModal">
+                            <i class="bx bx-plus-circle"></i> City
+                        </button>
+                        <!-- city creation modal starts here-->
+                        <div class="modal fade" id="cityModal" tabindex="-1" aria-labelledby="cityModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header" style="background-color:#405189;padding:10px 15px 10px 10px;">
+                                        <h1 class="modal-title text-white mb-0 fs-5" id="cityModalLabel">Add City</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: white;"></button>
+                                    </div>
+                                    <form id="city_form" method="post" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                                                    <label for="country" class="form-label">Country <span style="color:red;">*</span></label>
+                                                    <select name="country" id="country" class="form-select" onchange="updateStateOptions()">
+                                                        <option value="">Select country</option>
+                                                        {% for i in country %}
+                                                            <option value="{{ i.id }}">{{ i.country_name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                                                    <label for="state" class="form-label">State <span style="color:red;">*</span></label>
+                                                    <select name="state" id="state" class="form-select">
+                                                        <option value="">Select state</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                                                    <label for="city" class="form-label">City <span style="color:red;">*</span></label>
+                                                    <input type="text" id="city" class="form-control" name="city" placeholder="Ex: Mumbai">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="submit" id="createcityFormSubmit" class="btn text-white" style="background-color:#405189;">Submit</button>
+                                            <button type="button" class="btn bg-light" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- city creation modal ends here-->
+                    </div>
+                    <div class="col-1"></div>
+                    <div class="col-5">
+                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="query" hx-get="{% url 'cityRenderData' %}" hx-trigger="input changed delay:500ms, query" hx-swap="innerHTML" hx-target="#cityTableBodyContainer">
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <!--card body starts here-->
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>City</th>
+                                <th>State</th>
+                                <th>Country</th>
+                                <th>Created On</th>
+                                <th>Status</th>
+                                <th style="text-align:center;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody
+                            hx-get="{% url 'cityRenderData' %}"
+                            hx-swap="innerHTML"
+                            hx-target="this"
+                            hx-trigger="revealed once"
+                            id="cityTableBodyContainer">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-center" id="pagination_div"></div>
+                <!--card body ends here-->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- city ends here -->
+
+<!--base_assets js file-->
+{% include 'base_assets/base_js.html' %}
+
+<script>
+$(document).ready(function() {
+    // Function to capitalize first letter
+    function capitalizeFirstLetter(str) {
+        if (str.length > 0) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+        return str;
+    }
+
+    // Custom validation methods
+    $.validator.addMethod("capitalizeFirstLetter", function(value, element) {
+        $(element).val(capitalizeFirstLetter(value));
+        return true;
+    }, "");
+
+    $.validator.addMethod("letterStartNoLeadingSpace", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z][^\s].*/.test(value);
+    }, "City name must start with a letter and have no leading space.");
+
+    $.validator.addMethod("atLeastOneAlpha", function(value, element) {
+        return this.optional(element) || /[a-zA-Z]/.test(value);
+    }, "Please enter at least one alphabetical character.");
+
+    $.validator.addMethod("noDoubleSpace", function(value, element) {
+        return this.optional(element) || !/\s{2,}/.test(value);
+    }, "Double spaces are not allowed.");
+
+    $.validator.addMethod("alphaSpaceOnly", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z\s]*$/.test(value);
+    }, "Only alphabetical characters and spaces are allowed.");
+
+    $('#city_form').validate({
+        rules: {
+            country: { required: true },
+            state: { required: true },
+            city: {
+                required: true,
+                alphaSpaceOnly: true,
+                noDoubleSpace: true,
+                letterStartNoLeadingSpace: true,
+                atLeastOneAlpha: true,
+                minlength: 2,
+                maxlength: 50,
+                capitalizeFirstLetter: true
+            }
+        },
+        messages: {
+            country: { required: "Please select a country." },
+            state: { required: "Please select a state." },
+            city: {
+                required: "Please enter the city name.",
+                alphaSpaceOnly: "Only alphabetical characters and spaces are allowed.",
+                noDoubleSpace: "Double spaces are not allowed.",
+                letterStartNoLeadingSpace: "City name must start with a letter and have no leading space.",
+                atLeastOneAlpha: "Please enter at least one alphabetical character.",
+                minlength: "City name should be at least 2 characters.",
+                maxlength: "City name should not exceed 50 characters."
+            }
+        },
+        submitHandler: function(form) {
+            console.log("Form is valid.");
+            form.submit();
+        }
+    });
+
+    // Function to update state options based on selected country
+    window.updateStateOptions = function() {
+        var countryId = $('#country').val();
+        var stateSelect = $('#state');
+        stateSelect.empty();
+        stateSelect.append('<option value="">Select state</option>');
+
+        if (countryId) {
+            $.ajax({
+                url: "{% url 'getStatesByCountry' %}",
+                data: { country_id: countryId },
+                dataType: 'json',
+                success: function(data) {
+                    $.each(data.states, function(index, state) {
+                        stateSelect.append('<option value="' + state.id + '">' + state.state_name + '</option>');
+                    });
+                }
+            });
+        }
+    };
+});
+</script>
+{% endblock %}

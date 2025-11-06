@@ -1,0 +1,23 @@
+{% load static %}
+{% if status_page == 'contact_page' %}
+    <td id="admin_contactus_status{{contact_us.id}}">
+      {% if contact_us.admin_contactus_status %}
+      <span class="badge bg-success">
+          <a href="#" hx-post="{% url 'contactUsStatusChange' contact_us.id %}"
+              hx-target="#admin_contactus_status{{contact_us.id}}"
+              hx-trigger="click once"
+              hx-swap="innerHTML"
+              hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Active</a>
+      </span>
+      {% else %}
+      <span class="badge bg-danger">
+          <a href="#" hx-post="{% url 'contactUsStatusChange' contact_us.id %}"
+              hx-target="#admin_contactus_status{{contact_us.id}}"
+              hx-trigger="click once"
+              hx-swap="innerHTML"
+              hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Deactive</a>
+      </span>
+      {% endif %}
+    </td>
+{% endif %}
+

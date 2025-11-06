@@ -1,0 +1,65 @@
+<form action="{% url 'updateTransportType' t.id %}" method="post" enctype="multipart/form-data" class="update_transport_type" id="update_transport_type">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+            <label for="utransport_type" class="form-label">Transport Type <span style="color:red;">*</span></label>
+            <input type="text" id="utransport_type" class="form-control" name="utransport_type" value="{{ t.transport_type }}" placeholder="Ex: Bus">
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" id="editTransportTypeFormSubmit" class="btn text-white" style="background-color:#405189;">Save</button>
+        <button type="button" class="btn bg-light" data-bs-dismiss="modal">Close</button>
+    </div>
+</form>
+<!-- base_assets js file -->
+{% include 'base_assets/base_js.html' %}
+
+<!-- Script starts here -->
+<script>
+$(document).ready(function() {
+    console.log('hello');
+
+    function capitalizeFirstLetter(str) {
+        if (str.length > 0) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+        return str;
+    }
+
+    // Adding custom validation method for capitalizing first letter
+    $.validator.addMethod("capitalizeFirstLetter", function(value, element) {
+        // Capitalize the input value
+        $(element).val(capitalizeFirstLetter(value));
+        return true;
+    }, "");
+
+    $.validator.addMethod("letterStartNoLeadingSpace", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z][a-zA-Z ]*$/.test(value);
+    }, "Please start with a letter and use only letters and spaces.");
+
+    $('#update_transport_type').validate({
+        rules: {
+            utransport_type: {
+                required: true,
+                minlength: 3,
+                maxlength: 100,
+                capitalizeFirstLetter: true,
+                letterStartNoLeadingSpace: true
+            }
+        },
+        messages: {
+            utransport_type: {
+                required: "Please enter Transport Type.",
+                minlength: "Transport Type should consist of at least 3 characters.",
+                maxlength: "Transport Type should not exceed 100 characters."
+            }
+        },
+        submitHandler: function(form) {
+            console.log("Form is valid.");
+            $('#editTransportTypeFormSubmit').prop('disabled', true);
+            form.submit();
+        }
+    });
+});
+</script>
+<!-- Script ends here -->

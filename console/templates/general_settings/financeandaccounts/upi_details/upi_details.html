@@ -1,0 +1,262 @@
+{% extends 'console_base/base.html' %}
+
+{% block content %}
+<!--alert starts here-->
+{% include 'alertcomponents/alertcomponent.html' %}
+<!--alert ends here-->
+
+{% include 'base_assets/base_css.html' %}
+
+<!-- breadcrumb starts here -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="{% url 'consoleGeneralSettings' %}">General Settings</a></li>
+                    <li class="breadcrumb-item active">UPI Details</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+<!--breadcrumb ends here-->
+
+<!-- upi start here -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-6">
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn text-white" style="background-color:#405189;" data-bs-toggle="modal" data-bs-target="#upiModal">
+                            <i class="bx bx-plus-circle"></i> UPI
+                        </button>
+                        <!-- upi creation modal starts here-->
+                        <div class="modal fade" id="upiModal" tabindex="-1" aria-labelledby="upiModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header" style="background-color:#405189;padding:10px 15px 10px 10px;">
+                                        <h1 class="modal-title text-white mb-0 fs-5" id="upiModalLabel">Add UPI</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: white;"></button>
+                                    </div>
+                                    <form id="upi_form" method="post" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <div class="modal-body">
+
+                                                    <div class="row">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                                                            <label for="upi_accountant" class="form-label">UPI Accountant Name <span style="color:red;">*</span></label>
+                                                            <input type="text" id="upi_accountant" class="form-control" name="upi_accountant" placeholder="Ex: Kumar">
+                                                        </div>
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                                                            <label for="upi_name" class="form-label">UPI Name <span style="color:red;">*</span></label>
+                                                            <input type="text" id="upi_name" class="form-control" name="upi_name" placeholder="Ex: UPI">
+                                                        </div>
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                                                            <label for="upi_id" class="form-label">UPI ID <span style="color:red;">*</span></label>
+                                                            <input type="text" id="upi_id" class="form-control" name="upi_id" placeholder="Ex: user@upi">
+                                                        </div>
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                                                            <label for="upi_phonenumber" class="form-label">UPI Phone Number <span style="color:red;">*</span></label>
+                                                            <input type="text" id="upi_phonenumber" class="form-control" name="upi_phonenumber" placeholder="Ex: 9876543210">
+                                                            <span id="phone-error" class="error" style="color:red;"></span>
+                                                            <span id="phone-success" class="success" style="color:green;"></span>
+                                                        </div>
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                                                            <label for="upi_qr_image" class="form-label">UPI QR Code Image <span style="color:red;">*</span></label>
+                                                            <input type="file" id="upi_qr_image" class="form-control" name="upi_qr_image">
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+                                        <div class="modal-footer d-flex justify-content-center">
+                                            <button type="submit" id="createupiFormSubmit" class="btn text-white" style="background-color:#405189;">Submit</button>
+                                            <button type="button" class="btn bg-light" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- upi creation modal ends here-->
+                    </div>
+                    <div class="col-1"></div>
+                    <div class="col-5">
+                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="query" hx-get="{% url 'upiRenderData' %}" hx-trigger="input changed delay:500ms, query" hx-swap="innerHTML" hx-target="#upiTableBodyContainer">
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <!--card body starts here-->
+                <div class="table-responsive">
+                    <table class="table border">
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>UPI Accountant</th>
+                                <th>UPI Name</th>
+                                <th>UPI ID</th>
+                                <th>Phone Number</th>
+                                <th>QR Code</th>
+                                <th>Created On</th>
+                                <th>Status</th>
+                                <th style="text-align:center;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody
+                            hx-get="{% url 'upiRenderData' %}"
+                            hx-swap="innerHTML"
+                            hx-target="this"
+                            hx-trigger="revealed once"
+                            id="upiTableBodyContainer">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-center" id="pagination_div"></div>
+                <!--card body ends here-->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- upi ends here -->
+
+<!--base_assets js file-->
+{% include 'base_assets/base_js.html' %}
+
+<script>
+$(document).ready(function() {
+    // Function to capitalize first letter
+    function capitalizeFirstLetter(str) {
+        if (str.length > 0) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+        return str;
+    }
+
+    // Custom validation methods
+    $.validator.addMethod("capitalizeFirstLetter", function(value, element) {
+        $(element).val(capitalizeFirstLetter(value));
+        return true;
+    }, "");
+
+    $.validator.addMethod("letterStartNoLeadingSpace", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z][^\s].*/.test(value);
+    }, "Name must start with a letter and have no leading space.");
+
+    $.validator.addMethod("atLeastOneAlpha", function(value, element) {
+        return this.optional(element) || /[a-zA-Z]/.test(value);
+    }, "Please enter at least one alphabetical character.");
+
+    $.validator.addMethod("noDoubleSpace", function(value, element) {
+        return this.optional(element) || !/\s{2,}/.test(value);
+    }, "Double spaces are not allowed.");
+
+    $.validator.addMethod("alphaSpaceOnly", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z\s]*$/.test(value);
+    }, "Only alphabetical characters and spaces are allowed.");
+
+    $.validator.addMethod("validUpiId", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/.test(value);
+    }, "Please enter a valid UPI ID (e.g., user@upi).");
+
+    $.validator.addMethod("validPhoneNumber", function(value, element) {
+        return this.optional(element) || /^[6-9]\d{9}$/.test(value);
+    }, "Please enter a valid 10-digit phone number starting with 6, 7, 8, or 9.");
+
+<!--    $.validator.addMethod("validImage", function(value, element) {-->
+<!--        if (element.files.length === 0) return true; // Allow empty for optional upload-->
+<!--        const file = element.files[0];-->
+<!--        const validTypes = ['.jpg', '.png',];-->
+<!--        return validTypes.includes(file.type);-->
+<!--    }, "Please upload a valid image file (JPG, PNG).");-->
+    $.validator.addMethod("maxFileSize", function(value, element, param) {
+        if (element.files && element.files.length > 0) {
+            return element.files[0].size <= param * 1024 * 1024; // Convert MB to bytes
+        }
+        return true;
+    }, "File size must not exceed {0}MB.");
+
+    $('#upi_form').validate({
+        rules: {
+            upi_accountant: {
+                required: true,
+                alphaSpaceOnly: true,
+                noDoubleSpace: true,
+                letterStartNoLeadingSpace: true,
+                atLeastOneAlpha: true,
+                minlength: 2,
+                maxlength: 50,
+                capitalizeFirstLetter: true
+            },
+            upi_name: {
+                required: true,
+                alphaSpaceOnly: true,
+                noDoubleSpace: true,
+                letterStartNoLeadingSpace: true,
+                atLeastOneAlpha: true,
+                minlength: 2,
+                maxlength: 50,
+                capitalizeFirstLetter: true
+            },
+            upi_id: {
+                required: true,
+                validUpiId: true,
+                maxlength: 100
+            },
+            upi_phonenumber: {
+                required: true,
+                validPhoneNumber: true
+            },
+            upi_qr_image: {
+                required: true,
+                extension: "jpg|png",
+<!--                validImage: true-->
+                maxFileSize :2
+
+            }
+        },
+        messages: {
+            upi_accountant: {
+                required: "Please enter the UPI accountant name.",
+                alphaSpaceOnly: "Only alphabetical characters and spaces are allowed.",
+                noDoubleSpace: "Double spaces are not allowed.",
+                letterStartNoLeadingSpace: "Accountant name must start with a letter and have no leading space.",
+                atLeastOneAlpha: "Please enter at least one alphabetical character.",
+                minlength: "Accountant name should be at least 2 characters.",
+                maxlength: "Accountant name should not exceed 50 characters."
+            },
+            upi_name: {
+                required: "Please enter the UPI name.",
+                alphaSpaceOnly: "Only alphabetical characters and spaces are allowed.",
+                noDoubleSpace: "Double spaces are not allowed.",
+                letterStartNoLeadingSpace: "UPI name must start with a letter and have no leading space.",
+                atLeastOneAlpha: "Please enter at least one alphabetical character.",
+                minlength: "UPI name should be at least 2 characters.",
+                maxlength: "UPI name should not exceed 50 characters."
+            },
+            upi_id: {
+                required: "Please enter the UPI ID.",
+                validUpiId: "Please enter a valid UPI ID (e.g., user@upi).",
+                maxlength: "UPI ID should not exceed 100 characters."
+            },
+            upi_phonenumber: {
+                required: "Please enter the phone number.",
+                validPhoneNumber: "Please enter a valid 10-digit phone number."
+            },
+            upi_qr_image: {
+                required: "Please upload a QR code image.",
+                extension:" Only .png, .jpg files are allowed",
+<!--                validImage: "Please upload a valid image file (JPG, PNG)."-->
+                maxFileSize: "Image size must not exceed 2MB"
+            }
+        },
+        submitHandler: function(form) {
+            console.log("Form is valid.");
+            form.submit();
+        }
+    });
+});
+</script>
+{% endblock %}

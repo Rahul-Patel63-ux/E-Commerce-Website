@@ -1,0 +1,522 @@
+{% extends 'console_base/base.html' %}
+
+{% block content %}
+
+
+{% include 'base_assets/base_css.html' %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="{% url 'consoleGeneralSettings' %}">General Settings</a></li>
+                </ol>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!--search starts here-->
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+    <div class="col-12 mb-4">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+    </div>
+
+</div>
+    </div>
+
+</div>
+
+
+<!--search ends here-->
+
+<!--New Modules starts here-->
+<!--<div class="card">-->
+<!--    <div class="card-header">New Modules</div>-->
+<!--    <div class="card-body">-->
+<!--        <div class="row">-->
+<!--            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4">-->
+<!--               <a href="">-->
+<!--                   <div class="card border-bottom border-3 card-animate border-secondary">-->
+<!--                       <div class="card-body">-->
+<!--                          <div class="d-flex align-items-center">-->
+<!--                               <div class="flex-shrink-0 fs-4 px-2 bg-primary bg-opacity-10">-->
+<!--                                   <i class="ri-account-box-line"></i>-->
+<!--                               </div>-->
+<!--                               <div class="flex-grow-1 ms-3">-->
+<!--                                   <p class="card-text fs-5">Gender</p>-->
+<!--                               </div>-->
+<!--                          </div>-->
+<!--                       </div>-->
+<!--                   </div>-->
+<!--               </a>-->
+<!--           </div>-->
+<!--            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4">-->
+<!--            <a href="{% url 'consoleMainCategory' %}">-->
+<!--                <div class="card border-bottom border-3 card-animate border-secondary">-->
+<!--                    <div class="card-body">-->
+<!--                       <div class="d-flex align-items-center">-->
+<!--                            <div class="flex-shrink-0 fs-4 px-2 bg-primary bg-opacity-10">-->
+
+<!--                                 <i class="bx bx-folder"></i>-->
+<!--                            </div>-->
+<!--                            <div class="flex-grow-1 ms-3">-->
+<!--                                <p class="card-text fs-5">Main Category</p>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </a>-->
+<!--        </div>-->
+<!--             <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4">-->
+<!--            <a href="{% url 'consoleSubCategory' %}">-->
+<!--                <div class="card border-bottom border-3 card-animate border-secondary">-->
+<!--                    <div class="card-body">-->
+<!--                       <div class="d-flex align-items-center">-->
+<!--                            <div class="flex-shrink-0 fs-4 px-2 bg-primary bg-opacity-10">-->
+
+<!--                                 <i class="bx bx-folder-minus"></i>-->
+<!--                            </div>-->
+<!--                            <div class="flex-grow-1 ms-3">-->
+<!--                                <p class="card-text fs-5">Sub-Category</p>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </a>-->
+<!--        </div>-->
+<!--            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4">-->
+<!--            <a href="{% url 'generalSettingsBrand' %}">-->
+<!--                <div class="card border-bottom border-3 card-animate border-secondary">-->
+<!--                    <div class="card-body">-->
+<!--                       <div class="d-flex align-items-center">-->
+<!--                            <div class="flex-shrink-0 fs-4 px-2 bg-primary bg-opacity-10">-->
+<!--                                <i class="ri-account-box-line"></i>-->
+
+<!--                            </div>-->
+<!--                            <div class="flex-grow-1 ms-3">-->
+<!--                                <p class="card-text fs-5">Brand</p>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </a>-->
+<!--        </div>-->
+<!--        </div>-->
+
+<!--    </div>-->
+
+<!--</div>-->
+
+<!--New Modules ends here-->
+
+<!--Product modules starts here-->
+<div class="card">
+    <div class="card-header">Product modules</div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4">
+                <a href="{% url 'generalSettingsProductMaterial' %}">
+                    <div class="card border-bottom border-3 card-animate border-secondary">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0 fs-4 px-2 bg-primary bg-opacity-10">
+                                    <i class="ri-account-box-line"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <p class="card-text fs-5">Material</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4">
+           <a href="{% url 'generalSettingProductSize' %}">
+               <div class="card border-bottom border-3 card-animate border-secondary">
+                   <div class="card-body">
+                      <div class="d-flex align-items-center">
+                           <div class="flex-shrink-0 fs-4 px-2 bg-primary bg-opacity-10">
+                               <i class="ri-account-box-line"></i>
+                           </div>
+                           <div class="flex-grow-1 ms-3">
+                               <p class="card-text fs-5">Size</p>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+           </a>
+       </div>
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4">
+                   <a href="{% url 'generalSettingsProductTag' %}">
+                       <div class="card border-bottom border-3 card-animate border-secondary">
+                           <div class="card-body">
+                              <div class="d-flex align-items-center">
+                                   <div class="flex-shrink-0 fs-4 px-2 bg-primary bg-opacity-10">
+                                       <i class="ri-account-box-line"></i>
+                                   </div>
+                                   <div class="flex-grow-1 ms-3">
+                                       <p class="card-text fs-5">Tag</p>
+                                   </div>
+                               </div>
+                           </div>
+                       </div>
+                   </a>
+               </div>
+
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4">
+                   <a href="{% url 'generalSettingProductPaymentType' %}">
+                       <div class="card border-bottom border-3 card-animate border-secondary">
+                           <div class="card-body">
+                              <div class="d-flex align-items-center">
+                                   <div class="flex-shrink-0 fs-4 px-2 bg-primary bg-opacity-10">
+                                       <i class="ri-account-box-line"></i>
+                                   </div>
+                                   <div class="flex-grow-1 ms-3">
+                                       <p class="card-text fs-5">Payment Type</p>
+                                   </div>
+                               </div>
+                           </div>
+                       </div>
+                   </a>
+               </div>
+
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4">
+                   <a href="{% url 'generalSettingProductColor' %}">
+                       <div class="card border-bottom border-3 card-animate border-secondary">
+                           <div class="card-body">
+                              <div class="d-flex align-items-center">
+                                   <div class="flex-shrink-0 fs-4 px-2 bg-primary bg-opacity-10">
+                                       <i class="ri-account-box-line"></i>
+                                   </div>
+                                   <div class="flex-grow-1 ms-3">
+                                       <p class="card-text fs-5">Color</p>
+                                   </div>
+                               </div>
+                           </div>
+                       </div>
+                   </a>
+               </div>
+        </div>
+    </div>
+</div>
+<!--Product modules ends here-->
+
+<!--Modules starts here-->
+<div class="card">
+    <div class="card-header">
+        Modules
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4">
+            <a href="{% url 'nationality' %}">
+                <div class="card border-bottom border-3 card-animate border-secondary">
+                    <div class="card-body">
+                       <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0 fs-4 px-2 bg-primary bg-opacity-10">
+                                <i class="ri-earth-fill"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <p class="card-text fs-5">Nationality</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4">
+                    <a href="{% url 'generalSettingsSalutation' %}">
+                        <div class="card border-bottom border-3 card-animate border-secondary">
+                            <div class="card-body">
+                               <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0 fs-4 px-2 bg-primary bg-opacity-10">
+                                        <i class="ri-account-box-line"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <p class="card-text fs-5">Salutation</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+        </div>
+    </div>
+</div>
+<!--Modules ends here-->
+
+<!--vendor management starts here-->
+<div class="card">
+    <div class="card-header">Vendor Management</div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4">
+            <a href="{% url 'vendorType' %}">
+                <div class="card border-bottom border-3 card-animate border-secondary">
+                    <div class="card-body">
+                       <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0 fs-4 px-2 bg-primary bg-opacity-10">
+                                <i class="ri-earth-fill"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <p class="card-text fs-5">Vendor Type</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        </div>
+    </div>
+</div>
+<!--vendor management ends here-->
+
+
+<!--Location starts here-->
+<!--<div class="card">-->
+<!--    <div class="card-header">Locations</div>-->
+<!--    <div class="card-body">-->
+<!--        <div class="row">-->
+<!--            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4">-->
+<!--                <a href="{% url 'vendorCountry' %}">-->
+<!--                    <div class="card border-bottom border-3 card-animate border-secondary">-->
+<!--                        <div class="card-body">-->
+<!--                           <div class="d-flex align-items-center">-->
+<!--                                <div class="flex-shrink-0 fs-4 px-2 bg-primary bg-opacity-10">-->
+<!--                                    <i class="ri-earth-fill"></i>-->
+<!--                                </div>-->
+<!--                                <div class="flex-grow-1 ms-3">-->
+<!--                                    <p class="card-text fs-5">Country</p>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </a>-->
+<!--            </div>-->
+<!--            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4">-->
+<!--                <a href="{% url 'vendorState' %}">-->
+<!--                    <div class="card border-bottom border-3 card-animate border-secondary">-->
+<!--                        <div class="card-body">-->
+<!--                           <div class="d-flex align-items-center">-->
+<!--                                <div class="flex-shrink-0 fs-4 px-2 bg-primary bg-opacity-10">-->
+<!--                                    <i class="ri-earth-fill"></i>-->
+<!--                                </div>-->
+<!--                                <div class="flex-grow-1 ms-3">-->
+<!--                                    <p class="card-text fs-5">State</p>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </a>-->
+<!--            </div>-->
+<!--            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4">-->
+<!--                <a href="{% url 'vendorCity' %}">-->
+<!--                    <div class="card border-bottom border-3 card-animate border-secondary">-->
+<!--                        <div class="card-body">-->
+<!--                           <div class="d-flex align-items-center">-->
+<!--                                <div class="flex-shrink-0 fs-4 px-2 bg-primary bg-opacity-10">-->
+<!--                                    <i class="ri-earth-fill"></i>-->
+<!--                                </div>-->
+<!--                                <div class="flex-grow-1 ms-3">-->
+<!--                                    <p class="card-text fs-5">City</p>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </a>-->
+<!--            </div>-->
+<!--            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4">-->
+<!--                <a href="{% url 'vendorArea' %}">-->
+<!--                    <div class="card border-bottom border-3 card-animate border-secondary">-->
+<!--                        <div class="card-body">-->
+<!--                           <div class="d-flex align-items-center">-->
+<!--                                <div class="flex-shrink-0 fs-4 px-2 bg-primary bg-opacity-10">-->
+<!--                                    <i class="ri-earth-fill"></i>-->
+<!--                                </div>-->
+<!--                                <div class="flex-grow-1 ms-3">-->
+<!--                                    <p class="card-text fs-5">Area</p>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </a>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+<!--Location ends here-->
+
+
+<!--Finance and accounts starts here-->
+
+<div class="card">
+    <div class="card-header">Finance & Accounts</div>
+    <div class="card-body">
+        <div class="row">
+<!--            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4">-->
+<!--                <a href="{% url 'accountType' %}">-->
+<!--                    <div class="card border-bottom border-3 card-animate border-secondary">-->
+<!--                        <div class="card-body">-->
+<!--                           <div class="d-flex align-items-center">-->
+<!--                                <div class="flex-shrink-0 fs-4 px-2 bg-primary bg-opacity-10">-->
+<!--                                    <i class="ri-earth-fill"></i>-->
+<!--                                </div>-->
+<!--                                <div class="flex-grow-1 ms-3">-->
+<!--                                    <p class="card-text fs-5">Account Type</p>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </a>-->
+<!--            </div>-->
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4">
+                <a href="{% url 'bankName' %}">
+                    <div class="card border-bottom border-3 card-animate border-secondary">
+                        <div class="card-body">
+                           <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0 fs-4 px-2 bg-primary bg-opacity-10">
+                                    <i class="ri-earth-fill"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <p class="card-text fs-5">Bank Name</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4">
+                <a href="{% url 'vendorUpi' %}">
+                    <div class="card border-bottom border-3 card-animate border-secondary">
+                        <div class="card-body">
+                           <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0 fs-4 px-2 bg-primary bg-opacity-10">
+                                    <i class="ri-earth-fill"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <p class="card-text fs-5">UPI details</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4">
+                <a href="{% url 'accountDetail' %}">
+                    <div class="card border-bottom border-3 card-animate border-secondary">
+                        <div class="card-body">
+                           <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0 fs-4 px-2 bg-primary bg-opacity-10">
+                                    <i class="ri-earth-fill"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <p class="card-text fs-5">Account details</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Finance and accounts ends here-->
+
+
+<!--transport management starts here-->
+<div class="card">
+    <div class="card-header">Transport Management</div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4">
+                <a href="{% url 'transportType' %}">
+                    <div class="card border-bottom border-3 card-animate border-secondary">
+                        <div class="card-body">
+                           <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0 fs-4 px-2 bg-primary bg-opacity-10">
+                                    <i class="ri-earth-fill"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <p class="card-text fs-5">Transport Type</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!--Transport management ends here-->
+
+
+<!--Site management starts here-->
+<!--<div class="card">-->
+<!--    <div class="card-header">Site Management</div>-->
+<!--    <div class="card-body">-->
+<!--        <div class="row">-->
+<!--            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4">-->
+<!--                <a href="{% url 'banner' %}">-->
+<!--                    <div class="card border-bottom border-3 card-animate border-secondary">-->
+<!--                        <div class="card-body">-->
+<!--                           <div class="d-flex align-items-center">-->
+<!--                                <div class="flex-shrink-0 fs-4 px-2 bg-primary bg-opacity-10">-->
+<!--                                    <i class="ri-earth-fill"></i>-->
+<!--                                </div>-->
+<!--                                <div class="flex-grow-1 ms-3">-->
+<!--                                    <p class="card-text fs-5">Banners</p>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </a>-->
+<!--            </div>-->
+<!--            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4">-->
+<!--                <a href="{% url 'generalSettingsContactUs' %}">-->
+<!--                    <div class="card border-bottom border-3 card-animate border-secondary">-->
+<!--                        <div class="card-body">-->
+<!--                           <div class="d-flex align-items-center">-->
+<!--                                <div class="flex-shrink-0 fs-4 px-2 bg-primary bg-opacity-10">-->
+
+<!--                                     <i class="bx bx-folder-minus"></i>-->
+<!--                                </div>-->
+<!--                                <div class="flex-grow-1 ms-3">-->
+<!--                                    <p class="card-text fs-5">Contact Us</p>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </a>-->
+<!--            </div>-->
+<!--            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4">-->
+<!--                <a href="{% url 'services' %}">-->
+<!--                    <div class="card border-bottom border-3 card-animate border-secondary">-->
+<!--                        <div class="card-body">-->
+<!--                           <div class="d-flex align-items-center">-->
+<!--                                <div class="flex-shrink-0 fs-4 px-2 bg-primary bg-opacity-10">-->
+
+<!--                                     <i class="bx bx-folder-minus"></i>-->
+<!--                                </div>-->
+<!--                                <div class="flex-grow-1 ms-3">-->
+<!--                                    <p class="card-text fs-5">Services</p>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </a>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+<!--Site management ends here-->
+{% include 'base_assets/base_js.html' %}
+{% endblock %}

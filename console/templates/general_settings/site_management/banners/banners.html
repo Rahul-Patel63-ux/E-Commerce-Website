@@ -1,0 +1,167 @@
+{% extends 'console_base/base.html' %}
+
+{% block content %}
+<!-- alert starts here -->
+{% include 'alertcomponents/alertcomponent.html' %}
+<!-- alert ends here -->
+
+<!-- breadcrumb starts here -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="{% url 'consoleGeneralSettings' %}">General Settings</a></li>
+                    <li class="breadcrumb-item active">Banner</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- breadcrumb ends here -->
+
+<!-- Banner start here -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-6">
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn text-white" style="background-color:#405189;" data-bs-toggle="modal" data-bs-target="#bannerModal">
+                            <i class="bx bx-plus-circle"></i> Add Banner
+                        </button>
+                        <!-- Banner creation modal starts here -->
+                        <div class="modal fade" id="bannerModal" tabindex="-1" aria-labelledby="bannerModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header" style="background-color:#405189;padding:10px 15px 10px 10px;">
+                                        <h1 class="modal-title text-white mb-0 fs-5" id="bannerModalLabel">Add Banner</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: white;"></button>
+                                    </div>
+                                    <form id="banner_form" method="post" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                                                    <label for="title" class="form-label">Banner Title <span style="color:red;">*</span></label>
+                                                    <input type="text" id="title" class="form-control" name="title" placeholder="Ex: Summer Sale">
+                                                </div>
+                                                <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                                                    <label for="banner_picture" class="form-label">Banner Image <span style="color:red;">*</span></label>
+                                                    <input type="file" id="banner_picture" class="form-control" name="banner_picture" accept="image/*">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="submit" id="createBannerFormSubmit" class="btn text-white" style="background-color:#405189;">Submit</button>
+                                            <button type="button" class="btn bg-light" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Banner creation modal ends here -->
+                    </div>
+                    <div class="col-1"></div>
+                    <div class="col-5">
+                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="query" hx-get="{% url 'bannerRenderData' %}" hx-trigger="input changed delay:500ms, query" hx-swap="innerHTML" hx-target="#bannerTableBodyContainer">
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- card body starts here -->
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>Title</th>
+                                <th>Image</th>
+                                <th>Created On</th>
+                                <th>Status</th>
+                                <th style="text-align:center;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody
+                            hx-get="{% url 'bannerRenderData' %}"
+                            hx-swap="innerHTML"
+                            hx-target="this"
+                            hx-trigger="revealed once"
+                            id="bannerTableBodyContainer">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-center" id="pagination_div">
+                </div>
+                <!-- card body ends here -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Banner ends here -->
+
+<!-- base assets js file -->
+{% include 'base_assets/base_js.html' %}
+
+<!-- Script starts here -->
+<script>
+$(document).ready(function() {
+    console.log('hello');
+
+    function capitalizeFirstLetter(str) {
+        if (str.length > 0) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+        return str;
+    }
+
+    // Adding custom validation method for capitalizing first letter
+    $.validator.addMethod("capitalizeFirstLetter", function(value, element) {
+        $(element).val(capitalizeFirstLetter(value));
+        return true;
+    }, "");
+
+    $.validator.addMethod("letterStartNoLeadingSpace", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z][a-zA-Z0-9 ]*$/.test(value);
+    }, "Please start with a letter and use only letters, numbers, and spaces.");
+
+    $.validator.addMethod("fileExtension", function(value, element) {
+        return this.optional(element) || /\.(jpg|jpeg|png|gif)$/i.test(value);
+    }, "Please upload an image file (jpg, jpeg, png, gif).");
+
+    $('#banner_form').validate({
+        rules: {
+            title: {
+                required: true,
+                minlength: 3,
+                maxlength: 255,
+                capitalizeFirstLetter: true,
+                letterStartNoLeadingSpace: true
+            },
+            banner_picture: {
+                required: true,
+                fileExtension: true
+            }
+        },
+        messages: {
+            title: {
+                required: "Please enter a banner title.",
+                minlength: "Title should be at least 3 characters.",
+                maxlength: "Title should not exceed 255 characters."
+            },
+            banner_picture: {
+                required: "Please upload a banner image.",
+                fileExtension: "Please upload a valid image file (jpg, jpeg, png, gif)."
+            }
+        },
+        submitLocator: function(form) {
+            console.log("Form is valid.");
+            $('#createBannerFormSubmit').prop('disabled', true);
+            form.submit();
+        }
+    });
+});
+</script>
+<!-- Script ends here -->
+{% endblock %}

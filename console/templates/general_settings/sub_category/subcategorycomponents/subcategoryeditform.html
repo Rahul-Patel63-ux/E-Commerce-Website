@@ -1,0 +1,115 @@
+<form action="{% url 'updateSubCategory' j.id %}" method="post" class="update_subcategory" enctype="multipart/form-data">
+  {% csrf_token %}
+          <div class="row">
+              <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                      <label for="category" class="form-label">Category <span style="color:red;">*</span></label>
+                      <select name="ucategory" id="category" class="form-select">
+                        <option value="">Select Category</option>
+                          {% for category in main_category %}
+                                <option value="{{ category.id }}" >{{ category.main_category }}</option>
+                            {% endfor %}
+                      </select>
+                </div>
+              <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                  <label for="subcategory" class="form-label">Sub Category <span style="color:red;">*</span></label>
+                  <input type="text" id="subcategory" class="form-control" name="usubcategory" value="{{j.sub_category}}" placeholder="Ex: Shirts">
+              </div>
+
+              <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                  <label for="short_name" class="form-label">Short Name <span class="text-light-emphasis">*</span></label>
+                  <input type="text" id="short_name" class="form-control" name="ushort_name" value="{{j.short_name}}" placeholder="Ex: M">
+              </div>
+              <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+                  <label for="usub_category_image" class="form-label">Sub Category Image <span class="text-light-emphasis">* (.png, .jpg)</span></label>
+                  <input type="file" id="usub_category_image" class="form-control" name="usub_category_image">
+              </div>
+
+          </div>
+
+    <div class="modal-footer">
+        <button type="submit" style="background-color:#405189;"  class="btn text-white update-category-btn">Save</button>
+        <button type="button" class="btn bg-light" data-bs-dismiss="modal">Close</button>
+    </div>
+</form>
+<!--base_assests js file-->
+{% include 'base_assets/base_js.html' %}
+
+
+<!--Script starts here-->
+<script>
+$(document).ready(function() {
+   console.log('hello');
+
+    function capitalizeFirstLetter(str) {
+        if (str.length > 0) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+        return str;
+    }
+
+    // Adding custom validation method for capitalizing first letter
+    $.validator.addMethod("capitalizeFirstLetter", function(value, element) {
+        // Capitalize the input value
+        $(element).val(capitalizeFirstLetter(value));
+        return true;
+    }, "");
+    $.validator.addMethod("maxFileSize", function(value, element, param) {
+        if (element.files && element.files.length > 0) {
+            return element.files[0].size <= param * 1024 * 1024; // Convert MB to bytes
+        }
+        return true;
+    }, "File size must not exceed {0}MB.");
+
+   $('.update_subcategory').validate({
+       rules: {
+           ucategory:{
+               required: true
+           },
+           usubcategory:{
+               required:true,
+               minlength: 3,
+                maxlength: 100,
+               capitalizeFirstLetter: true
+           },
+           ushort_name:{
+               minlength: 1,
+                maxlength: 1,
+                capitalizeFirstLetter: true
+           },
+           usub_category_image:{
+               extension: "jpg|png",
+               accept:"image/png,image/jpg",
+               maxFileSize :2
+           }
+       },
+       messages:{
+           ucategory:{
+               required: "Choose Main Category."
+           },
+           usubcategory:{
+               required:" Plaese enter category.",
+               minlength: "Sub category should consist at least 3 charecters.",
+                maxlength: "Sub category should not be exceeded 100 charecters."
+           },
+           ushort_name:{
+               minlength: "Short name should consist 1 charecter.",
+                maxlength: "Short name should consist 1 charecter."
+
+           },
+           usub_category_image:{
+               extension:" Only .png, .jpg files are allowed",
+               accept: "Only Images are allowed",
+               maxFileSize: "Image size must not exceed 2MB"
+
+           }
+       },
+       submitHandler: function(form) {
+          console.log(" Form is valid.");
+          form.submit();
+      }
+   });
+});
+
+<!--Script ends here-->
+</script>
+<!--Script ends here-->

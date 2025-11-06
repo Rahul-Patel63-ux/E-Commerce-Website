@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en" data-layout="vertical" data-sidebar="dark" data-sidebar-image="img-1" data-sidebar-size="lg" data-preloader="disable" data-theme="default" data-topbar="light" data-bs-theme="light" data-theme-color="0">
+
+{% load static %}
+<!-- Mirrored from themesbrand.com/dosix/layouts/auth-twostep.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 10 May 2025 10:08:23 GMT -->
+<head>
+
+    <meta charset="utf-8">
+    <title>title | Dosix - Admin & Dashboard Template</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="Minimal Admin & Dashboard Template" name="description">
+    <meta content="Themesbrand" name="author">
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="assets/images/favicon.ico">
+    
+    <!-- Fonts css load -->
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link id="fontsLink" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+    
+    {% include 'user_base_assets/base_css.html' %}  
+</head>
+
+<body>
+    
+{% include 'alertcomponents/alertcomponent.html' %}
+
+    <section class="auth-page-wrapper p-2 p-lg-4 position-relative d-flex align-items-center justify-content-center min-vh-100">
+        <div class="card mb-0 w-100 p-3 p-lg-2" style="background-image: url({% static 'assets/images/auth/auth.jpg' %});background-size: cover;background-position: center;">
+            <div class="effect-one"></div>
+            <div class="row g-0 align-items-center">
+                <div class="col-xxl-8 order-last order-xl-first">
+                    <div class="card auth-card border-0 shadow-none mb-0 bg-transparent">
+                        
+                    </div>
+                </div>
+                <!--end col-->
+                <div class="col-xxl-4 mx-auto">
+                    <div class="card shadow-lg border-none m-lg-5">
+                        <div class="card-body">
+                            <div class="text-center mt-4">
+                                <div class="mb-4 pb-4">
+                                    <a href="index.html" class="auth-logo">
+                                        <img src="{% static 'assets/images/logo-dark.png' %}" alt="" height="30" class="auth-logo-dark mx-auto">
+                                        <img src="assets/images/logo-light.png" alt="" height="30" class="auth-logo-light mx-auto">
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="text-muted text-center mb-4 mx-lg-3">
+                                <div class="mb-4">
+                                    <img src="{% static 'assets/images/auth/permission.png' %}" alt="" class="avatar-md">
+                                </div>
+                                <h4>Verify Your Email</h4>
+                                <p>Please enter the 4 digit code sent to your Email</p>
+                            </div>
+                            <div class="p-2">
+                                <form autocomplete="off" method="post" action="{% url 'otp-2' user_id %}">
+                                    {% csrf_token %}
+                                    <div class="row">
+                                        <div class="col-3">
+                                            <div class="mb-3">
+                                                <label for="digit1-input" class="visually-hidden">Digit 1</label>
+                                                <input type="text" class="form-control form-control-lg text-center" placeholder="0" onkeyup="moveToNext(1, event)" maxLength="1" name="digit1" id="digit1-input">
+                                            </div>
+                                        </div><!-- end col -->
+                                
+                                        <div class="col-3">
+                                            <div class="mb-3">
+                                                <label for="digit2-input" class="visually-hidden">Digit 2</label>
+                                                <input type="text" class="form-control form-control-lg text-center" placeholder="0" onkeyup="moveToNext(2, event)" maxLength="1" name="digit2" id="digit2-input">
+                                            </div>
+                                        </div><!-- end col -->
+                                
+                                        <div class="col-3">
+                                            <div class="mb-3">
+                                                <label for="digit3-input" class="visually-hidden">Digit 3</label>
+                                                <input type="text" class="form-control form-control-lg text-center" placeholder="0" onkeyup="moveToNext(3, event)" maxLength="1" name="digit3" id="digit3-input">
+                                            </div>
+                                        </div><!-- end col -->
+                                
+                                        <div class="col-3">
+                                            <div class="mb-3">
+                                                <label for="digit4-input" class="visually-hidden">Digit 4</label>
+                                                <input type="text" class="form-control form-control-lg text-center" placeholder="0" onkeyup="moveToNext(4, event)" maxLength="1" name="digit4" id="digit4-input">
+                                            </div>
+                                        </div><!-- end col -->
+                                    </div>
+                                    <div class="mt-3">
+                                        <button type="submit" class="btn btn-primary w-100">Confirm</button>
+                                    </div>
+                                </form><!-- end form -->
+                                
+        
+                                <!-- <div class="mt-5 text-center">
+                                    <p class="mb-0">Didn't receive a code ? <a href="auth-pass-reset.html" class="fw-semibold text-primary text-decoration-underline">Resend</a> </p>
+                                </div> -->
+                            </div>
+                        </div><!-- end card body -->
+                    </div><!-- end card -->
+                </div>
+                <!--end col-->
+            </div>
+            <!--end row-->
+        </div>
+    </section>
+
+    <!-- JAVASCRIPT -->
+    {% include 'user_base_assets/base_js.html' %}
+
+</body>
+
+
+<!-- Mirrored from themesbrand.com/dosix/layouts/auth-twostep.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 10 May 2025 10:08:23 GMT -->
+</html>

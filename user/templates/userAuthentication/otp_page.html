@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en" data-layout="vertical" data-sidebar="dark" data-sidebar-image="img-1" data-sidebar-size="lg"
+    data-preloader="disable" data-theme="default" data-topbar="light" data-bs-theme="light" data-theme-color="0">
+    {% load static %}
+
+    <!-- Mirrored from themesbrand.com/dosix/layouts/auth-signin.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 10 May 2025 10:08:22 GMT -->
+    <head>
+
+        <meta charset="utf-8">
+        <title>Ecommerce | Sign In</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- App favicon -->
+        <link rel="shortcut icon" href="{% static 'assets/images/favicon.ico' %}">
+
+
+        {% include 'user_base_assets/base_css.html' %}
+    </head>
+
+    <body>
+
+        {% if messages %}
+        <div class="position-fixed top-0 end-0 p-3" style="z-index: 1055">
+            {% for message in messages %}
+            <div class="toast align-items-center text-bg-{{ message.tags }} border-0" role="alert" aria-live="assertive"
+                aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        {{ message }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+
+
+        <section
+            class="auth-page-wrapper p-2 p-lg-4 position-relative d-flex align-items-center justify-content-center min-vh-100">
+            <div class="card mb-0 w-100 p-3 p-lg-2"
+                style="background-image: url({% static 'assets/images/auth/auth.jpg' %});background-size: cover;background-position: center;">
+                <div class="effect-one"></div>
+                <div class="row g-0 align-items-center">
+                    <div class="col-xxl-8 order-last order-xl-first">
+                        <div class="card auth-card border-0 shadow-none mb-0 bg-transparent">
+                            <div class="card-body p-4 p-xl-5 d-flex justify-content-between flex-column h-100">
+
+
+                            </div>
+                        </div>
+                    </div>
+                    <!--end col-->
+                    <div class="col-lg-8 col-xxl-4 mx-auto order-first order-xl-last">
+                        <div class="card shadow-lg border-none m-lg-5">
+                            <div class="card-body">
+                                <div class="text-center mt-4">
+                                    <div class="mb-4 pb-2">
+                                        <div class="auth-logo">
+                                            <img src="{% static 'assets/images/logo-dark.png' %}" alt="" height="30"
+                                                class="auth-logo-dark mx-auto">
+                                            <img src="{% static 'assets/images/logo-light.png' %}" alt="" height="30"
+                                                class="auth-logo-light mx-auto">
+                                        </div>
+                                    </div>
+                                    <h5 class="fs-3xl">OTP</h5>
+                                    <p class="text-muted">Please check your registered email for OTP</p>
+                                </div>
+                                <div class="p-2 mt-4">
+                                    <form action="{% url 'otp' user_id %}" id="otpform" method="post">
+                                        {% csrf_token %}
+                                        <div class="mb-3">
+                                            <label for="otp" class="form-label">Enter OTP <span
+                                                    style="color:red">*</span></label>
+                                            <div class="position-relative ">
+                                                <input type="text" class="form-control  password-input" id="otp"
+                                                    placeholder="Ex. 1234" name="otp">
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-4">
+                                            <button class="btn btn-primary w-100" id="sign_in_button" type="submit">Submit <i class="bi bi-arrow-right ms-1 fw-bold"></i></button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div><!-- end card body -->
+                        </div><!-- end card -->
+                    </div>
+                    <!--end col-->
+                </div>
+                <!--end row-->
+            </div>
+        </section>
+
+        {% include 'user_base_assets/base_js.html' %}
+        
+        <!-- JAVASCRIPT -->
+        
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="{% static 'assets/js/jquery.validate.min.js' %}"></script>
+
+        <script>
+
+            $(document).ready(function () {
+
+                $.validator.addMethod("noSpace", function(value, element){
+            return this.optional(element) || (value.trim().length === value.length);
+        }, "Spaces are not allowed");
+
+        $.validator.addMethod("noCharacters", function(value, element) {
+            return this.optional(element) || /^[^a-zA-Z]+$/.test(value);
+        }, "Characters are not allowed");
+
+        $.validator.addMethod("noSpecialChars", function (value, element) {
+            return this.optional(element) || /^[a-zA-Z0-9 ]+$/.test(value);
+        }, "Special Characters are not allowed");
+                    $('#otpform').validate({
+                        rules:{
+                            otp:{
+                                required:true, 
+                                noSpace: true,
+                                noCharacters: true, 
+                                noSpecialChars: true
+                            }
+                        },
+                        messages:{
+                            otp:{
+                                required:'Plese enter OTP',
+                                noSpace: "Spaces are not allowed",
+                                noCharacters: "Characters are not allowed", 
+                                noSpecialChars: "Special Characters are not allowed"
+                            }
+                        },
+                        submitHandler: function (form) {
+                        $('#sign_in_button').prop('disabled', true);
+                        form.submit();
+                    }
+                });
+                $('.toast').each(function () {
+                    var toast = new bootstrap.Toast(this, {
+                        autohide: true,
+                        delay: 5000
+                    });
+                    toast.show();
+                });
+            });
+        </script>
+
+    </body>
+
+    <!-- Mirrored from themesbrand.com/dosix/layouts/auth-signin.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 10 May 2025 10:08:23 GMT -->
+</html>

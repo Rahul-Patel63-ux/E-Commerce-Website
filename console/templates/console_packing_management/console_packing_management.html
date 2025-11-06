@@ -1,0 +1,61 @@
+{% extends 'console_base/base.html' %}
+
+{% block content %}
+<!--alert starts here-->
+{% include 'alertcomponents/alertcomponent.html' %}
+<!--alert ends here-->
+
+{% include 'base_assets/base_css.html' %}
+
+<!-- breadcrum starts here -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="{% url 'packingManagementView' %}">Packing Management</a></li>
+                </ol>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!--breadcrum ends here-->
+
+<div class="row row-cols-xxl-5 row-cols-lg-3 row-cols-md-2 row-cols-1 mt-5">
+
+    <a href="#" hx-get="{% url 'packingManagementPackedView' %}" hx-trigger="click" hx-target="#packing_management_container_block" hx-swap="innerHTML">
+        <div class="col">
+
+
+            <div class="card border-bottom border-3 card-animate border-success">
+                <div class="card-body">
+
+                    <h4 class="mb-4"><span class="counter-value" data-target="21438">{{ packed_orders }}</span></h4>
+
+                    <p class="text-muted fw-medium text-uppercase mb-0">Packed</p>
+                </div>
+            </div>
+        </div>
+    </a>
+    <a href="#" hx-get="{% url 'packingManagementYetToPackView' %}" hx-trigger="click" hx-target="#packing_management_container_block" hx-swap="innerHTML">
+        <div class="col">
+            <div class="card border-bottom border-3 card-animate border-danger">
+                <div class="card-body">
+                    <h4 class="mb-4"><span class="counter-value" data-target="2314">{{ yet_to_pack_orders }}</span></h4>
+
+                    <p class="text-muted fw-medium text-uppercase mb-0">Yet To Pack</p>
+                </div>
+            </div>
+        </div>
+    </a>
+</div>
+
+<div id="packing_management_container_block">
+
+</div>
+
+
+{% include 'base_assets/base_js.html' %}
+
+{% endblock %}

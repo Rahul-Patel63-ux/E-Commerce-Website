@@ -1,0 +1,156 @@
+{% extends "user_base/base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+{% include 'alertToast/alerttoasters.html' %}
+
+<div class="main-content">
+    <div class="container mt-5"></div>
+
+    {% if product or categorized_product %}
+    <div class="row mt-2">
+        {% if product %}
+        <label class="text-muted fs-3xl fw-semibold mt-4 mb-3">{{ value | upper }}</label>
+        {% endif %}
+
+        <!-- If Product == Ture -->
+        {% for inv in product %}
+
+        <div class="col-6 col-xl-3">
+            <div class="card ribbon-box shadow-lg ribbon-fill right">
+                <div class="ribbon ribbon-info">{{inv.discount_percent}}</div>
+                {% with inv.product.images.all|first as img %}
+                {% if img %}
+                <img class="card-img-top img-fluid" src="{{ img.image.url }}" alt="image"
+                    style="height: 400px; width: 100%; object-fit: cover;">
+                {% else %}
+                <img class="card-img-top img-fluid" src="" alt="no-image"
+                    style="height: 400px; width: 100%; object-fit: cover;">
+                {% endif %}
+                {% endwith %}
+
+                <div class="card-body">
+                    <div class="row">
+                        <span
+                            class="card-title col-md-7 text-danger fw-bold">{{ inv.product.product_title|truncatechars:18  }}</span>
+                        <span
+                            class="text-muted col-md-5 ps-5">{{ inv.product.main_category_ref.main_category|capfirst }}</span>
+                    </div>
+                    <p class="card-text">{{ inv.product.product_description|truncatechars:30 }}</p>
+                </div>
+                <a href="{% url 'each-product' inv.product.id %}" class="stretched-link"></a>
+
+            </div>
+        </div>
+        {% endfor %}
+
+
+
+        <!-- If categorized_product == True -->
+        {% for sub_cat, value in categorized_product.items %}
+        {% with forloop.counter as count %}
+
+        <label class="text-muted fs-3xl fw-semibold mt-4 mb-3">{{ sub_cat | upper }}</label>
+        <div class="swiper-wrapper-container">
+            <div class="swiper myswiper swiper-{{count}}">
+                <div class="swiper-wrapper">
+
+                    {% for p in value %}
+                    <!-- <div class="col-6 col-xl-3"> -->
+                    <div class="swiper-slide">
+                        <div class="card ribbon-box shadow-lg ribbon-fill right">
+                            <div class="ribbon ribbon-info">{{p.discount_percent}}</div>
+                            {% with p.product.images.all|first as img %}
+                            {% if img %}
+                            <img class="card-img-top img-fluid" src="{{ img.image.url }}" alt="image"
+                                style="height: 400px; width: 100%; object-fit: cover;">
+                            {% else %}
+                            <img class="card-img-top img-fluid" src="" alt="no-image"
+                                style="height: 400px; width: 100%; object-fit: cover;">
+                            {% endif %}
+                            {% endwith %}
+
+                            <div class="card-body">
+                                <div class="row">
+                                    <span
+                                        class="card-title col-md-8 text-danger fw-semibold">{{ p.product.product_title|truncatechars:18  }}</span>
+                                    <span
+                                        class="text-muted col-md-4">{{ p.product.main_category_ref.main_category|capfirst }}</span>
+                                </div>
+                                <p class="card-text">{{ p.product.product_description|truncatechars:30 }}</p>
+                            </div>
+                            <a href="{% url 'each-product' p.product.id %}" class="stretched-link"></a>
+                        </div>
+                    </div>
+                    <!-- </div> -->
+                    {% endfor %}
+                </div>
+
+                <!-- If we need navigation buttons -->
+                <div class="swiper-button-next swiper-button-next-{{count}}"></div>
+                <div class="swiper-button-prev swiper-button-prev-{{count}}"></div>
+
+            </div>
+        </div>
+
+        {% endwith %}
+        {% endfor %}
+
+
+        {% else %}
+        <div class="row">
+            <div class="col-12 text-center fs-4" style="color:red">
+                No Record Found!
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+<script src="{% static 'assets/libs/swiper/swiper-bundle.min.js' %}"></script>
+<script>
+    document.querySelectorAll('.myswiper').forEach((el, index) => {
+        // Generate unique class names
+        const nextClass = 'swiper-button-next-' + index;
+        const prevClass = 'swiper-button-prev-' + index;
+
+        // Assign unique classes to each swiper's navigation buttons
+        const nextEl = el.querySelector('.swiper-button-next');
+        const prevEl = el.querySelector('.swiper-button-prev');
+
+        if (nextEl) nextEl.classList.add(nextClass);
+        if (prevEl) prevEl.classList.add(prevClass);
+
+        // Initialize Swiper
+        new Swiper(el, {
+            slidesPerView: 4,
+            spaceBetween: 20,
+
+            breakpoints: {
+                320: {
+                    slidesPerView: 2,
+                    spaceBetween: 20
+                },
+                640: {
+                    slidesPerView: 3,
+                    spaceBetween: 20
+                },
+                1306: {
+                    slidesPerView: 4,
+                    spaceBetween: 40
+                },
+            },
+
+            navigation: {
+                nextEl: '.' + nextClass,
+                prevEl: '.' + prevClass,
+            },
+        });
+    });
+</script>
+
+
+{% endblock content %}

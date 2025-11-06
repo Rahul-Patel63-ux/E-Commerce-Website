@@ -1,0 +1,208 @@
+
+
+
+{% if vendor_details %}
+        {% for v in vendor_details %}
+            <tr>
+                <td class="border-light">{{forloop.counter0|add:vendor_details.start_index}}</td>
+
+
+                <td class="td-width-auto border-light">
+
+                    <div class="d-flex gap-2 align-items-center">
+                        <div>
+                            {% if v.vendor_company_logo %}
+                                <img src="{{ v.vendor_company_logo.url }}" alt="{{ v.vendor_company_name }} Logo" style="height:40px; width:40px;" class="company-logo" loading="lazy">
+                            {% else %}
+                                <div style="height:40px; width:40px; background-color:#e9ecef; display:flex; align-items:center; justify-content:center; font-size:24px; color:#6c757d;">
+                                    {{ v.vendor_company_name|first }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <a href="#showvendorModal-{{v.id}}" class=""  data-bs-toggle="modal" hx-get="{% url 'vendorDataRender' %}?showid={{v.id}}" hx-target="#show-vendor-{{v.id}}" hx-trigger="click once" hx-swap="outerHTML">
+                                <h5 class="fs-6 mb-0">{{ v.vendor_company_name }}</h5>
+                            </a>
+
+                            <small class="text-muted">{{ v.vendor_type_ref.vendor_type|default:"Unknown" }}</small>
+
+                        </div>
+
+                    </div>
+
+                </td>
+
+                <td class="border-light">{{ v.vendor_name }}</td>
+                <td class="border-light">{{ v.vendor_email }}</td>
+                <td class="border-light">{{ v.vendor_phone_number }}</td>
+                <td class="border-light">{{ v.vendor_city_ref.city_name|default:"Unknown" }}</td>
+                <td class="border-light">{{ v.vendor_created_at|date:"d M,Y" }}</td>
+                <td class="border-light" id="vendor_status_td{{v.id}}">
+                      {% if v.vendor_status %}
+                      <span class="badge bg-success">
+                          <a href="#" hx-post="{% url 'vendorStatusChange' v.id %}"
+                              hx-target="#vendor_status_td{{v.id}}"
+                              hx-trigger="click once"
+                              hx-swap="innerHTML"
+                              hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Active</a>
+                      </span>
+                      {% else %}
+                      <span class="badge bg-danger">
+                          <a href="#" hx-post="{% url 'vendorStatusChange' v.id %}"
+                              hx-target="#vendor_status_td{{v.id}}"
+                              hx-trigger="click once"
+                              hx-swap="innerHTML"
+                              hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Deactive</a>
+                      </span>
+                      {% endif %}
+                  </td>
+                <td class="border-light d-flex gap-2 justify-content-center">
+
+
+                  <a href="#editcreatevendorModal-{{v.id}}" class="btn btn-sm text-white btn-icon" style="background-color:#405189;" data-bs-toggle="modal" hx-get="{% url 'vendorDataRender' %}?editid={{v.id}}" hx-target="#createvendor-edit-form-{{v.id}}" hx-trigger="click once" hx-swap="outerHTML">
+                        <i class="ri-pencil-fill"></i>
+                    </a>
+
+                  <button class="btn btn-sm bg-danger text-white btn-icon" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal-{{v.id}}">
+                    <i class="ri-delete-bin-5-fill"></i>
+                </button>
+
+              </td>
+            </tr>
+        <!-- delete model start here -->
+            <div class="modal fade zoomIn" id="deleteConfirmModal-{{v.id}}" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered ">
+                <div class="modal-content">
+                  <div class="modal-header bg-danger pb-3">
+                      <h5 class="modal-title text-white" id="deletecreatevendorModalLabel">Delete Vendor Details</h5>
+                      <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close" id="btn-close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="mt-2 text-center">
+                      <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json" trigger="loop"
+                        colors="primary:#f7b84b,secondary:#f06548" style="width:100px;height:100px"></lord-icon>
+                      <div class="mt-4 pt-2 fs-15 mx-4 mx-sm-5">
+                        <h4>Are you sure ?</h4>
+                        <p class="text-muted mx-4 mb-0">Are you sure you want to remove this Vendor - {{v.vendor_name}} ?</p>
+                      </div>
+                    </div>
+                    <div class="d-flex gap-2 justify-content-center mt-4 mb-2">
+                      <button type="button" class="btn w-sm btn-light" data-bs-dismiss="modal">Close</button>
+                      <!-- <button type="button" class="btn w-sm btn-danger " id="delete-record">Yes, Delete It!</button> -->
+                      <a href="{% url 'deleteVendor' v.id%}" class="btn w-sm btn-danger delete-createvendor-btn" id="delete-record">Yes,
+                        delete it!</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- delete model end here -->
+
+        <!-- Edit form modal-->
+            <div class="modal fade" id="editcreatevendorModal-{{v.id}}" tabindex="-1" aria-labelledby="editcreatevendorModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header" style="background-color:#405189;padding:10px 15px 10px 10px;">
+                            <h5 class="modal-title text-white mb-0">Edit Vendor Details</h5>
+                            <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" style="background-color: white;" type="button"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            <div id="createvendor-edit-form-{{v.id}}">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="showvendorModal-{{v.id}}" tabindex="-1" aria-labelledby="showvendorModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header" style="background-color:#405189;padding:10px 15px 10px 10px;">
+                            <h5 class="modal-title text-white mb-0">Show Vendor Details</h5>
+                            <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" style="background-color: white;" type="button"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            <div id="show-vendor-{{v.id}}">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+{% endfor %}
+{% else %}
+
+    <tr>
+        <td colspan="8" style="color:red; text-align:center;">No Records Found</td>
+    </tr>
+
+{% endif %}
+
+
+<!--pagination starts here-->
+   <div class="d-flex justify-content-center" id="pagination_div" hx-swap-oob="true"  >
+        <ul class="pagination pagination-separated pagination-sm justify-content-center justify-content-sm-start mb-0">
+          {% if vendor_details.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="#" hx-get="{% url 'vendorDataRender' %}?page={{ vendor_details.previous_page_number }}"  hx-target="#createvendorTableBodyContainer" hx-swap="innerHTML" hx-include="#search-filter-form,#query">Previous</a>
+                </li>
+                {% else %}
+                    <li class="page-item disabled text-muted">
+                        <a class="page-link" href="#" >Previous</a>
+                    </li>
+                {% endif %}
+
+                <!-- First page -->
+                {% if vendor_details.number > 3  %}
+                    <li class="page-item">
+                        <a class="page-link" href="#" hx-get="{% url 'vendorDataRender' %}?page=1" hx-target="#createvendorTableBodyContainer" hx-swap="innerHTML" hx-include="#search-filter-form,#query">1</a>
+                    </li>
+                    {% if vendor_details.number == 4 %}
+                    <li class="page-item text-muted" style="display: none;"><span class="page-link">...</span></li>
+                    {% else %}
+                    <li class="page-item text-muted" ><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endif %}
+
+
+
+
+                <!-- Pages around the current page -->
+                {% for page_num in vendor_details.paginator.page_range %}
+                    {% if page_num >= vendor_details.number|add:-2 and page_num <= vendor_details.number|add:2 %}
+                        <li class="page-item {% if page_num == vendor_details.number %}active{% endif %}">
+                            <a class="page-link" href="#" hx-get="{% url 'vendorDataRender' %}?page={{ page_num }}" hx-target="#createvendorTableBodyContainer" hx-swap="innerHTML" hx-include="#search-filter-form,#query">{{ page_num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                <!-- Last page -->
+                {% if vendor_details.number < vendor_details.paginator.num_pages|add:-2 %}
+
+                    <li class="page-item text-muted"><span class="page-link">...</span></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#" hx-get="{% url 'vendorDataRender' %}?page={{ vendor_details.paginator.num_pages }}" hx-target="#createvendorTableBodyContainer" hx-swap="innerHTML" hx-include="#search-filter-form,#query">{{ vendor_details.paginator.num_pages }}</a>
+                    </li>
+                {% endif %}
+
+                {% if vendor_details.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="#" hx-get="{% url 'vendorDataRender' %}?page={{ vendor_details.next_page_number }}" hx-target="#createvendorTableBodyContainer" hx-swap="innerHTML" hx-include="#search-filter-form,#query">Next</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled text-muted">
+                        <a class="page-link" href="#">Next</a>
+                    </li>
+                {% endif %}
+        </ul>
+      </div>
+
+<!-- pagination ends here-->

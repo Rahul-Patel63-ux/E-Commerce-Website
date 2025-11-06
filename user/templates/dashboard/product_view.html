@@ -1,0 +1,43 @@
+{% load static %}
+
+{% if products %}
+<div class="row mb-5 mt-2">
+    {% for inv in products %}
+    {% if inv.inventory_status %}
+    <div class="col-6 col-xl-3">
+        <div class="card ribbon-box shadow-lg overflow-hidden right">
+            <div class="ribbon ribbon-info ribbon-shape trending-ribbon">
+                <i class="ri-flashlight-fill text-white align-bottom float-start me-1"></i>
+                <span class="trending-ribbon-text">{{inv.discount_percent}}%</span>
+            </div>
+            {% with inv.product.images.all|first as img %}
+            {% if img %}
+            <img class="card-img-top img-fluid" src="{{ img.image.url }}" alt="image"
+            style="height: 400px; width: 100%; object-fit: cover;">
+            {% else %}
+            <img class="card-img-top img-fluid" src="" alt="no-image"
+            style="height: 300px; width: 100%; object-fit: cover;">
+            {% endif %}
+            {% endwith %}
+            
+            <div class="card-body">
+                
+                <div class="row">
+                    <span class="card-title col-md-8 text-danger fs-6 fw-semibold">{{ inv.product.product_title|truncatechars:18 }}</span>
+                    <span class="text-muted col-md-4 ">{{ inv.product.main_category_ref.main_category|capfirst }}</span>
+                </div>
+                <p class="card-text">{{ inv.product.product_description|truncatechars:30 }}</p>
+            </div>
+            <a href="{% url 'each-product' inv.product.id %}" class="stretched-link"></a>
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% else %}
+    <div class="row mt-5">
+        <div class="col-12 text-center fs-4 " style="color:red">
+            No Record Found!
+        </div>
+    </div>
+</div>
+{% endif %}

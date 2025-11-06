@@ -1,0 +1,85 @@
+{% load static %}
+
+<form action="{% url 'updateBanner' b.id %}" method="post" enctype="multipart/form-data" class="update_banner" id="update_banner">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+            <label for="utitle" class="form-label">Banner Title <span style="color:red;">*</span></label>
+            <input type="text" id="utitle" class="form-control" name="utitle" value="{{ b.title }}" placeholder="Ex: Summer Sale">
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+            <label for="ubanner_picture" class="form-label">Banner Image</label>
+            <input type="file" id="ubanner_picture" class="form-control" name="ubanner_picture" accept="image/*">
+            {% if b.banner_picture %}
+                <img src="{{ b.banner_picture.url }}" alt="{{ b.title }}" style="max-width: 100px; max-height: 50px; margin-top: 10px;">
+            {% else %}
+                <p>No Image</p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" id="editBannerFormSubmit" class="btn text-white" style="background-color:#405189;">Save</button>
+        <button type="button" class="btn bg-light" data-bs-dismiss="modal">Close</button>
+    </div>
+</form>
+
+<!-- base assets js file -->
+{% include 'base_assets/base_js.html' %}
+
+<!-- Script starts here -->
+<script>
+$(document).ready(function() {
+    console.log('hello');
+
+    function capitalizeFirstLetter(str) {
+        if (str.length > 0) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+        return str;
+    }
+
+    $.validator.addMethod("capitalizeFirstLetter", function(value, element) {
+        $(element).val(capitalizeFirstLetter(value));
+        return true;
+    }, "");
+
+    $.validator.addMethod("letterStartNoLeadingSpace", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z][a-zA-Z0-9 ]*$/.test(value);
+    }, "Please start with a letter and use only letters, numbers, and spaces.");
+
+    $.validator.addMethod("fileExtension", function(value, element) {
+        return this.optional(element) || /\.(jpg|jpeg|png|gif)$/i.test(value);
+    }, "Please upload an image file (jpg, jpeg, png, gif).");
+
+    $('#update_banner').validate({
+        rules: {
+            utitle: {
+                required: true,
+                minlength: 3,
+                maxlength: 255,
+                capitalizeFirstLetter: true,
+                letterStartNoLeadingSpace: true
+            },
+            ubanner_picture: {
+                fileExtension: true
+            }
+        },
+        messages: {
+            utitle: {
+                required: "Please enter a banner title.",
+                minlength: "Title should be at least 3 characters.",
+                maxlength: "Title should not exceed 255 characters."
+            },
+            ubanner_picture: {
+                fileExtension: "Please upload a valid image file (jpg, jpeg, png, gif)."
+            }
+        },
+        submitHandler: function(form) {
+            console.log("Form is valid.");
+            $('#editBannerFormSubmit').prop('disabled', true);
+            form.submit();
+        }
+    });
+});
+</script>
+<!-- Script ends here -->

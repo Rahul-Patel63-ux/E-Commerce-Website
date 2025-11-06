@@ -1,0 +1,472 @@
+{% load static %}
+{% block style %}
+<style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+
+<!--        .container {-->
+<!--            width: 90%;-->
+<!--            max-width: 1200px;-->
+<!--            margin: 0 auto;-->
+<!--            padding: 20px;-->
+<!--        }-->
+
+        .company-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .company-logo img {
+            height: 50px;
+            width: 50px;
+            object-fit: contain;
+        }
+
+
+        .centering_text {
+            text-align: center;
+        }
+
+        .rightside_text {
+            text-align: right;
+        }
+
+<!--        .mute_text {-->
+<!--            color: #6c757d;-->
+<!--        }-->
+
+        .thanking_message {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 20px -15px;
+        }
+
+<!--        .col-4 {-->
+<!--            flex: 0 0 33.3333%;-->
+<!--            max-width: 33.3333%;-->
+<!--            padding: 0 15px;-->
+<!--            margin-bottom: 15px;-->
+<!--        }-->
+
+        .table_container {
+            width: 100%;
+            overflow-x: auto;
+            margin-top: 20px;
+            margin-bottom:20px;
+        }
+
+        .table_details {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #dee2e6;
+        }
+
+        .table_details th,
+        .table_details td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #dee2e6;
+        }
+
+        .table_details th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .table-footer td {
+            font-weight: bold;
+        }
+
+        .status_badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.875em;
+        }
+
+        .status_badge_success {
+            background-color: #28a745;
+            color: #fff;
+        }
+
+        .status_badge_danger {
+            background-color: #F6744B;
+            color: #fff;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.875em;
+            background-color: #007bff;
+            color: #fff;
+            transition: background-color 0.15s;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+
+
+        h2 {
+            font-size: 1.8em;
+            margin-bottom: 0;
+        }
+
+        h5 {
+            font-size: 1.25em;
+            margin-bottom: 10px;
+        }
+
+        h6 {
+            font-size: 1.1em;
+            margin-top: 20px;
+        }
+
+        p {
+            margin-bottom: 5px;
+        }
+
+        small {
+            font-size: 0.875em;
+            display: block;
+        }
+
+        strong {
+            font-weight: bold;
+        }
+
+        sub {
+            font-size: 0.75em;
+            vertical-align: sub;
+        }
+        .from_and_to_details{
+            display:flex;
+            justify-content:space-between;
+            gap:15px;
+        }
+        .from_details{
+            width:400px;
+        }
+        .to_details{
+           width:400px;
+<!--                margin-left:auto;-->
+        }
+        .thanking_message{
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .thanking_message_block_print_button{
+            margin-top:20px;
+        }
+    </style>
+{% endblock %}
+
+        <div class="company-details">
+            <!-- Company Logo (Left) -->
+            <div class="company-logo">
+                <img src="{{ invoice.vendor.vendor_company_logo.url }}" alt="company_logo">
+            </div>
+
+            <!-- Company Name (Center) -->
+            <div class="centering_text">
+                <h2>{{ invoice.vendor.vendor_company_name }}</h2>
+            </div>
+
+            <!-- Invoice ID and Date (Right) -->
+            <div class="rightside_text">
+                <small><strong>Invoice:</strong> {{ invoice.invoice_id }}</small>
+                <small><strong>Date:</strong> {{ invoice.purchase_ref.created_at|date:"d M, Y" }}</small>
+            </div>
+        </div>
+        <div class="from_and_to_details">
+            <div class="from_details">
+                <h5>From:</h5>
+                <p class="mute_text"><strong>Name:</strong> {{ invoice.vendor.vendor_name|default:"N/A" }}</p>
+                <p class="mute_text"><strong>Company:</strong> {{ invoice.vendor.vendor_company_name|default:"N/A" }}</p>
+                <p class="mute_text"><strong>Address:</strong> {{ invoice.vendor.vendor_address|default:"N/A" }}</p>
+                <p class="mute_text"><strong>Phone:</strong> {{ invoice.vendor.vendor_phone_number|default:"N/A" }}</p>
+                <p class="mute_text"><strong>Email:</strong> {{ invoice.vendor.vendor_email|default:"N/A" }}</p>
+            </div>
+
+            <div class="to_details">
+                <h5>Ship To:</h5>
+                <p class="mute_text"><strong>Name:</strong> {{ admin_profile.admin_name|default:invoice.admin_registration_id.admin_username|default:"N/A" }}</p>
+                <p class="mute_text"><strong>Company:</strong> {{ admin_profile.admin_company_name|default:"N/A" }}</p>
+                <p class="mute_text"><strong>Address:</strong> {{ admin_contact.admin_contactus_address|default:"N/A" }}</p>
+                <p class="mute_text"><strong>Phone:</strong> {{ admin_contact.admin_contactus_phonenumber|default:"N/A" }}</p>
+                <p class="mute_text"><strong>Email:</strong> {{ admin_contact.admin_contactus_email|default:invoice.admin_registration_id.admin_email|default:"N/A" }}</p>
+            </div>
+        </div>
+        <h6>Purchase Items</h6>
+        <div class="table_container">
+            <table class="table_details">
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Product</th>
+                        <th>MRP</th>
+                        <th>Purchase Price</th>
+                        <th>Quantity<sub>pcs</sub></th>
+                        <th>CGST (%)</th>
+                        <th>SGST (%)</th>
+                        <th>Total Amount</th>
+                        <th>Total with GST</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in invoice.purchase_ref.items.all %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ item.product.product_title }}</td>
+                            <td>Rs. {{ item.mrp|default:"0.00" }}</td>
+                            <td>Rs. {{ item.purchase_price|default:"0.00" }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>{{ item.cgst|default:"0.00" }}</td>
+                            <td>{{ item.sgst|default:"0.00" }}</td>
+                            <td>Rs. {{ item.total_amount|default:"0.00" }}</td>
+                            <td>Rs. {{ item.total_amount_with_gst|default:"0.00" }}</td>
+                            <td>
+                                {% if item.purchase_item_status %}
+                                    <span class="status_badge  status_badge_success">Success</span>
+                                {% else %}
+                                    <span class="status_badge status_badge_danger">Pending</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="10" class="centering_text">No items found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr class="table-footer">
+                        <td colspan="4" class="rightside_text"><strong>Totals:</strong></td>
+                        <td>{{ totals.total_quantity|default:"0.00" }}</td>
+                        <td>{{ totals.total_cgst|default:"0.00" }}</td>
+                        <td>{{ totals.total_sgst|default:"0.00" }}</td>
+                        <td>Rs. {{ totals.total_amount|default:"0.00" }}</td>
+                        <td>Rs. {{ totals.total_amount_with_gst|default:"0.00" }}</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="table_container">
+            <table class="table_details">
+                <thead>
+                    <tr>
+                        <th>Grand Total</th>
+                        <th>Advance Amount</th>
+                        <th>Pending Amount</th>
+                        <th>Mode Of Payment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Rs. {{ invoice.grand_total|default:"0.00" }}</td>
+                        <td>Rs. {{ invoice.advance_amount|default:"0.00" }}</td>
+                        <td> Rs. {{ invoice.pending_amount|default:"0.00" }}</td>
+                        <td>{{ invoice.purchase_ref.payment_type.payment_type }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        {% if invoice.purchase_ref.payment_type.payment_type.lower == 'cash' %}
+            <p><strong>Cash Amount:</strong> Rs. {{ invoice.purchase_ref.cash_amount|default:"0.00" }}</p>
+        {% elif invoice.purchase_ref.payment_type.payment_type.lower == 'upi' %}
+            <p><strong>UPI ID:</strong> {{ invoice.purchase_ref.upi_id|default:"N/A" }}</p>
+            <p><strong>UPI Transaction ID:</strong> {{ invoice.purchase_ref.upi_transaction_id|default:"N/A" }}</p>
+        {% elif invoice.purchase_ref.payment_type.payment_type.lower == 'upi_cash' %}
+            <p><strong>UPI Cash Amount:</strong> Rs. {{ invoice.purchase_ref.upi_cash_amount|default:"0.00" }}</p>
+            <p><strong>UPI Amount:</strong> Rs. {{ invoice.purchase_ref.upi_amount|default:"0.00" }}</p>
+            <p><strong>UPI Cash Transaction ID:</strong> {{ invoice.purchase_ref.upi_cash_transaction_id|default:"N/A" }}</p>
+        {% elif invoice.purchase_ref.payment_type.payment_type.lower == 'net_banking' %}
+            <p><strong>Account Type:</strong> {{ invoice.purchase_ref.account_type|default:"N/A" }}</p>
+            <p><strong>Bank Name:</strong> {{ invoice.purchase_ref.bank_name|default:"N/A" }}</p>
+            <p><strong>Account Number:</strong> {{ invoice.purchase_ref.account_number|default:"N/A" }}</p>
+            <p><strong>Netbanking令 Transaction ID:</strong> {{ invoice.purchase_ref.netbanking_transaction_id|default:"N/A" }}</p>
+        {% elif invoice.purchase_ref.payment_type.payment_type.lower == 'cheque' %}
+            <p><strong>Cheque Number:</strong> {{ invoice.purchase_ref.cheque_number|default:"N/A" }}</p>
+        {% endif %}
+
+        <div class="thanking_message">
+            <div class="thanking_message_block">
+                <p class="centering_text mute_text">Total Due amount for this purchase : <strong>Rs. {{ invoice.pending_amount|default:"0.00" }}</strong></p>
+            </div>
+            <div class="thanking_message_block">
+                <h5 class="centering_text">Thank you for the purchases !</h5>
+            </div>
+            <div class="thanking_message_block_print_button centering_text">
+                <a class="button" href="{% url 'generate_invoice_pdf' invoice.invoice_id %}">Print</a>
+            </div>
+        </div>
+
+<!--<div class="container">-->
+<!--    <div class="company_details d-flex justify-content-between align-items-center mb-4">-->
+<!--        &lt;!&ndash; Company Logo (Left) &ndash;&gt;-->
+<!--        <div class="company_logo">-->
+<!--            <img src="{{ invoice.vendor.vendor_company_logo.url }}" alt="company_logo" style="height: 50px; width: 50px;">-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Company Name (Center) &ndash;&gt;-->
+<!--        <div class="text-center">-->
+<!--            <h2 class="mb-0">{{ invoice.vendor.vendor_company_name }}</h2>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Invoice ID and Date (Right) &ndash;&gt;-->
+<!--        <div class="text-end">-->
+<!--            <small class="text-muted d-block"><strong>Invoice:</strong> {{ invoice.invoice_id }}</small>-->
+<!--            <small class="d-block"><strong>Date:</strong> {{ invoice.purchase_ref.created_at|date:"d M, Y" }}</small>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    <div class="row ">-->
+<!--        <div class="col-lg-4">-->
+<!--            <h5>To:</h5>-->
+<!--            <p class="text-muted m-0"><strong>Name:</strong> {{ admin_profile.admin_name|default:invoice.admin_registration_id.admin_username|default:"N/A" }}</p>-->
+<!--            <p class="text-muted m-0"><strong>Company:</strong> {{ admin_profile.admin_company_name|default:"N/A" }}</p>-->
+<!--            <p class="text-muted m-0"><strong>Address:</strong> {{ admin_contact.admin_contactus_address|default:"N/A" }}</p>-->
+<!--            <p class="text-muted m-0"><strong>Phone:</strong> {{ admin_profile.admin_phone|default:"N/A" }}</p>-->
+<!--            <p class="text-muted m-0"><strong>Email:</strong> {{ admin_contact.admin_contactus_email|default:invoice.admin_registration_id.admin_email|default:"N/A" }}</p>-->
+<!--        </div>-->
+<!--        <div class="col-lg-4">-->
+
+<!--        </div>-->
+<!--        <div class="col-lg-4">-->
+<!--            <h5>Ship To:</h5>-->
+<!--            <p class="text-muted m-0"><strong>Name:</strong> {{ admin_profile.admin_name|default:invoice.admin_registration_id.admin_username|default:"N/A" }}</p>-->
+<!--            <p class="text-muted m-0"><strong>Company:</strong> {{ admin_profile.admin_company_name|default:"N/A" }}</p>-->
+<!--            <p class="text-muted m-0"><strong>Address:</strong> {{ admin_contact.admin_contactus_address|default:"N/A" }}</p>-->
+<!--            <p class="text-muted m-0"><strong>Phone:</strong> {{ admin_contact.admin_contactus_phonenumber|default:"N/A" }}</p>-->
+<!--            <p class="text-muted m-0"><strong>Email:</strong> {{ admin_contact.admin_contactus_email|default:invoice.admin_registration_id.admin_email|default:"N/A" }}</p>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    <div class="table-responsive">-->
+<!--        <table class="table table-bordered mt-4">-->
+<!--            <thead>-->
+<!--                <tr>-->
+<!--                    <th>Grand Total</th>-->
+<!--                    <th>Advance Amount</th>-->
+<!--                    <th>Pending Amount</th>-->
+<!--                    <th>Mode Of Payment</th>-->
+
+<!--                </tr>-->
+<!--            </thead>-->
+<!--            <tbody>-->
+
+<!--                    <tr>-->
+<!--                        <td>Rs. {{ invoice.grand_total|default:"0.00" }}</td>-->
+<!--                        <td>Rs. {{ invoice.advance_amount|default:"0.00" }}</td>-->
+<!--                        <td>Rs. {{ invoice.pending_amount|default:"0.00" }}</td>-->
+<!--                        <td>{{invoice.purchase_ref.payment_type.payment_type}}</td>-->
+<!--                    </tr>-->
+
+<!--            </tbody>-->
+<!--        </table>-->
+<!--    </div>-->
+<!--    {% if invoice.purchase_ref.payment_type.payment_type.lower == 'cash' %}-->
+<!--        <p><strong>Cash Amount:</strong> Rs. {{ invoice.purchase_ref.cash_amount|default:"0.00" }}</p>-->
+<!--    {% elif invoice.purchase_ref.payment_type.payment_type.lower == 'upi' %}-->
+<!--        <p><strong>UPI ID:</strong> {{ invoice.purchase_ref.upi_id|default:"N/A" }}</p>-->
+<!--        <p><strong>UPI Transaction ID:</strong> {{ invoice.purchase_ref.upi_transaction_id|default:"N/A" }}</p>-->
+<!--    {% elif invoice.purchase_ref.payment_type.payment_type.lower == 'upi_cash' %}-->
+<!--        <p><strong>UPI Cash Amount:</strong> Rs. {{ invoice.purchase_ref.upi_cash_amount|default:"0.00" }}</p>-->
+<!--        <p><strong>UPI Amount:</strong> Rs. {{ invoice.purchase_ref.upi_amount|default:"0.00" }}</p>-->
+<!--        <p><strong>UPI Cash Transaction ID:</strong> {{ invoice.purchase_ref.upi_cash_transaction_id|default:"N/A" }}</p>-->
+<!--    {% elif invoice.purchase_ref.payment_type.payment_type.lower == 'net_banking' %}-->
+<!--        <p><strong>Account Type:</strong> {{ invoice.purchase_ref.account_type|default:"N/A" }}</p>-->
+<!--        <p><strong>Bank Name:</strong> {{ invoice.purchase_ref.bank_name|default:"N/A" }}</p>-->
+<!--        <p><strong>Account Number:</strong> {{ invoice.purchase_ref.account_number|default:"N/A" }}</p>-->
+<!--        <p><strong>Netbanking Transaction ID:</strong> {{ invoice.purchase_ref.netbanking_transaction_id|default:"N/A" }}</p>-->
+<!--    {% elif invoice.purchase_ref.payment_type.payment_type.lower == 'cheque' %}-->
+<!--        <p><strong>Cheque Number:</strong> {{ invoice.purchase_ref.cheque_number|default:"N/A" }}</p>-->
+<!--    {% endif %}-->
+<!--    <h6 class="mt-4">Purchase Items</h6>-->
+<!--    <div class="table-responsive">-->
+<!--        <table class="table table-bordered">-->
+<!--            <thead>-->
+<!--                <tr>-->
+<!--                    <th>S.No</th>-->
+<!--                    <th>Product</th>-->
+
+<!--                    <th>MRP</th>-->
+<!--                    <th>Purchase Price</th>-->
+<!--                    <th>Quantity<sub>pcs</sub></th>-->
+<!--                    <th>CGST (%)</th>-->
+<!--                    <th>SGST (%)</th>-->
+<!--                    <th>Total Amount</th>-->
+<!--                    <th>Total with GST</th>-->
+<!--                    <th>Status</th>-->
+<!--                </tr>-->
+<!--            </thead>-->
+<!--            <tbody>-->
+<!--                {% for item in invoice.purchase_ref.items.all %}-->
+<!--                    <tr>-->
+<!--                        <td>{{ forloop.counter }}</td>-->
+<!--                        <td>{{ item.product.product_title }}</td>-->
+
+<!--                        <td>Rs. {{ item.mrp|default:"0.00" }}</td>-->
+<!--                        <td>Rs. {{ item.purchase_price|default:"0.00" }}</td>-->
+<!--                        <td>{{ item.quantity }}</td>-->
+<!--                        <td>{{ item.cgst|default:"0.00" }}</td>-->
+<!--                        <td>{{ item.sgst|default:"0.00" }}</td>-->
+<!--                        <td>Rs. {{ item.total_amount|default:"0.00" }}</td>-->
+<!--                        <td>Rs. {{ item.total_amount_with_gst|default:"0.00" }}</td>-->
+<!--                        <td>-->
+<!--                            {% if item.purchase_item_status %}-->
+<!--                                <span class="badge bg-success">Success</span>-->
+<!--                            {% else %}-->
+<!--                                <span class="badge bg-danger">Pending</span>-->
+<!--                            {% endif %}-->
+<!--                        </td>-->
+<!--                    </tr>-->
+<!--                {% empty %}-->
+<!--                    <tr>-->
+<!--                        <td colspan="10" class="text-center">No items found.</td>-->
+<!--                    </tr>-->
+<!--                {% endfor %}-->
+<!--            </tbody>-->
+<!--            <tfoot>-->
+<!--                <tr class="table-footer">-->
+<!--                    <td colspan="4" class="text-end"><strong>Totals:</strong></td>-->
+<!--                    <td>{{ totals.total_quantity|default:"0.00" }}<sub>pcs</sub></td>-->
+<!--                    <td>Rs. {{ totals.total_cgst|default:"0.00" }}</td>-->
+<!--                    <td>Rs. {{ totals.total_sgst|default:"0.00" }}</td>-->
+<!--                    <td>Rs. {{ totals.total_amount|default:"0.00" }}</td>-->
+<!--                    <td>Rs. {{ totals.total_amount_with_gst|default:"0.00" }}</td>-->
+<!--                    <td></td>-->
+<!--                </tr>-->
+<!--            </tfoot>-->
+<!--        </table>-->
+<!--    </div>-->
+<!--    <div class="row">-->
+<!--        <div class="col-lg-12">-->
+<!--            <p class="text-center text-muted">Total Due amount for this purchase : <strong>Rs. {{ invoice.pending_amount|default:"0.00" }}</strong></p>-->
+<!--        </div>-->
+<!--        <div class="col-lg-12">-->
+<!--            <h5 class="text-center fs-5">Thank you for the purchases !</h5>-->
+<!--        </div>-->
+<!--        <div class="col-lg-12 text-end">-->
+<!--            <button class="btn btn-primary btn-sm mt-3">Download</button>-->
+<!--        </div>-->
+<!--    </div>-->
+
+
+<!--</div>-->
+
+

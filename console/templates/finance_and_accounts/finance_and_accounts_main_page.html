@@ -1,0 +1,151 @@
+{% extends 'console_base/base.html' %}
+
+{% block content %}
+<!--alert starts here-->
+{% include 'alertcomponents/alertcomponent.html' %}
+<!--alert ends here-->
+
+{% include 'base_assets/base_css.html' %}
+
+<!-- breadcrum starts here -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="{% url 'financeAndAccountsShow' %}">Finance & Accounts</a></li>
+                </ol>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!--breadcrum ends here-->
+
+<!-- purchases start here -->
+<div class="row">
+    <div class="col-6">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                      <div class="col-6">
+                          <h1 class="fs-4">Purchases</h1>
+                           <!-- Button trigger modal -->
+<!--                              <a href="{% url 'purchaseManagement' %}" class="btn text-white" style="background-color:#405189;" >-->
+<!--                                <i class="bx bx-plus-circle"></i> Add Purchases-->
+<!--                              </a>-->
+
+
+
+
+<!--                              <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importModal"><i class="bx bxs-file-import"></i> Import</button>-->
+<!--                              &lt;!&ndash; Buttons with Label &ndash;&gt;-->
+<!--                              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exportModal"><i class=" bx bxs-file-export"></i> Export</button>-->
+                      </div>
+                      <div class="col-1"></div>
+                      <div class="col-5">
+                          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="query" hx-get="{% url 'purchaseRenderData' %}" hx-trigger="input changed delay:500ms, query" hx-swap="innerHTML" hx-target="#purchasesTableBodyContainer">
+                      </div>
+                </div>
+            </div>
+            <div class="card-body">
+            <!--card body starts here-->
+                <div class="table-responsive">
+                      <table class="table border">
+                          <thead style="background-color:#405189;">
+                                <tr>
+                                    <th class="text-white text-nowrap">S.No</th>
+                                    <th class="text-white text-nowrap">Invoice ID</th>
+                                    <th class="text-white text-nowrap">Vendor</th>
+                                    <th class="text-white text-nowrap">No. of Products</th>
+                                    <th class="text-white text-nowrap">Total Quantity</th>
+                                    <th class="text-white text-nowrap">Grand Total</th>
+                                    <th class="text-white text-nowrap">Total GST</th>
+                                    <th class="text-white text-nowrap">Advance Amount</th>
+                                    <th class="text-white text-nowrap">Pending Amount</th>
+<!--                                    <th>Credit Amount</th>-->
+                                    <th class="text-white text-nowrap">Created On</th>
+                                    <th class="text-white text-nowrap">Purchase Status</th>
+                                    <th class="text-white text-nowrap" style="text-align:center;">Action</th>
+                                </tr>
+                          </thead>
+                          <tbody
+                                  hx-get="{% url 'purchaseRenderData' %}"
+                                  hx-swap="innerHTML"
+                                  hx-target="this"
+                                  hx-trigger="revealed once"
+                                  id="purchasesTableBodyContainer">
+
+                          </tbody>
+                      </table>
+                    </div>
+                <div class="d-flex justify-content-center" id="pagination_div">
+
+                </div>
+                <!--card body ends here-->
+
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-6">
+                        <h1 class="fs-4">Orders</h1>
+                    </div>
+
+                    <div class="col-6">
+                        <input type="text" class="form-control" name="text_query" placeholder="Search by Order ID, Customer, or Products"
+                               value="{{ text_query|default:'' }}"
+                               hx-get="{% url 'myOrderViewRenderData' %}"
+                               hx-target="#my_orders_table_container_block"
+                               hx-swap="innerHTML"
+                               hx-trigger="keyup changed delay:500ms"
+                               hx-include="[name='search_query'],[name='text_query']">
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered ">
+                                <thead style="background-color:#405189;">
+                                    <tr>
+                                        <th class="text-white text-nowrap">S.No</th>
+                                        <th class="text-white text-nowrap">Order ID</th>
+                                        <th class="text-white text-nowrap">Products</th>
+                                        <th class="text-white text-nowrap">Customer</th>
+                                        <th class="text-white text-nowrap">Amount</th>
+                                        <th class="text-white text-nowrap">Order Date</th>
+                                        <th class="text-white text-nowrap">Order Status</th>
+                                        <th class="text-white text-nowrap">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="my_orders_table_container_block"
+                                       hx-get="{% url 'myOrderViewRenderData' %}"
+                                       hx-trigger="revealed once"
+                                       hx-target="this"
+                                       hx-swap="innerHTML"
+                                >
+
+                                </tbody>
+                            </table>
+                            <div class="d-flex justify-content-center" id="pagination_div">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- purchases ends here -->
+
+
+{% include 'base_assets/base_js.html' %}
+
+{% endblock %}

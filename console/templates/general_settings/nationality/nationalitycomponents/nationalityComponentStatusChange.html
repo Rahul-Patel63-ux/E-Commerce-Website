@@ -1,0 +1,23 @@
+{% load static %}
+
+{% if status_page == 'nationality_page' %}
+        <td class="border-light" id="nationality_status_td{{nationality.id}}">
+            {% if nationality.nationality_status %}
+            <span class="badge bg-success">
+              <a href="#" hx-post="{% url 'nationalityStatusChange' nationality.id %}"
+                  hx-target="#nationality_status_td{{nationality.id}}"
+                  hx-trigger="click once"
+                  hx-swap="innerHTML"
+                  hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Active</a>
+            </span>
+            {% else %}
+            <span class="badge bg-danger">
+              <a href="#" hx-post="{% url 'nationalityStatusChange' nationality.id %}"
+                  hx-target="#nationality_status_td{{nationality.id}}"
+                  hx-trigger="click once"
+                  hx-swap="innerHTML"
+                  hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="text-white">Deactive</a>
+            </span>
+            {% endif %}
+        </td>
+{% endif %}

@@ -1,0 +1,99 @@
+{% load static %}
+
+<form action="{% url 'updateServices' s.id %}" method="post" enctype="multipart/form-data" class="update_services" id="update_services">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+            <label for="uservice_title" class="form-label">Service Title <span style="color:red;">*</span></label>
+            <input type="text" id="uservice_title" class="form-control" name="uservice_title" value="{{ s.service_title }}" placeholder="Ex: Web Development">
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+            <label for="ucontent" class="form-label">Content <span style="color:red;">*</span></label>
+            <textarea id="ucontent" class="form-control" name="ucontent" placeholder="Enter service description" rows="4">{{ s.content }}</textarea>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+            <label for="uimage" class="form-label">Service Image</label>
+            <input type="file" id="uimage" class="form-control" name="uimage" accept="image/*">
+            {% if s.image %}
+                <img src="{{ s.image.url }}" alt="{{ s.service_title }}" style="max-width: 100px; max-height: 50px; margin-top: 10px;">
+            {% else %}
+                <p>No Image</p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" id="editServicesFormSubmit" class="btn text-white" style="background-color:#405189;">Save</button>
+        <button type="button" class="btn bg-light" data-bs-dismiss="modal">Close</button>
+    </div>
+</form>
+
+<!-- base assets js file -->
+{% include 'base_assets/base_js.html' %}
+
+<!-- Script starts here -->
+<script>
+$(document).ready(function() {
+    console.log('hello');
+
+    function capitalizeFirstLetter(str) {
+        if (str.length > 0) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+        return str;
+    }
+
+    $.validator.addMethod("capitalizeFirstLetter", function(value, element) {
+        $(element).val(capitalizeFirstLetter(value));
+        return true;
+    }, "");
+
+    $.validator.addMethod("letterStartNoLeadingSpace", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z][a-zA-Z0-9 ]*$/.test(value);
+    }, "Please start with a letter and use only letters, numbers, and spaces.");
+
+    $.validator.addMethod("fileExtension", function(value, element) {
+        return this.optional(element) || /\.(jpg|jpeg|png|gif)$/i.test(value);
+    }, "Please upload an image file (jpg, jpeg, png, gif).");
+
+    $('#update_services').validate({
+        rules: {
+            uservice_title: {
+                required: true,
+                minlength: 3,
+                maxlength: 200,
+                capitalizeFirstLetter: true,
+                letterStartNoLeadingSpace: true
+            },
+            ucontent: {
+                required: true,
+                minlength: 10,
+                maxlength: 500
+            },
+            uimage: {
+                fileExtension: true
+            }
+        },
+        messages: {
+            uservice_title: {
+                required: "Please enter a service title.",
+                minlength: "Title should be at least 3 characters.",
+                maxlength: "Title should not exceed 200 characters."
+            },
+            ucontent: {
+                required: "Please enter service content.",
+                minlength: "Content should be at least 10 characters.",
+                maxlength: "Content should not exceed 500 characters."
+            },
+            uimage: {
+                fileExtension: "Please upload a valid image file (jpg, jpeg, png, gif)."
+            }
+        },
+        submitHandler: function(form) {
+            console.log("Form is valid.");
+            $('#editServicesFormSubmit').prop('disabled', true);
+            form.submit();
+        }
+    });
+});
+</script>
+<!-- Script ends here -->

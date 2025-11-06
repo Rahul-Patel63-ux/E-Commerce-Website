@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en" data-layout="vertical" data-sidebar="dark" data-sidebar-image="img-1" data-sidebar-size="lg" data-preloader="disable" data-theme="default" data-topbar="light" data-bs-theme="light" data-theme-color="0">
+
+
+<head>
+    {% load static %}
+
+        <meta charset="utf-8">
+        <title>E-Commerce | {% block title %}{% endblock %}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta content="" name="description">
+        <meta content="" name="author">
+        <!-- App favicon -->
+        <link rel="shortcut icon" href="{% static 'assets/images/favicon.ico' %}">
+        <!-- base css assets -->
+       {% include 'base_assets/base_css.html' %}
+       <!-- custom css -->
+        {% block style %}
+        {% endblock %}
+        <!-- custom css end here -->
+
+
+</head>
+
+<body>
+
+{% block content %}
+
+
+
+    <section class="auth-page-wrapper p-2 p-lg-4 position-relative d-flex align-items-center justify-content-center min-vh-100">
+        <div class="card mb-0 w-100 p-3 p-lg-2" style="background-image: url({% static 'assets/images/auth/auth.jpg' %});background-size: cover;background-position: center;">
+            <div class="effect-one"></div>
+            <div class="row g-0 align-items-center">
+                <div class="col-xxl-8 order-last order-xl-first">
+                    <div class="card auth-card border-0 shadow-none mb-0 bg-transparent">
+                        <div class="card-body p-4 p-xl-5 d-flex justify-content-between flex-column h-100">
+
+<!--                            <div class="text-center mt-auto">-->
+<!--                                <p class="mb-0 mt-3 text-white">-->
+<!--                                    &copy;-->
+<!--                                    <script>document.write(new Date().getFullYear())</script> Dosix. Crafted with <i class="mdi mdi-heart text-danger"></i> by Themesbrand-->
+<!--                                </p>-->
+<!--                            </div>-->
+                        </div>
+                    </div>
+                </div>
+                <!--end col-->
+                <div class="col-xxl-4 mx-auto">
+                    <div class="card shadow-lg border-none m-lg-5">
+                        <div class="card-body">
+                            <div class="text-center mt-4">
+                                <div class="mb-4 pb-2">
+                                    <a href="" class="auth-logo">
+                                        <img src="{% static 'assets/images/logo-dark.png' %}" alt="" height="30" class="auth-logo-dark mx-auto">
+                                        <img src="{% static 'assets/images/logo-light.png' %}" alt="" height="30" class="auth-logo-light mx-auto">
+                                    </a>
+                                </div>
+                                <h5 class="fs-3xl">Sign up</h5>
+
+                            </div>
+<!--                            {% if messages %}-->
+<!--                                <div class="row">-->
+<!--                                    <div class="col-12">-->
+<!--                                        {% for message in messages %}-->
+<!--                                            <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show" role="alert">-->
+<!--                                                {{ message }}-->
+<!--                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>-->
+<!--                                            </div>-->
+<!--                                        {% endfor %}-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            {% endif %}-->
+<!--                            {% if error %}-->
+<!--                                <div class="row">-->
+<!--                                    <div class="col-12">-->
+<!--                                        <div class="alert alert-danger alert-dismissible fade show" role="alert">-->
+<!--                                            {{ error }}-->
+<!--                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            {% endif %}-->
+                            <!--alert starts here-->
+                            {% include 'alertcomponents/alertcomponent.html' %}
+                            <!--alert ends here-->
+                            <div class="p-2 mt-4">
+                                <form id="sign_up_form" action="{% url 'signUp' %}" method="post">
+                                    {% csrf_token %}
+
+                                    <div class="mb-3">
+                                        <label for="useremail" class="form-label">Email <span class="text-danger">*</span></label>
+                                        <input type="email" class="form-control" id="useremail" name="useremail" placeholder="Enter email address" >
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="username" class="form-label">Username <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control " id="username" name="username" placeholder="Enter username" >
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label" for="password-input">Password <span class="text-danger">*</span></label>
+                                        <div class="position-relative auth-pass-inputgroup">
+                                            <input type="password" class="form-control password-input pe-5" onpaste="return false" placeholder="Enter password" id="password-input" name="password_input">
+                                            <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted password-addon" type="button" id="password-addon"><i class="ri-eye-fill align-middle"></i></button>
+                                        </div>
+                                    </div>
+
+
+
+
+<!--pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"-->
+                                    <div class="mb-3">
+                                        <label class="form-label" for="confirm-password-input">Confirm Password <span class="text-danger">*</span></label>
+                                        <div class="position-relative auth-pass-inputgroup">
+                                            <input type="password" class="form-control password-input pe-5" onpaste="return false" placeholder="Enter password" id="confirm-password-input" name="confirm_password_input" >
+                                            <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted password-addon" type="button" id="confirm-password-addon"><i class="ri-eye-fill align-middle"></i></button>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3 form-check">
+                                        <input type="checkbox" class="form-check-input" id="terms-checkbox" name="terms" required>
+                                        <label class="form-check-label" for="terms-checkbox">I agree to the <a href="#">Terms & Conditions</a> <span class="text-danger">*</span></label>
+                                    </div>
+
+
+
+                                    <div class="mt-4">
+                                        <button type="submit" class="btn btn-primary w-100" id="sign_up_button">Sign Up</button>
+                                    </div>
+
+
+                                </form>
+
+                                <div class="mt-5 text-center">
+                                    <p class="mb-0">Already have an account ? <a href="{% url 'sign-in' %}" class="fw-semibold text-primary text-decoration-underline"> Signin </a> </p>
+                                </div>
+                            </div>
+                        </div><!-- end card body -->
+                    </div><!-- end card -->
+                </div>
+                <!--end col-->
+            </div>
+            <!--end row-->
+        </div>
+    </section>
+
+    <!-- JAVASCRIPT -->
+    <script src="{% static 'assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/libs/simplebar/dist/simplebar.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugins.js' %}"></script>
+
+    <script src="{% static 'assets/js/pages/passowrd-create.init.js' %}"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}
+
+
+<!-- my custom js start here -->
+{% block scripts %}
+
+<!--jquery links -->
+<script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.21.0/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.21.0/additional-methods.min.js"></script>
+
+
+<script>
+        $(document).ready(function() {
+            // Custom validation method for username (alphanumeric, no special symbols)
+            $.validator.addMethod("usernameFormat", function(value, element) {
+                return this.optional(element) || /^[a-zA-Z0-9]+$/.test(value);
+            }, "Username must contain only letters and numbers, no special symbols.");
+
+            $.validator.addMethod("noSpaces", function(value, element) {
+                return this.optional(element) || !/\s/.test(value);
+            }, "Spaces not allowed");
+
+            // Custom validation method for password complexity
+            $.validator.addMethod("passwordComplexity", function(value, element) {
+                return this.optional(element) ||
+                    (value.length >= 8 &&
+                     /[a-z]/.test(value) &&
+                     /[A-Z]/.test(value) &&
+                     /[0-9]/.test(value) &&
+                     /[!@#$%^&*(),.?":{}|<>]/.test(value) &&
+                     !/\s/.test(value));
+            }, "Password must be at least 8 characters, include a lowercase letter, uppercase letter, number, and special symbol, with no spaces.");
+
+            // Initialize jQuery Validation
+            $("#sign_up_form").validate({
+                rules: {
+                    useremail: {
+                        required: true,
+                        email: true
+                    },
+                    username: {
+                        required: true,
+                        noSpaces: true,
+                        minlength: 3,
+                        usernameFormat: true
+                    },
+                    password_input: {
+                        required: true,
+                        passwordComplexity: true
+                    },
+                    confirm_password_input: {
+                        required: true,
+                        equalTo: "#password-input"
+                    },
+                    terms: {
+                        required: true
+                    }
+                },
+                messages: {
+                    useremail: {
+                        required: "Please enter your email address.",
+                        email: "Please enter valid email address."
+                    },
+                    username: {
+                        required: "Please enter username.",
+                        noSpaces :"Spaces not allowed.",
+                        minlength: "Username must be at least 3 characters long.",
+                        usernameFormat: "Username must contain only letters and numbers, no special symbols."
+                    },
+                    password_input: {
+                        required: "Please enter a password."
+                    },
+                    confirm_password_input: {
+                        required: "Please confirm your password.",
+                        equalTo: "Passwords do not match."
+                    },
+                    terms: {
+                        required: "You must agree to the Terms & Conditions."
+                    }
+                },
+                errorPlacement: function(error, element) {
+                    if (element.attr("name") == "terms") {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
+                },
+                submitHandler: function(form) {
+                    $(form).find('button[type="submit"]').prop('disabled', true);
+                    form.submit();
+                }
+            });
+        });
+    </script>
+
+{% endblock %}
+<!-- my custom js end here -->
+</body>
+
+</html>

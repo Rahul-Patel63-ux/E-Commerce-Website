@@ -1,0 +1,60 @@
+<form method="post" action="{% url 'update-gender' i.id %}" class="update_gender">
+    {% csrf_token %}
+    <div >
+        <div class="mb-3">
+            <label for="upgender" class="form-label">Gender <Span class="text-danger">*</Span></label>
+            <input type="text" class="form-control" name="upgender" value="{{i.gender | capfirst }}" id="upgender" placeholder="Ex- Male/Female">
+        </div>
+
+    </div>
+    <div class="modal-footer d-flex justify-content-center">
+        <button type="submit" id="submitBtn" class="btn btn-primary update-religion-btn">Save Changes</button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+    </div>
+</form>
+
+<script>
+    $(document).ready(function (){
+        
+        $.validator.addMethod("noSpace", function (value, element) {
+            return value.indexOf(" ") < 0;
+        }, "Spaces are not allowed");
+
+
+        $.validator.addMethod("noNumbers", function (value, element) {
+            return this.optional(element) || /^[^0-9]+$/.test(value);
+        }, "Numbers are not allowed");
+
+
+        $.validator.addMethod("noSpecialChars", function (value, element) {
+            return this.optional(element) || /^[A-Za-z0-9]+$/.test(value);
+        }, "Special characters are not allowed");
+
+        $('.update_gender').validate({
+            rules: {
+                upgender: {
+                    required: true,
+                    minlength: 2,
+                    maxlength: 8,
+                    noSpace: true,
+                    noSpecialChars: true,
+                    noNumbers: true
+                }
+            },
+            messages: {
+                upgender : {
+                    required: 'Please Enter Gender',
+                    minlength: 'Minimum 2 characters required',
+                    maxlength: 'Maximum 8 characters allowed',
+                    noSpace: "Spaces are not allowed",
+                    noSpecialChars: "Special Characters are not allowed",
+                    noNumbers: "Numbers are not allowed"
+                }
+            },
+            submitHandler: function (form) {
+                $('#submitBtn').prop("disabled", true);
+                form.submit();
+            }
+        });
+    });
+</script>

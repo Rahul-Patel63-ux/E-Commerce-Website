@@ -1,0 +1,788 @@
+{% extends "user_base/base.html" %}
+
+{% load static %}
+{% block content %}
+{% load humanize %}
+
+
+{% include 'alertToast/alerttoasters.html' %}
+
+
+<div class="container-fluid">
+
+    <!-- start page title -->
+    <div class="row pt-5">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+                        <li class="breadcrumb-item active">Shop Cart</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end page title -->
+     <!-- Cart Table rows -->
+    <div class="row justify-content-center">
+        <div class="col-xxl-12">
+            <div class="card shadow-lg">
+                <div class="row g-0 product-list">
+                    <div class="col-xxl-9">
+                        <div class="card-header d-flex align-items-center gap-2">
+                            <h5 class="card-title flex-grow-1 mb-0">Shopping Cart</h5>
+                            <div class="flex-shrink-0">
+                                <span class="badge bg-secondary-subtle text-secondary">{{ num }} Items</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table align-middle table-nowrap table-borderless mb-0">
+                                    <thead class="table-active table-primary">
+                                        <tr>
+                                            <th>Product Items</th>
+                                            <th>Item Price</th>
+                                            <th>Discount (%)</th>
+                                            <th class="text-center">Quantity</th>
+                                            <th class="text-start ps-3">Qty x Price</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if cart_products %}
+                                        {% for item in cart_products  %}
+                                        <tr class="product">
+                                            <td>
+                                                <div class="product-item d-flex align-items-center gap-3">
+                                                    <div class="avatar-md flex-shrink-0">
+                                                        <div class="avatar-title bg-light rounded">
+                                                            {% with item.product.images.all|first as img %}
+                                                                {% if img %}
+                                                            <img src="{{ img.image.url }}" alt="."
+                                                                class="avatar-md"
+                                                                style="object-fit: cover;">
+                                                            {% else %}
+                                                            <span class="text-dark">No Image</span>
+                                                            {% endif %}
+                                                            {% endwith %}
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <h6 class="fs-md mb-1"><a
+                                                                href="{% url 'each-product' item.product.id %}"
+                                                                class="text-reset">{{ item.product.product_title }}
+                                                                <!-- <span
+                                                                    class="ms-2 discount text-muted">({{ cpro.product.product_discount_percentage | floatformat:'-2' }}%)</span> -->
+                                                                </a>
+                                                        </h6>
+                                                        <p class="text-muted mb-2">{{ item.product.main_category_ref }}
+                                                            - {{ item.product.sub_category_ref | capfirst }}</p>
+                                                        <p class="mb-0"><span
+                                                                class="text-muted">Size:</span>{{ item.selected_size | upper }}
+                                                            <span class="text-muted">Color:</span>
+                                                            {{ item.product.product_color_ref | title }}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td><i class="bi bi-currency-rupee"></i><span
+                                                    class="price">{{ item.amount | floatformat:2 | intcomma  }}</span>
+                                            </td>
+                                            <td>
+                                                {% for inv in inventory_items %}
+                                                {% if inv.product_id == item.product_id %}
+                                                <span class="discount">{{ inv.discount_percent  }} %</span>
+                                                {% endif %}
+                                                {% endfor %}
+                                            </td>
+                                            <td class="text-center">
+                                                <form action="{% url 'cart' item.id %}" method="post">
+                                                    {% csrf_token %}
+                                                    <div class="input-step">
+                                                        <button type="submit" class="minus">–</button>
+                                                        <input type="number" class="quantity" name="qty"
+                                                            value="{{ item.quantity }}" min="1" max="100" readonly>
+                                                        <button type="submit" class="plus">+</button>
+                                                    </div>
+                                                </form>
+                                            </td>
+                                            <td class="fw-medium text-start" id="amount"><i
+                                                    class="bi bi-currency-rupee"></i><span
+                                                    class="line-price">{{ item.amount | floatformat:2  }}</span></td>
+                                            <td><button class="btn btn-md text-dark btn-icon" data-bs-toggle="modal"
+                                                    data-bs-target="#deleteConfirmModal-{{item.id}}" >
+                                                    <i class="ri-delete-bin-5-fill text-danger"></i>
+                                                </button></td>
+                                        </tr>
+                                        <!-- delete model start here -->
+                                        <div class="modal fade zoomIn" id="deleteConfirmModal-{{item.id}}" tabindex="-1"
+                                            aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered ">
+                                                <div class="modal-content">
+                                                    <div class="modal-header bg-danger pb-3">
+                                                        <h5 class="modal-title text-white" id="deletegenderModalLabel">
+                                                            Delete Product</h5>
+                                                        <button type="button" class="btn-close bg-white"
+                                                            data-bs-dismiss="modal" aria-label="Close"
+                                                            id="btn-close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="mt-2 text-center">
+                                                            <div class="mt-4 pt-2 fs-15 mx-4 mx-sm-5">
+                                                                <h4>Are you sure ?</h4>
+                                                                <p class="text-muted mx-4 mb-0">Are you sure you want to
+                                                                    remove this Product?</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="d-flex gap-2 justify-content-center mt-4 mb-2">
+                                                            <button type="button" class="btn w-sm btn-light"
+                                                                data-bs-dismiss="modal">Close</button>
+                                                            <!-- <button type="button" class="btn w-sm btn-danger " id="delete-record">Yes, Delete It!</button> -->
+                                                            <a href="{% url 'delete-product' %}?delid={{ item.id }}"
+                                                                class="btn w-sm btn-danger delete-productr-btn"
+                                                                id="delete-record">Yes,
+                                                                delete it!</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- delete model end here -->
+                                        {% endfor %}
+
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="5" class="text-center text-danger fs-5 fw-semibold">Product Not Added
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xxl-3">
+                        <div class="border-start-xxl border-top-xxl-0 border-top h-100">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Order Summary</h5>
+                            </div>
+                            <div class="card-body mt-2">
+                                <div class="table-card">
+                                    <div class="row ms-1 p-1">
+
+                                        <div class="row pt-3">
+                                            <div class="fw-semibold col-md-6" colspan="2">Total :</div>
+                                            <div class="fw-semibold col-md-6 container-fluid text-end cart-total"
+                                                name="total"></div>
+                                        </div>
+                                        <div class="row pt-3">
+                                            <div colspan="2" class="col-md-6">Discount :</div>
+                                            <div class="text-end col-md-6 container-fluid cart-discount"
+                                                name="discount">
+                                            </div>
+                                        </div>
+                                        <div class="row pt-3">
+                                            <div class="col-md-6" colspan="2">Sub Total:</div>
+                                            <div class="text-end col-md-6 container-fluid cart-subtotal"
+                                                name="subtotal">
+                                            </div>
+                                        </div>
+                                        <div class="row pt-3">
+                                            <div class="col-md-6" colspan="2">Estimated Tax (18%): </div>
+                                            <div class="text-end col-md-6 container-fluid cart-tax">
+                                            </div>
+                                        </div>
+                                        <div class="row pt-3">
+                                            <div class="col-md-6" colspan="2">Coupon code :</div>
+                                            <div class="text-end col-md-6 container-fluid">
+                                                <input type="text" id="coupon-code" name="coupon"
+                                                    hx-get="{% url 'validate-coupon' %}"
+                                                    hx-trigger="input changed delay:1000ms" placeholder="Ex. AB1234"
+                                                    hx-target="#coupon-response" hx-swap="none"
+                                                    class="form-control cart-coupon" />
+
+                                                <!-- <input type="hidden" name="coupon_code" id="coupon_code_hidden" value="No Coupon"> -->
+                                                <div id="coupon-response"></div>
+
+                                            </div>
+                                        </div>
+                                        <div class="row pt-3">
+                                            <div class="col-md-6 fw-semibold" colspan="2">Grand Total :</div>
+                                            <div class="text-end col-md-6 container-fluid" name="grandtotal">
+                                                <span class="fw-semibold cart-paying"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-end mt-4 d-flex flex-wrap gap-1 justify-content-end">
+                                    <a href="{% url 'dashboard' %}" class="btn btn-secondary">Continue Shopping</a>
+                                    {% if cart_products %}
+                                    <button class="btn btn-primary" data-bs-target="#orderConfirm"
+                                        data-bs-toggle="modal">Order</button>
+                                    {% else %}
+                                    <button class="btn btn-primary" data-bs-target="#orderConfirm"
+                                        data-bs-toggle="modal" disabled>Order</button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup Modal for Order place confirmation -->
+    <div class="modal fade" id="orderConfirm">
+        <div class="modal-dialog modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <!-- Creating popup window Header start-->
+                <div class="modal-header pb-3 pt-2" style="background-color:#405189;">
+                    <h4 class="modal-title text-white">Order Confirmation</h4>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal"
+                        style="background-color: white;" type="button"></button>
+                </div>
+                <!-- Creating Popup window Header Ends -->
+
+                <!-- Creating Fields for the popup window starts here-->
+                <form id="orderForm" action="{% url 'generate-order' %}" method="post">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="inputField">
+                            <div class="mt-2 text-center">
+                                <div class="mt-4 pt-2 fs-15 mx-4 mx-sm-5">
+                                    <h4>Are you sure ?</h4>
+                                    <p class="text-muted">You are Confirming this Order with amount <span
+                                            class="cart-paying fw-semibold text-dark"></span> ?</p>
+                                </div>
+                            </div>
+                            <hr>
+                            <h5 class="text-secondary">Enter Delivery Address:</h5>
+                            <div class="row mt-4">
+                                <div class="col-md-6 col-sm-6 fs-10">
+                                    <label for="country" class="form-label">Country <span style="color:red">*</span></label>
+                                    <select name="country" class="form-select country">
+                                        <option value="" class="text-muted">Select Country</option>
+                                        {% for country in countries %}
+                                            <option value="{{country.id}}">{{country.country_name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6 col-sm-6 fs-10">
+                                    <label for="state" class="form-label">State <span style="color:red">*</span></label>
+                                    <select name="state" class="form-select state">
+                                        <option value="" class="text-muted">Select State</option>
+                                        {% for state in states %}
+                                            <option value="{{state.id}}">{{state.state_name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-md-6 col-sm-6 fs-10">
+                                    <label for="city" class="form-label">City <span style="color:red">*</span></label>
+                                    <select name="city" class="form-select city">
+                                        <option value="" class="text-muted">Select City</option>
+                                        {% for city in cities %}
+                                            <option value="{{city.id}}">{{city.city_name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6 col-sm-6 fs-10">
+                                    <label for="area" class="form-label">Area <span style="color:red">*</span></label>
+                                    <select name="area" class="form-select area">
+                                        <option value="" class="text-muted">Select Area</option>
+                                        {% for a in area %}
+                                            <option value="{{a.id}}">{{a.area_name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-12 col-sm-12">
+                                    <label for="address">Address <span style="color:red">*</span></label>
+                                    <textarea id="address" class="form-control mt-1" name="address"
+                                        placeholder="Ex. 24/60 First Floor Bapu Nagar - 500038"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Creating Fields for the popup window ends here -->
+
+                    <!-- Creating Buttons starts Here -->
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-outline-secondary">Confirm</button>
+                        <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal"
+                            aria-lable="close">Close</button>
+                    </div>
+                </form>
+                <!-- Creating Buttons Ends Here -->
+            </div>
+        </div>
+    </div>
+    <!-- Popup end here for order confirmation -->
+
+
+</div>
+<!-- container-fluid -->
+
+
+
+<!--<script>-->
+
+<!--    $(document).ready(function () {-->
+<!--        let couponDiscount = 0;-->
+<!--        let minimumPurchase = 0;-->
+<!--        let paying = 0;-->
+
+<!--        function updateSummary() {-->
+<!--            let total = 0;-->
+<!--            let discount = 0;-->
+
+<!--            $('.product').each(function () {-->
+<!--                let discount_percent = parseFloat($(this).find('.discount').text().replace(/[^\d.]/g, '')) || 0;-->
+<!--                let unitPrice = parseFloat($(this).find('.price').text().replace(/,/g, '')) || 0;-->
+<!--                let quantity = parseInt($(this).find('.quantity').val()) || 0;-->
+
+<!--                let discount_amount = (quantity * (unitPrice * discount_percent) / 100);-->
+<!--                let lineTotal = (unitPrice - (unitPrice * discount_percent) / 100) * quantity;-->
+
+<!--                discount += discount_amount;-->
+<!--                $(this).find('.line-price').text(lineTotal.toFixed(2));-->
+<!--                total += unitPrice * quantity;-->
+<!--            });-->
+
+<!--            let subtotal = total - discount;-->
+<!--            let tax = subtotal * 0.18;-->
+<!--            paying = (subtotal + tax);-->
+
+<!--            if (couponDiscount > 0 && total >= minimumPurchase) {-->
+<!--                paying = paying - (paying * couponDiscount) / 100;-->
+<!--                alert('Coupon applied: ' + couponDiscount + '% off on ₹' + minimumPurchase + '+ purchases.');-->
+<!--            } else if (minimumPurchase > 0 && total < minimumPurchase) {-->
+<!--                alert("Coupon will be applicable only on ₹" + minimumPurchase + '+ purchases.');-->
+<!--            }-->
+
+<!--            $('.cart-total').html('<i class="bi bi-currency-rupee"></i>' + total.toFixed(2));-->
+<!--            $('.cart-discount').html('- <i class="bi bi-currency-rupee"></i>' + discount.toFixed(2));-->
+<!--            $('.cart-subtotal').html('<i class="bi bi-currency-rupee"></i>' + subtotal.toFixed(2));-->
+<!--            $('.cart-tax').html('<i class="bi bi-currency-rupee"></i>' + tax.toFixed(2));-->
+<!--            $('.cart-paying').html('<i class="bi bi-currency-rupee"></i>' + paying.toFixed(2));-->
+<!--        }-->
+
+<!--        $('.plus').click(function () {-->
+<!--            let input = $(this).siblings('.quantity');-->
+<!--            let qty = parseInt(input.val()) || 0;-->
+<!--            if (qty < 100) {-->
+<!--                qty++;-->
+<!--                input.val(qty);-->
+<!--            }-->
+<!--            updateSummary();-->
+<!--        });-->
+
+<!--        $('.minus').click(function () {-->
+<!--            let input = $(this).siblings('.quantity');-->
+<!--            let qty = parseInt(input.val()) || 0;-->
+<!--            if (qty > 1) {-->
+<!--                qty&#45;&#45;;-->
+<!--                input.val(qty);-->
+<!--            }-->
+<!--            updateSummary();-->
+<!--        });-->
+
+<!--        document.getElementById('coupon-code').addEventListener('htmx:afterRequest', function (event) {-->
+<!--            try {-->
+<!--                let response = JSON.parse(event.detail.xhr.responseText);-->
+<!--                if (response.valid) {-->
+<!--                    couponDiscount = response.discount_per;-->
+<!--                    minimumPurchase = response.min_purchase;-->
+<!--                } else {-->
+<!--                    couponDiscount = 0;-->
+<!--                    minimumPurchase = 0;-->
+<!--                    alert('Invalid coupon code.');-->
+<!--                }-->
+<!--                updateSummary();-->
+<!--            } catch (e) {-->
+<!--                console.error("Invalid JSON or error parsing coupon response:", e);-->
+<!--            }-->
+<!--        });-->
+
+<!--        updateSummary();-->
+
+<!--        $.validator.addMethod("noSpace", function(value, element) {-->
+<!--            return this.optional(element) || (value.trim().length === value.length);-->
+<!--        }, "Spaces are not allowed");-->
+
+<!--        $.validator.addMethod("noNumbers", function(value, element) {-->
+<!--            return this.optional(element) || /^[^0-9]+$/.test(value);-->
+<!--        }, "Numbers are not allowed");-->
+
+<!--        $.validator.addMethod("noSpecialChars", function(value, element) {-->
+<!--            return this.optional(element) || /^[a-zA-Z0-9 ]+$/.test(value);-->
+<!--        }, "Special Characters are not allowed");-->
+
+<!--        $('#orderForm').validate({-->
+<!--            rules: {-->
+<!--                country: { required: true },-->
+<!--                state: { required: true },-->
+<!--                city: { required: true },-->
+<!--                area: { required: true },-->
+<!--                address: {-->
+<!--                    required: true,-->
+<!--                    minlength: 3,-->
+<!--                    maxlength: 100,-->
+<!--                    noSpace: true-->
+<!--                }-->
+<!--            },-->
+<!--            messages: {-->
+<!--                country: { required: 'Please select country' },-->
+<!--                state: { required: 'Please select state' },-->
+<!--                city: { required: 'Please select city' },-->
+<!--                area: { required: 'Please select area' },-->
+<!--                address: {-->
+<!--                    required: 'Please enter address',-->
+<!--                    minlength: 'Minimum 3 characters required',-->
+<!--                    maxlength: 'Maximum 100 characters allowed',-->
+<!--                    noSpace: 'Spaces are not allowed'-->
+<!--                }-->
+<!--            },-->
+<!--            submitHandler: function(form) {-->
+<!--                form.submit();-->
+<!--            }-->
+<!--        });-->
+
+<!--        $('.country').change(function () {-->
+<!--            var countryId = $(this).val();-->
+<!--            if (countryId) {-->
+<!--                $.ajax({-->
+<!--                    url: "{% url 'get_states' %}",-->
+<!--                    data: { 'country_id': countryId },-->
+<!--                    dataType: 'json',-->
+<!--                    success: function(data) {-->
+<!--                        $('.state').empty();-->
+<!--                        $('.state').append('<option value="">Select State</option>');-->
+<!--                        $.each(data.states, function(index, state) {-->
+<!--                            $('.state').append(-->
+<!--                                $('<option>').val(state.id).text(state.state_name)-->
+<!--                            );-->
+<!--                        });-->
+<!--                        $('.city').empty();-->
+<!--                        $('.city').append('<option value="">Select City</option>');-->
+<!--                        $('.area').empty();-->
+<!--                        $('.area').append('<option value="">Select Area</option>');-->
+<!--                    }-->
+<!--                });-->
+<!--            } else {-->
+<!--                $('.state').empty();-->
+<!--                $('.state').append('<option value="">Select State</option>');-->
+<!--                $('.city').empty();-->
+<!--                $('.city').append('<option value="">Select City</option>');-->
+<!--                $('.area').empty();-->
+<!--                $('.area').append('<option value="">Select Area</option>');-->
+<!--            }-->
+<!--        });-->
+
+<!--        $('.state').change(function () {-->
+<!--            var stateId = $(this).val();-->
+<!--            if (stateId) {-->
+<!--                $.ajax({-->
+<!--                    url: "{% url 'get_cities' %}",-->
+<!--                    data: { 'state_id': stateId },-->
+<!--                    dataType: 'json',-->
+<!--                    success: function(data) {-->
+<!--                        $('.city').empty();-->
+<!--                        $('.city').append('<option value="">Select City</option>');-->
+<!--                        $.each(data.cities, function(index, city) {-->
+<!--                            $('.city').append(-->
+<!--                                $('<option>').val(city.id).text(city.city_name)-->
+<!--                            );-->
+<!--                        });-->
+<!--                        $('.area').empty();-->
+<!--                        $('.area').append('<option value="">Select Area</option>');-->
+<!--                    }-->
+<!--                });-->
+<!--            } else {-->
+<!--                $('.city').empty();-->
+<!--                $('.city').append('<option value="">Select City</option>');-->
+<!--                $('.area').empty();-->
+<!--                $('.area').append('<option value="">Select Area</option>');-->
+<!--            }-->
+<!--        });-->
+
+<!--        $('.city').change(function () {-->
+<!--            var cityId = $(this).val();-->
+<!--            if (cityId) {-->
+<!--                $.ajax({-->
+<!--                    url: "{% url 'get_areas' %}",-->
+<!--                    data: { 'city_id': cityId },-->
+<!--                    dataType: 'json',-->
+<!--                    success: function(data) {-->
+<!--                        $('.area').empty();-->
+<!--                        $('.area').append('<option value="">Select Area</option>');-->
+<!--                        $.each(data.areas, function(index, area) {-->
+<!--                            $('.area').append(-->
+<!--                                $('<option>').val(area.id).text(area.area_name)-->
+<!--                            );-->
+<!--                        });-->
+<!--                    }-->
+<!--                });-->
+<!--            } else {-->
+<!--                $('.area').empty();-->
+<!--                $('.area').append('<option value="">Select Area</option>');-->
+<!--            }-->
+<!--        });-->
+<!--    });-->
+<!--</script>-->
+
+
+
+<script>
+    $(document).ready(function () {
+        // calculation of all the prices + discounts
+        let couponDiscount = 0;
+        let minimumPurchase = 0;
+        let extraDiscount = 0;
+        let paying = 0
+
+        function updateSummary() {
+            let total = 0;
+            let discount = 0;
+
+            $('.product').each(function () {
+                let discount_percent = parseFloat($(this).find('.discount').text().replace(/[^\d.]/g, '')) || 0;
+                let unitPrice = parseFloat($(this).find('.price').text().replace(/,/g, '')) || 0;
+                let quantity = parseInt($(this).find('.quantity').val()) || 0;
+
+                discount += (quantity * (unitPrice * discount_percent) / 100);
+                let lineTotal = unitPrice * quantity;
+
+                $(this).find('.line-price').text(lineTotal.toFixed(2).toLocaleString("en-IN"));
+                total += lineTotal;
+            });
+
+
+            let subtotal = total - discount;
+            let tax = subtotal * 0.18;
+            paying = (subtotal + tax);
+
+            // Apply coupon discount only if minimumPurchase condition is met
+            if (couponDiscount > 0 && total >= minimumPurchase) {
+                paying = (paying - (paying * couponDiscount) / 100);
+                alert('Coupon applied: ' + couponDiscount + '% off on ₹' + minimumPurchase + '+ purchases.');
+            } else if (minimumPurchase > 0 && minimumPurchase - 0.01 < minimumPurchase) {
+                alert("Coupon will be applicable only on ₹" + minimumPurchase + '+ pruchases.')
+            }
+
+            $('.cart-total').html('<i class="bi bi-currency-rupee"></i>' + total.toFixed(2));
+            $('.cart-discount').html('- <i class="bi bi-currency-rupee"></i>' + discount.toFixed(2));
+            $('.cart-subtotal').html('<i class="bi bi-currency-rupee"></i>' + subtotal.toFixed(2));
+            $('.cart-tax').html('<i class="bi bi-currency-rupee"></i>' + tax.toFixed(2));
+            $('.cart-paying').html('<i class="bi bi-currency-rupee"></i>' + paying.toFixed(2));
+        }
+
+        // Quantity buttons
+        $('.plus').click(function () {
+            let input = $(this).siblings('.quantity');
+            let qty = parseInt(input.val()) || 0;
+            if (qty < 100) {
+                qty++;
+            }
+            updateSummary();
+        });
+
+        $('.minus').click(function () {
+            let input = $(this).siblings('.quantity');
+            let qty = parseInt(input.val()) || 0;
+            if (qty > 0) {
+                qty--;
+            }
+            updateSummary();
+        });
+
+        // HTMX response handler for coupon code
+        document.getElementById('coupon-code').addEventListener('htmx:afterRequest', function (event) {
+            try {
+                let response = JSON.parse(event.detail.xhr.responseText);
+                if (response.valid) {
+                    couponDiscount = response.discount_per;
+                    minimumPurchase = response.min_purchase;
+                } else {
+                    couponDiscount = 0;
+                    minimumPurchase = 0;
+                    alert('Invalid coupon code.');
+                }
+
+                updateSummary();
+            } catch (e) {
+                console.error("Invalid JSON or error parsing coupon response:", e);
+            }
+        });
+
+        // Initial summary calculation
+        updateSummary();
+
+
+        // validation for Country, State, City, Street
+        $.validator.addMethod("noSpace", function(value, element){
+            return this.optional(element) || (value.trim().length === value.length);
+        }, "Spaces are not allowed");
+
+        $.validator.addMethod("noNumbers", function(value, element) {
+            return this.optional(element) || /^[^0-9]+$/.test(value);
+        }, "Numbers are not allowed");
+
+        $.validator.addMethod("noSpecialChars", function (value, element) {
+            return this.optional(element) || /^[a-zA-Z0-9 ]+$/.test(value);
+        }, "Special Charactors are not allowed");
+
+
+        $('#orderForm').validate({
+            rules: {
+                country: {
+                    required: true,
+                },
+                state: {
+                    required: true,
+                },
+                city: {
+                    required: true,
+                },
+                area: {
+                    required: true,
+                },
+                address: {
+                    required: true,
+                    minlength: 3,
+                    maxlength: 100,
+                    noSpace: true
+                }
+            },
+            messages: {
+                country: {
+                    required: 'Please select country',
+                },
+                state: {
+                    required: 'Please select state',
+                },
+                city: {
+                    required: 'Please select city',
+                },
+                area: {
+                    required: 'Please select area',
+                },
+                address: {
+                    required: 'Please enter address',
+                    minlength: 'Minimum 3 characters required',
+                    maxlength: 'Maximum 100 characters allowed',
+                    noSpace: "Spaces are not allowed"
+                }
+            },
+            submitHandler: function(form){
+                form.submit();
+            }
+        });
+
+
+        // When country get changes, related states will be shown
+        $('.country').change(function () {
+            var countryId = $(this).val();
+            if (countryId) {
+                $.ajax({
+                    url: "{% url 'get_states' %}",
+                    data: {
+                        'country_id': countryId
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        $('.state').empty();
+                        $('.state').append('<option value="">Select State</option>');
+                        $.each(data.states, function (index, state) {
+                            $('.state').append(
+                                $('<option>').val(state.id).text(state.state_name)
+                            );
+                        });
+
+                        // Clear city and area dropdowns
+                        $('.city').empty();
+                        $('.city').append('<option value=""> Select City</option>');
+                        $('.area').empty();
+                        $('.area').append('<option value=""> Select Area</option>');
+                    }
+                });
+            } else {
+                $('.state').empty();
+                $('.state').append('<option value=""> Select State</option>');
+                $('.city').empty();
+                $('.city').append('<option value=""> Select City</option>');
+                $('.area').empty();
+                $('.area').append('<option value=""> Select Area</option>');
+            }
+        });
+
+        // When state get changes, related city will be shown
+        $('.state').change(function () {
+            var stateId = $(this).val();
+            if (stateId) {
+                $.ajax({
+                    url: "{% url 'get_cities' %}",
+                    data: {
+                        'state_id': stateId
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        $('.city').empty();
+                        $('.city').append('<option value="">Select City</option>');
+                        $.each(data.cities, function (index, city) {
+                            $('.city').append(
+                                $('<option>').val(city.id).text(city.city_name)
+                            );
+                        });
+
+                        // Clear area dropdowns
+                        $('.area').empty();
+                        $('.area').append('<option value=""> Select Area</option>');
+                    }
+                });
+            } else {
+                $('.city').empty();
+                $('.city').append('<option value=""> Select City</option>');
+                $('.area').empty();
+                $('.area').append('<option value=""> Select Area</option>');
+            }
+        });
+
+
+        // When city get changes, related area will be shown
+        $('.city').change(function () {
+            var cityId = $(this).val();
+            if (cityId) {
+                $.ajax({
+                    url: "{% url 'get_areas' %}",
+                    data: {
+                        'city_id': cityId
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        $('.area').empty();
+                        $('.area').append('<option value="">Select Area</option>');
+                        $.each(data.areas, function (index, area) {
+                            $('.area').append(
+                                $('<option>').val(area.id).text(area.area_name)
+                            );
+                        });
+                    }
+                });
+            } else {
+                $('.area').empty();
+                $('.area').append('<option value=""> Select Area</option>');
+            }
+        });
+    });
+
+</script>
+
+{% endblock %}
