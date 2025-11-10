@@ -6,7 +6,6 @@ from django.db import transaction
 from django.contrib import messages
 from datetime import datetime
 from django.views import View
-# from .models import UserRegistration, UserProfileSetup
 from django.core.mail import send_mail
 import random
 import requests
@@ -43,38 +42,6 @@ def send_otp_on_email(email, subject, message):
     recipient_list = [f"{email}"] # It contain multiple email-address on them we want to send same email.
     send_mail(subject, message, from_email, recipient_list)
 
-
-# To send OTP on Phone Number (Not implimented)
-def send_on_number(number, subject, message):
-    api_key = "8c79945a-4ccb-11f0-a562-0200cd936042"
-    
-    url = f"https://2factor.in/API/V1/{api_key}/ADDON_SERVICES/SEND/TSMS"
-
-    full_message = f"{subject}: {message}"
-
-    payload = {
-        "From": "TXTIND",  
-        "To": number,
-        "Msg": full_message
-    }
-
-    headers = {
-        'Content-Type': "application/json"
-    }
-
-    try:
-        response = requests.post(url, data=json.dumps(payload), headers=headers)
-        print("2Factor response:", response.text)
-        
-        if response.status_code == 200:
-            return True
-        else:
-            return False
-        
-    except Exception as e:
-        print(f"Error sending SMS: {e}")
-        return redirect('forget-pass')
-    
     
 def sign_up(request):
     try:
@@ -160,27 +127,7 @@ def forget_password(request):
     if request.method == 'POST':
         user_credentrial = request.POST.get('forgetpass', '').strip()
        
-        try:          
-            # email and phone number      
-            # user = UserRegistration.objects.filter(
-            #     Q(email__iexact=user_credentrial) |
-            #     Q(phone_number__iexact=user_credentrial)
-            #     ).first()
-            
-            # if user.email == user_credentrial:
-            #     subject = 'E-Commerce Shopping LogIn Credentails'
-            #     message = f"Registered Username: {user.username}\nRegistered Password: {user.password}"
-            #     send_otp_on_email(user.email , subject, message)
-            #     messages.success(request, "Please Check your Email.")
-            #     return redirect('signIn')
-            # elif user.phone_number == user_credentrial:
-            #     subject = 'E-Commerce Shopping LogIn Credentails'
-            #     message = f"Registered Username: {user.username}\nRegistered Password: {user.password}"
-            #     send_on_number(user.phone_number, subject, message)
-            #     messages.success(request, "Please Check your Phone SMS.")
-            #     return redirect('signIn')
-            
-            # only with email
+        try:
             user = UserRegistration.objects.filter(email__iexact= user_credentrial).first()
             
             if user:
@@ -218,27 +165,27 @@ def otp_page(request, user_id):
     return render(request, 'userAuthentication/otp_page.html', {'user_id': user.id})
 
 
-def otp_page_2(request, user_id):
+# def otp_page_2(request, user_id):
     
-    user  = get_object_or_404(UserRegistration, id=user_id)
-    print(":;sdjfpasdfhieofpejfo", user.otp, type(user.otp))
-    if request.method == "POST":
-        digit1 = request.POST.get('digit1')
-        digit2 = request.POST.get('digit2')
-        digit3 = request.POST.get('digit3')
-        digit4 = request.POST.get('digit4')
+#     user  = get_object_or_404(UserRegistration, id=user_id)
+#     print(":;sdjfpasdfhieofpejfo", user.otp, type(user.otp))
+#     if request.method == "POST":
+#         digit1 = request.POST.get('digit1')
+#         digit2 = request.POST.get('digit2')
+#         digit3 = request.POST.get('digit3')
+#         digit4 = request.POST.get('digit4')
         
-        user_otp = digit1 + digit2 + digit3 + digit4
-        print("ojfsfsjfjioofjf", user_otp)
-        if user.otp == user_otp:
-            user.status = True
-            user.save()
-            messages.success(request, "Registration Successfull.")
-            return redirect('signIn')
-        messages.warning(request, "Please enter valid OTP")
-        return redirect('otp-2', user.id)
+#         user_otp = digit1 + digit2 + digit3 + digit4
+#         print("ojfsfsjfjioofjf", user_otp)
+#         if user.otp == user_otp:
+#             user.status = True
+#             user.save()
+#             messages.success(request, "Registration Successfull.")
+#             return redirect('signIn')
+#         messages.warning(request, "Please enter valid OTP")
+#         return redirect('otp-2', user.id)
    
-    return render(request, 'userAuthentication/otp_page2.html', {'user_id': user.id})
+#     return render(request, 'userAuthentication/otp_page2.html', {'user_id': user.id})
 
 @session_login_required
 def profile(request):
@@ -463,7 +410,7 @@ def related_products(request):
     elif sub:
         query_in = Q(product__sub_category_ref__sub_category__iexact=sub)
     product = InventoryItem.objects.filter(query_in, allocated_quantity__gt=0).select_related('product').prefetch_related('product__images')
-    print('Poooooooooooooo ', product)
+    
     if main:
         categorized_product = {}
         for m in product:
@@ -477,7 +424,7 @@ def related_products(request):
                     if i.product.sub_category_ref.sub_category == sub_cat:
                         product_list.append(i)
                 categorized_product[sub_cat] = product_list
-        print("rrrrrrrrrrrrrrrrrr --", categorized_product)
+        
         
         context = {
         'categorized_product': categorized_product,
@@ -498,11 +445,11 @@ def add_to_cart(request, pk):
 
             # Quantity Increment/Decrement
             qty = request.POST.get('qty')
-            print("pppppppppppppp QTY", qty)
+            
             
             if qty:
                 cart = get_object_or_404(Cart, id=pk, user=user)
-                print("cccccccccccccccc Cart", cart)
+                
 
                 inventory_item = InventoryItem.objects.filter(product=cart.product, allocated_quantity__gt=0, inventory_status=True)
                 print("fhoajhadsgohgaj", inventory_item[0].id)
