@@ -19,7 +19,7 @@ urlpatterns = [
      path('sign-out/', views.sign_out, name='sign-out'),
      path('forget-password/', views.forget_password, name='forget-pass'),
      path('otp-configration/<int:user_id>', views.otp_page, name='otp'),
-     path('otp-configration-2/', views.otp_page_2, name='otp-2'),
+     # path('otp-configration-2/', views.otp_page_2, name='otp-2'),
      
      # One time Profile Setup
      path('user-profile', views.profile, name='profile'),
